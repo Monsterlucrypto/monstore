@@ -11,7 +11,7 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, activePath, title }: LayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
