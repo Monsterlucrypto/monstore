@@ -19,7 +19,10 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
     const check = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) setCollapsed(true);
+      if (mobile) {
+        setCollapsed(true);
+        setMobileOpen(false);
+      }
     };
     check();
     window.addEventListener("resize", check);
@@ -39,19 +42,17 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
         input { color-scheme: dark; }
 
-        @media (max-width: 768px) {
-          .mobile-menu-btn { display: flex !important; }
-          .header-search { display: none !important; }
-          .wallet-addr { display: none !important; }
-          .mobile-overlay { display: block !important; }
-        }
+        /* ── RWD 字體自動縮放 ── */
+        html { font-size: 16px; }
+        @media (max-width: 1024px) { html { font-size: 15px; } }
+        @media (max-width: 768px)  { html { font-size: 14px; } }
+        @media (max-width: 480px)  { html { font-size: 13px; } }
 
+        /* ── RWD Grid 自動換行 ── */
         @media (max-width: 1024px) {
           .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
           .grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
-          .grid-2 { grid-template-columns: 1fr !important; }
         }
-
         @media (max-width: 640px) {
           .grid-4 { grid-template-columns: 1fr !important; }
           .grid-3 { grid-template-columns: 1fr !important; }
@@ -60,32 +61,72 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
           .hero-row { grid-template-columns: 1fr !important; }
           .founder-benefits { grid-template-columns: repeat(2, 1fr) !important; }
         }
+
+        /* ── 手機 Header 元素 ── */
+        .mobile-menu-btn { display: none !important; }
+        .header-search { display: flex; }
+        .wallet-addr { display: inline; }
+
+        @media (max-width: 768px) {
+          .mobile-menu-btn { display: flex !important; }
+          .header-search { display: none !important; }
+          .wallet-addr { display: none !important; }
+        }
       `}</style>
 
       <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0b" }}>
-        {/* 手機時側欄用 overlay 方式顯示 */}
-        <div style={{ position: "fixed", top: 0, left: isMobile && !mobileOpen ? -240 : 0, zIndex: 100, transition: "left 0.25s ease" }}>
+
+        {/* 手機遮罩 — 點擊關閉側欄 */}
+        {isMobile && mobileOpen && (
+          <div
+            onClick={() => setMobileOpen(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 99, backdropFilter: "blur(2px)" }}
+          />
+        )}
+
+        {/* Sidebar — 手機用 overlay，桌機用 fixed */}
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: isMobile ? (mobileOpen ? 0 : -240) : 0,
+            zIndex: 100,
+            transition: "left 0.25s ease",
+            height: "100vh",
+          }}
+        >
           <Sidebar
             activePath={activePath}
             collapsed={isMobile ? false : collapsed}
             onToggle={() => {
-              if (isMobile) setMobileOpen(false);
-              else setCollapsed(!collapsed);
+              if (isMobile) {
+                setMobileOpen(false);
+              } else {
+                setCollapsed(!collapsed);
+              }
             }}
           />
         </div>
 
-        {/* 手機遮罩 */}
-        {isMobile && mobileOpen && (
-          <div onClick={() => setMobileOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 99 }} />
-        )}
-
-        <main style={{ marginLeft: sidebarWidth, flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh", transition: "margin-left 0.25s ease" }}>
+        {/* 主內容 */}
+        <main
+          style={{
+            marginLeft: sidebarWidth,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "100vh",
+            transition: "margin-left 0.25s ease",
+          }}
+        >
           <Header
             title={title}
             onMenuClick={isMobile ? () => setMobileOpen(true) : undefined}
           />
-          <div className="content-pad" style={{ padding: 32, flex: 1 }}>
+          <div
+            className="content-pad"
+            style={{ padding: 32, flex: 1 }}
+          >
             {children}
           </div>
         </main>
