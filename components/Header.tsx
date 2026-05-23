@@ -2,7 +2,6 @@
 
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
-  bgPrimary: "#0a0a0b",
   borderSubtle: "rgba(201,168,76,0.12)", borderMid: "rgba(201,168,76,0.25)",
   textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#4a4740",
 };
@@ -26,16 +25,17 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
         borderBottom: `0.5px solid ${C.borderSubtle}`,
         display: "flex",
         alignItems: "center",
-        padding: "0 20px",
-        gap: 12,
+        padding: "0 16px",
+        gap: 10,
         position: "sticky",
         top: 0,
         zIndex: 50,
-        background: "rgba(10,10,11,0.92)",
+        background: "rgba(10,10,11,0.95)",
         backdropFilter: "blur(20px)",
+        flexShrink: 0,
       }}
     >
-      {/* 漢堡選單按鈕 — 只在手機顯示 */}
+      {/* 漢堡按鈕 — 只在手機傳入 onMenuClick 時顯示 */}
       {onMenuClick && (
         <button
           onClick={onMenuClick}
@@ -44,9 +44,7 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
             border: `0.5px solid ${C.borderSubtle}`,
             borderRadius: 8,
             width: 36, height: 36,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer",
             color: C.textSecondary,
             fontSize: 18,
@@ -57,6 +55,7 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
         </button>
       )}
 
+      {/* 頁面標題 */}
       <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 400, color: C.textPrimary, letterSpacing: 0.5, whiteSpace: "nowrap" }}>
         {title}
       </div>
@@ -93,10 +92,10 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
           flexShrink: 0,
         }}>
           🔔
-          <div style={{ position: "absolute", top: 7, right: 7, width: 6, height: 6, background: C.gold, borderRadius: "50%", border: `1.5px solid #0a0a0b` }} />
+          <div style={{ position: "absolute", top: 7, right: 7, width: 6, height: 6, background: C.gold, borderRadius: "50%", border: "1.5px solid #0a0a0b" }} />
         </div>
 
-        {/* 使用者頭像 + 錢包 */}
+        {/* 使用者 */}
         <div style={{
           display: "flex", alignItems: "center", gap: 8,
           padding: "6px 10px",

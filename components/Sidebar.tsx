@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
   borderSubtle: "rgba(201,168,76,0.12)", borderMid: "rgba(201,168,76,0.25)",
@@ -32,52 +30,50 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activePath, collapsed, onToggle, isMobile = false }: SidebarProps) {
-  const w = isMobile ? "80vw" : collapsed ? 64 : 240;
+  const w = isMobile ? 260 : collapsed ? 64 : 240;
 
   return (
     <aside
       style={{
         width: w,
-        maxWidth: isMobile ? 300 : undefined,
         minHeight: "100vh",
-        background: "rgba(14,14,18,0.98)",
+        height: "100%",
+        background: "rgba(14,14,18,0.99)",
         borderRight: `0.5px solid ${C.borderSubtle}`,
         display: "flex",
         flexDirection: "column",
-        position: "fixed",
-        top: 0, left: 0,
-        zIndex: 100,
         paddingBottom: 24,
-        transition: "width 0.25s ease",
         overflow: "hidden",
+        transition: "width 0.25s ease",
       }}
     >
-      {/* Logo + 折疊按鈕 */}
+      {/* Logo + 按鈕 */}
       <div style={{
-        padding: "20px 14px 18px",
+        padding: "18px 14px",
         borderBottom: `0.5px solid ${C.borderSubtle}`,
         display: "flex",
         alignItems: "center",
         gap: 10,
         justifyContent: collapsed && !isMobile ? "center" : "flex-start",
         minHeight: 64,
+        flexShrink: 0,
       }}>
-        <div style={{ width: 36, height: 36, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
+        {/* Logo 圖片 */}
+        <div style={{ width: 34, height: 34, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
           <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
 
-        {/* 品牌名稱：桌機折疊時隱藏，手機永遠顯示 */}
+        {/* 品牌名稱 */}
         {(!collapsed || isMobile) && (
-          <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, letterSpacing: 1, whiteSpace: "nowrap", overflow: "hidden" }}>
+          <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, letterSpacing: 1, whiteSpace: "nowrap", flex: 1 }}>
             Mon<span style={{ color: C.gold }}>store</span>
           </div>
         )}
 
-        {/* 折疊按鈕：手機版改成 ✕ 關閉，桌機版是 ◀ / ▶ */}
+        {/* 按鈕：手機顯示 ✕，桌機顯示 ◀/▶ */}
         <button
           onClick={onToggle}
           style={{
-            marginLeft: "auto",
             background: "transparent",
             border: `0.5px solid ${C.borderSubtle}`,
             borderRadius: 6,
@@ -85,9 +81,9 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
             display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer",
             color: C.textMuted,
-            fontSize: isMobile ? 16 : 11,
+            fontSize: isMobile ? 14 : 11,
             flexShrink: 0,
-            transition: "all 0.2s",
+            marginLeft: collapsed && !isMobile ? 0 : "auto",
           }}
         >
           {isMobile ? "✕" : collapsed ? "▶" : "◀"}
@@ -95,7 +91,7 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: "16px 10px", display: "flex", flexDirection: "column", gap: 2, overflowY: "auto" }}>
+      <nav style={{ flex: 1, padding: "14px 8px", display: "flex", flexDirection: "column", gap: 2, overflowY: "auto" }}>
         {navItems.map((item) => {
           const isActive = activePath === item.href;
           return (
@@ -107,7 +103,7 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
                 display: "flex",
                 alignItems: "center",
                 gap: collapsed && !isMobile ? 0 : 10,
-                padding: collapsed && !isMobile ? "10px 0" : "11px 12px",
+                padding: collapsed && !isMobile ? "10px 0" : "10px 12px",
                 justifyContent: collapsed && !isMobile ? "center" : "flex-start",
                 borderRadius: 8,
                 textDecoration: "none",
@@ -119,13 +115,12 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
                 position: "relative",
                 transition: "all 0.2s",
                 whiteSpace: "nowrap",
-                overflow: "hidden",
               }}
             >
               {isActive && (
                 <span style={{ position: "absolute", left: -1, top: "20%", height: "60%", width: 2, background: C.gold, borderRadius: "0 2px 2px 0" }} />
               )}
-              <span style={{ fontSize: 18, width: 22, textAlign: "center", flexShrink: 0 }}>{item.icon}</span>
+              <span style={{ fontSize: 17, width: 22, textAlign: "center", flexShrink: 0 }}>{item.icon}</span>
               {(!collapsed || isMobile) && item.label}
             </a>
           );
@@ -134,9 +129,9 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
 
       {/* 底部使用者 */}
       {(!collapsed || isMobile) && (
-        <div style={{ padding: "16px 10px 0", borderTop: `0.5px solid ${C.borderSubtle}` }}>
+        <div style={{ padding: "14px 8px 0", borderTop: `0.5px solid ${C.borderSubtle}`, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.goldLight, fontFamily: F.display, flexShrink: 0 }}>CL</div>
+            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display, flexShrink: 0 }}>CL</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12.5, fontWeight: 500, color: C.textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Chinglu</div>
               <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.mono }}>0x7f4a...3d8c</div>
@@ -147,8 +142,8 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
 
       {/* 折疊時只顯示頭像 */}
       {collapsed && !isMobile && (
-        <div style={{ padding: "16px 0 0", borderTop: `0.5px solid ${C.borderSubtle}`, display: "flex", justifyContent: "center" }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.goldLight, fontFamily: F.display }}>CL</div>
+        <div style={{ padding: "14px 0 0", borderTop: `0.5px solid ${C.borderSubtle}`, display: "flex", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display }}>CL</div>
         </div>
       )}
     </aside>
