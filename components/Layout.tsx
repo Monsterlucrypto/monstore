@@ -19,10 +19,7 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
     const check = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) {
-        setCollapsed(true);
-        setMobileOpen(false);
-      }
+      if (mobile) setMobileOpen(false);
     };
     check();
     window.addEventListener("resize", check);
@@ -42,13 +39,11 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
         input { color-scheme: dark; }
 
-        /* ── RWD 字體自動縮放 ── */
         html { font-size: 16px; }
         @media (max-width: 1024px) { html { font-size: 15px; } }
         @media (max-width: 768px)  { html { font-size: 14px; } }
         @media (max-width: 480px)  { html { font-size: 13px; } }
 
-        /* ── RWD Grid 自動換行 ── */
         @media (max-width: 1024px) {
           .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
           .grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
@@ -58,15 +53,11 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
           .grid-3 { grid-template-columns: 1fr !important; }
           .grid-2 { grid-template-columns: 1fr !important; }
           .content-pad { padding: 16px !important; }
-          .hero-row { grid-template-columns: 1fr !important; }
-          .founder-benefits { grid-template-columns: repeat(2, 1fr) !important; }
         }
 
-        /* ── 手機 Header 元素 ── */
         .mobile-menu-btn { display: none !important; }
         .header-search { display: flex; }
         .wallet-addr { display: inline; }
-
         @media (max-width: 768px) {
           .mobile-menu-btn { display: flex !important; }
           .header-search { display: none !important; }
@@ -76,35 +67,33 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
 
       <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0b" }}>
 
-        {/* 手機遮罩 — 點擊關閉側欄 */}
+        {/* 手機遮罩 */}
         {isMobile && mobileOpen && (
           <div
             onClick={() => setMobileOpen(false)}
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 99, backdropFilter: "blur(2px)" }}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 99, backdropFilter: "blur(3px)" }}
           />
         )}
 
-        {/* Sidebar — 手機用 overlay，桌機用 fixed */}
+        {/* Sidebar */}
         <div
           style={{
             position: "fixed",
             top: 0,
-            left: isMobile ? (mobileOpen ? 0 : -240) : 0,
+            left: isMobile ? (mobileOpen ? 0 : "-85vw") : 0,
             zIndex: 100,
-            transition: "left 0.25s ease",
             height: "100vh",
+            transition: "left 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           }}
         >
           <Sidebar
             activePath={activePath}
             collapsed={isMobile ? false : collapsed}
             onToggle={() => {
-              if (isMobile) {
-                setMobileOpen(false);
-              } else {
-                setCollapsed(!collapsed);
-              }
+              if (isMobile) setMobileOpen(false);
+              else setCollapsed(!collapsed);
             }}
+            isMobile={isMobile}
           />
         </div>
 
@@ -123,10 +112,7 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
             title={title}
             onMenuClick={isMobile ? () => setMobileOpen(true) : undefined}
           />
-          <div
-            className="content-pad"
-            style={{ padding: 32, flex: 1 }}
-          >
+          <div className="content-pad" style={{ padding: 32, flex: 1 }}>
             {children}
           </div>
         </main>
