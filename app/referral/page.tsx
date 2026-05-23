@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Layout from "@/components/Layout";
 
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
@@ -16,8 +17,6 @@ const F = {
 };
 
 const PTS_TO_USD = 0.0666;
-
-// 推薦獎勵規則：被推薦人購買 Founder Membership 金額的 10%
 const REFERRAL_RATE = 0.1;
 
 const founderTiers = [
@@ -54,7 +53,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-// 推薦總覽
 function ReferralSummary() {
   const [copied, setCopied] = useState(false);
 
@@ -65,18 +63,14 @@ function ReferralSummary() {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-      {/* 左：推薦碼 */}
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }} className="grid-2">
       <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 60%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, fontFamily: F.body }}>你的推薦碼</div>
         <div style={{ fontFamily: F.mono, fontSize: 28, fontWeight: 700, color: C.goldLight, letterSpacing: 3, marginBottom: 16 }}>{userReferral.code}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, padding: "10px 14px", marginBottom: 16 }}>
           <span style={{ flex: 1, fontSize: 11, color: C.textMuted, fontFamily: F.mono, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userReferral.link}</span>
-          <button
-            onClick={handleCopy}
-            style={{ fontSize: 11, color: copied ? "#5ea96e" : C.gold, background: "transparent", border: "none", cursor: "pointer", fontFamily: F.body, flexShrink: 0, padding: "2px 8px" }}
-          >
+          <button onClick={handleCopy} style={{ fontSize: 11, color: copied ? "#5ea96e" : C.gold, background: "transparent", border: "none", cursor: "pointer", fontFamily: F.body, flexShrink: 0, padding: "2px 8px" }}>
             {copied ? "✓ 已複製" : "複製連結"}
           </button>
         </div>
@@ -86,13 +80,12 @@ function ReferralSummary() {
         </div>
       </div>
 
-      {/* 右：統計數字 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} className="grid-2">
         {[
-          { label: "已推薦人數",   value: `${userReferral.totalReferred} 人`,               sub: "成功購買會員",          color: C.textPrimary },
+          { label: "已推薦人數",   value: `${userReferral.totalReferred} 人`,                sub: "成功購買會員",          color: C.textPrimary },
           { label: "累計獎勵積分", value: `${userReferral.totalEarned.toLocaleString()} pts`, sub: `≈ $${(userReferral.totalEarned * PTS_TO_USD).toFixed(2)} USD`, color: C.goldLight },
-          { label: "待確認積分",   value: `${userReferral.pendingPts.toLocaleString()} pts`, sub: "審核中，7 天內入帳",     color: "#c9954c" },
-          { label: "推薦回饋率",   value: "10%",                                              sub: "購買金額折合積分",      color: C.gold },
+          { label: "待確認積分",   value: `${userReferral.pendingPts.toLocaleString()} pts`,  sub: "審核中，7 天內入帳",    color: "#c9954c" },
+          { label: "推薦回饋率",   value: "10%",                                               sub: "購買金額折合積分",     color: C.gold },
         ].map((s) => (
           <div key={s.label} style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 12, padding: 18, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>{s.label}</div>
@@ -105,7 +98,6 @@ function ReferralSummary() {
   );
 }
 
-// 各階層推薦獎勵說明
 function RewardRules() {
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
@@ -116,8 +108,7 @@ function RewardRules() {
       <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 20 }}>
         被推薦人購買任何 Founder Membership 後，你立即獲得其購買金額 10% 折合積分
       </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }} className="grid-4">
         {founderTiers.map((t) => (
           <div key={t.name} style={{ background: t.colorDim, border: `0.5px solid ${t.colorBorder}`, borderRadius: 12, padding: 18 }}>
             <div style={{ fontSize: 12, fontWeight: 500, color: t.color, marginBottom: 12, fontFamily: F.body }}>{t.name}</div>
@@ -130,7 +121,6 @@ function RewardRules() {
           </div>
         ))}
       </div>
-
       <div style={{ marginTop: 20, background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, padding: "12px 16px", fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
         ✦ 積分換算匯率：1 pt = $0.0666 USD &nbsp;·&nbsp; 推薦獎勵於對方購買確認後 7 個工作天內入帳 &nbsp;·&nbsp; 無推薦人數上限
       </div>
@@ -138,7 +128,6 @@ function RewardRules() {
   );
 }
 
-// 推薦紀錄
 function ReferralHistory() {
   const statusColor = (s: string) => s === "已確認"
     ? { color: "#5ea96e", bg: "rgba(94,169,110,0.08)", border: "rgba(94,169,110,0.25)" }
@@ -150,14 +139,11 @@ function ReferralHistory() {
         <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>推薦紀錄</div>
         <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.mono }}>共 {referralHistory.length} 筆</span>
       </div>
-
-      {/* 表頭 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr 1.2fr 1fr 1fr 1fr", gap: 12, padding: "0 0 12px", borderBottom: `0.5px solid ${C.borderSubtle}`, marginBottom: 4 }}>
         {["日期", "錢包地址", "購買方案", "購買金額", "獲得積分", "狀態"].map((h) => (
           <div key={h} style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>{h}</div>
         ))}
       </div>
-
       {referralHistory.map((r, i) => {
         const sc = statusColor(r.status);
         return (
@@ -178,7 +164,6 @@ function ReferralHistory() {
   );
 }
 
-// 如何推薦步驟
 function HowItWorks() {
   const steps = [
     { num: "01", title: "複製推薦連結", desc: "在上方複製你的專屬推薦連結或推薦碼" },
@@ -190,7 +175,7 @@ function HowItWorks() {
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
       <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 24 }}>推薦流程</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, position: "relative" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }} className="grid-4">
         {steps.map((s, i) => (
           <div key={s.num} style={{ position: "relative" }}>
             {i < steps.length - 1 && (
@@ -210,81 +195,26 @@ function HowItWorks() {
 
 export default function ReferralPage() {
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0a0b; color: #f0ece0; font-family: 'DM Sans', system-ui, sans-serif; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
-      `}</style>
-      <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0b" }}>
-        <aside style={{ width: 240, minHeight: "100vh", background: "rgba(14,14,18,0.97)", borderRight: `0.5px solid rgba(201,168,76,0.12)`, position: "fixed", top: 0, left: 0, zIndex: 100, display: "flex", flexDirection: "column", paddingBottom: 24 }}>
-          <div style={{ padding: "20px 20px 18px", borderBottom: `0.5px solid rgba(201,168,76,0.12)`, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 8, overflow: "hidden", background: "#000", border: "0.5px solid rgba(201,168,76,0.25)", flexShrink: 0 }}>
-              <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-            </div>
-            <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: "#f0ece0", letterSpacing: 1 }}>
-              Mon<span style={{ color: C.gold }}>store</span>
-            </div>
-          </div>
-          <nav style={{ flex: 1, padding: "20px 12px", display: "flex", flexDirection: "column", gap: 2 }}>
-            {[
-              { label: "Dashboard",      icon: "⬡",  href: "/",            active: false },
-              { label: "VIP Membership", icon: "◈",  href: "/vip",         active: false },
-              { label: "Rewards",        icon: "✦",  href: "/rewards",     active: false },
-              { label: "Marketplace",    icon: "◻",  href: "/marketplace", active: false },
-              { label: "Founder Pass",   icon: "🥚", href: "/founder",     active: false },
-              { label: "Referral",       icon: "⟐",  href: "/referral",    active: true  },
-              { label: "Settings",       icon: "⊙",  href: "/settings",    active: false },
-            ].map((item) => (
-              <a key={item.label} href={item.href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, textDecoration: "none", color: item.active ? C.goldLight : "#8a8578", fontSize: 13.5, background: item.active ? "rgba(201,168,76,0.1)" : "transparent", border: `0.5px solid ${item.active ? "rgba(201,168,76,0.25)" : "transparent"}`, fontFamily: F.body, position: "relative", transition: "all 0.2s" }}>
-                {item.active && <span style={{ position: "absolute", left: -1, top: "20%", height: "60%", width: 2, background: C.gold, borderRadius: "0 2px 2px 0" }} />}
-                <span style={{ fontSize: 16, width: 20, textAlign: "center" }}>{item.icon}</span>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <div style={{ padding: "16px 12px 0", borderTop: `0.5px solid rgba(201,168,76,0.12)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, border: `0.5px solid rgba(201,168,76,0.12)` }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.goldLight, fontFamily: F.display, flexShrink: 0 }}>CL</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 500, color: "#f0ece0" }}>Chinglu</div>
-                <div style={{ fontSize: 10, color: "#4a4740", fontFamily: F.mono }}>0x7f4a...3d8c</div>
-              </div>
-            </div>
-          </div>
-        </aside>
-        <main style={{ marginLeft: 240, flex: 1, minHeight: "100vh" }}>
-          <header style={{ height: 64, borderBottom: `0.5px solid rgba(201,168,76,0.12)`, display: "flex", alignItems: "center", padding: "0 32px", position: "sticky", top: 0, zIndex: 50, background: "rgba(10,10,11,0.92)", backdropFilter: "blur(20px)" }}>
-            <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 400, color: "#f0ece0", letterSpacing: 0.5 }}>推薦計畫</div>
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, border: `0.5px solid rgba(201,168,76,0.12)` }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display }}>CL</div>
-              <span style={{ fontFamily: F.mono, fontSize: 11, color: "#8a8578" }}>0x7f4a...3d8c</span>
-            </div>
-          </header>
-          <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
-            <div>
-              <SectionLabel>推薦總覽</SectionLabel>
-              <ReferralSummary />
-            </div>
-            <div>
-              <SectionLabel>各方案推薦獎勵</SectionLabel>
-              <RewardRules />
-            </div>
-            <div>
-              <SectionLabel>推薦流程</SectionLabel>
-              <HowItWorks />
-            </div>
-            <div>
-              <SectionLabel>推薦紀錄</SectionLabel>
-              <ReferralHistory />
-            </div>
-            <div style={{ height: 8 }} />
-          </div>
-        </main>
+    <Layout activePath="/referral" title="推薦計畫">
+      <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
+        <div>
+          <SectionLabel>推薦總覽</SectionLabel>
+          <ReferralSummary />
+        </div>
+        <div>
+          <SectionLabel>各方案推薦獎勵</SectionLabel>
+          <RewardRules />
+        </div>
+        <div>
+          <SectionLabel>推薦流程</SectionLabel>
+          <HowItWorks />
+        </div>
+        <div>
+          <SectionLabel>推薦紀錄</SectionLabel>
+          <ReferralHistory />
+        </div>
+        <div style={{ height: 8 }} />
       </div>
-    </>
+    </Layout>
   );
 }

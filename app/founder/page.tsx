@@ -1,5 +1,5 @@
 "use client";
-
+import Layout from "@/components/Layout";
 import { useState } from "react";
 
 const C = {
@@ -22,6 +22,48 @@ const userFounder = {
   wallet: "0x7f4a...3d8c",
 };
 
+const founderTiers = [
+  {
+    name: "Founder Tier",
+    price: 5000,
+    slots: 20,
+    remaining: 3,
+    weight: "1.29%",
+    color: "#E8C96A",
+    colorDim: "rgba(232,201,106,0.12)",
+    colorBorder: "rgba(232,201,106,0.35)",
+  },
+  {
+    name: "Gold Tier",
+    price: 1000,
+    slots: 180,
+    remaining: 47,
+    weight: "0.24%",
+    color: "#C9A84C",
+    colorDim: "rgba(201,168,76,0.12)",
+    colorBorder: "rgba(201,168,76,0.3)",
+  },
+  {
+    name: "Silver Tier",
+    price: 300,
+    slots: 300,
+    remaining: 112,
+    weight: "0.07%",
+    color: "#a8a9ad",
+    colorDim: "rgba(168,169,173,0.1)",
+    colorBorder: "rgba(168,169,173,0.25)",
+  },
+  {
+    name: "Bronze Tier",
+    price: 100,
+    slots: 500,
+    remaining: 284,
+    weight: "0.02%",
+    color: "#cd7f32",
+    colorDim: "rgba(205,127,50,0.1)",
+    colorBorder: "rgba(205,127,50,0.25)",
+  },
+];
 const benefits = [
   {
     icon: "🥚", name: "永久 VIP",
@@ -202,42 +244,70 @@ function BenefitCards() {
 // 積分兌換說明
 function PricingSection() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-      <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
-        <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 20 }}>取得方式</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {[
-            { method: "積分兌換", price: "8,000 pts", usd: "≈ $532.8 USD", note: "最划算", highlight: true },
-            { method: "直接購買", price: "$599 USD", usd: "信用卡 / 加密貨幣", note: "", highlight: false },
-          ].map((p) => (
-            <div key={p.method} style={{ background: p.highlight ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.02)", border: `0.5px solid ${p.highlight ? C.borderMid : C.borderSubtle}`, borderRadius: 10, padding: 18, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, marginBottom: 4, fontFamily: F.body }}>{p.method}</div>
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{p.usd}</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: p.highlight ? C.goldLight : C.textSecondary }}>{p.price}</div>
-                {p.note && <div style={{ fontSize: 10, color: C.gold, marginTop: 4, fontFamily: F.body, background: "rgba(201,168,76,0.1)", padding: "2px 8px", borderRadius: 4 }}>{p.note}</div>}
-              </div>
-            </div>
-          ))}
-        </div>
-        {!userFounder.hasPass && (
-          <button style={{ width: "100%", marginTop: 20, background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "13px 0", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body }}>
-            立即取得 Founder Pass
-          </button>
-        )}
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* 說明文字 */}
+      <div style={{ background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: "12px 18px", fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+        ✦ 此為平台生態權益，非公司股權、股票或證券 &nbsp;·&nbsp; Founder Pool 最多占平台總生態收益 20% &nbsp;·&nbsp; Reward Weight 代表你在 Founder Pool 中的分潤比例
       </div>
 
-      <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
-        <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 20 }}>重要說明</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {/* 四個階層卡片 */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+        {founderTiers.map((t) => {
+          const soldPct = Math.round(((t.slots - t.remaining) / t.slots) * 100);
+          return (
+            <div key={t.name} style={{ background: t.colorDim, border: `0.5px solid ${t.colorBorder}`, borderRadius: 14, padding: 22, display: "flex", flexDirection: "column", gap: 14 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: t.color, marginBottom: 4, fontFamily: F.body, letterSpacing: 0.5 }}>{t.name}</div>
+                <div style={{ fontFamily: F.mono, fontSize: 26, fontWeight: 700, color: C.textPrimary, lineHeight: 1 }}>${t.price.toLocaleString()}</div>
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>一次性永久會員</div>
+              </div>
+
+              <div style={{ height: "0.5px", background: t.colorBorder }} />
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>Reward Weight</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color: t.color }}>{t.weight}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>總名額</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textSecondary }}>{t.slots}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>剩餘名額</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color: t.remaining < 20 ? "#c96060" : C.textPrimary }}>{t.remaining}</span>
+                </div>
+              </div>
+
+              {/* 售出進度 */}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
+                  <span>已售出</span>
+                  <span>{soldPct}%</span>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 3, height: 4, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${soldPct}%`, background: `linear-gradient(90deg, ${t.color}80, ${t.color})`, borderRadius: 3 }} />
+                </div>
+              </div>
+
+              <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, background: `linear-gradient(135deg, ${t.color}30, ${t.color}15)`, border: `0.5px solid ${t.colorBorder}`, color: t.color, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
+                立即加入
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 重要說明 */}
+      <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 14, padding: 24 }}>
+        <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, marginBottom: 16 }}>重要說明</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {[
-            { icon: "◎", text: "Founder Pass 與帳號永久綁定，不可轉讓" },
-            { icon: "✦", text: "嚴格限量 1,000 張，售完即止，不追加發行" },
-            { icon: "◈", text: "所有權益自購買當日起立即生效" },
-            { icon: "⟐", text: "持有期間可隨時查看專屬 Pass ID 與權益狀態" },
-            { icon: "◆", text: "平台若有重大調整，Founder 享有優先知情權" },
+            { icon: "◎", text: "Founder Membership 與帳號永久綁定，不可轉讓" },
+            { icon: "✦", text: "Reward Weight 代表你在 Founder Pool 的分潤權重，非公司股份" },
+            { icon: "◈", text: "Founder Pool 最多占平台總生態收益的 20%，每月自動分配" },
+            { icon: "⟐", text: "所有權益自購買當日起立即生效，月回饋次月開始計算" },
+            { icon: "◆", text: "各階層名額售完即止，不追加發行" },
           ].map((n, i) => (
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
               <span style={{ fontSize: 14, color: C.gold, flexShrink: 0, marginTop: 1 }}>{n.icon}</span>
@@ -249,7 +319,6 @@ function PricingSection() {
     </div>
   );
 }
-
 // FAQ
 function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
@@ -275,84 +344,30 @@ function FAQ() {
 
 export default function FounderPassPage() {
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0a0b; color: #f0ece0; font-family: 'DM Sans', system-ui, sans-serif; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
-      `}</style>
-      <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0b" }}>
-        <aside style={{ width: 240, minHeight: "100vh", background: "rgba(14,14,18,0.97)", borderRight: `0.5px solid rgba(201,168,76,0.12)`, position: "fixed", top: 0, left: 0, zIndex: 100, display: "flex", flexDirection: "column", paddingBottom: 24 }}>
-          <div style={{ padding: "20px 20px 18px", borderBottom: `0.5px solid rgba(201,168,76,0.12)`, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 8, overflow: "hidden", background: "#000", border: "0.5px solid rgba(201,168,76,0.25)", flexShrink: 0 }}>
-              <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-            </div>
-            <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: "#f0ece0", letterSpacing: 1 }}>
-              Mon<span style={{ color: C.gold }}>store</span>
-            </div>
+    <Layout activePath="/founder" title="Founder Pass">
+      <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
+        <HeroBanner />
+        {userFounder.hasPass && (
+          <div>
+            <SectionLabel>我的狀態</SectionLabel>
+            <MyFounderStatus />
           </div>
-          <nav style={{ flex: 1, padding: "20px 12px", display: "flex", flexDirection: "column", gap: 2 }}>
-            {[
-              { label: "Dashboard",      icon: "⬡",  href: "/",            active: false },
-              { label: "VIP Membership", icon: "◈",  href: "/vip",         active: false },
-              { label: "Rewards",        icon: "✦",  href: "/rewards",     active: false },
-              { label: "Marketplace",    icon: "◻",  href: "/marketplace", active: false },
-              { label: "Founder Pass",   icon: "🥚", href: "/founder",     active: true  },
-              { label: "Referral",       icon: "⟐",  href: "/referral",    active: false },
-              { label: "Settings",       icon: "⊙",  href: "/settings",    active: false },
-            ].map((item) => (
-              <a key={item.label} href={item.href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, textDecoration: "none", color: item.active ? C.goldLight : "#8a8578", fontSize: 13.5, background: item.active ? "rgba(201,168,76,0.1)" : "transparent", border: `0.5px solid ${item.active ? "rgba(201,168,76,0.25)" : "transparent"}`, fontFamily: F.body, position: "relative", transition: "all 0.2s" }}>
-                {item.active && <span style={{ position: "absolute", left: -1, top: "20%", height: "60%", width: 2, background: C.gold, borderRadius: "0 2px 2px 0" }} />}
-                <span style={{ fontSize: 16, width: 20, textAlign: "center" }}>{item.icon}</span>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <div style={{ padding: "16px 12px 0", borderTop: `0.5px solid rgba(201,168,76,0.12)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, border: `0.5px solid rgba(201,168,76,0.12)` }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: C.goldLight, fontFamily: F.display, flexShrink: 0 }}>CL</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 500, color: "#f0ece0" }}>Chinglu</div>
-                <div style={{ fontSize: 10, color: "#4a4740", fontFamily: F.mono }}>0x7f4a...3d8c</div>
-              </div>
-            </div>
-          </div>
-        </aside>
-        <main style={{ marginLeft: 240, flex: 1, minHeight: "100vh" }}>
-          <header style={{ height: 64, borderBottom: `0.5px solid rgba(201,168,76,0.12)`, display: "flex", alignItems: "center", padding: "0 32px", position: "sticky", top: 0, zIndex: 50, background: "rgba(10,10,11,0.92)", backdropFilter: "blur(20px)" }}>
-            <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 400, color: "#f0ece0", letterSpacing: 0.5 }}>Founder Pass</div>
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, border: `0.5px solid rgba(201,168,76,0.12)` }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display }}>CL</div>
-              <span style={{ fontFamily: F.mono, fontSize: 11, color: "#8a8578" }}>0x7f4a...3d8c</span>
-            </div>
-          </header>
-          <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
-            <HeroBanner />
-            {userFounder.hasPass && (
-              <div>
-                <SectionLabel>我的狀態</SectionLabel>
-                <MyFounderStatus />
-              </div>
-            )}
-            <div>
-              <SectionLabel>專屬權益</SectionLabel>
-              <BenefitCards />
-            </div>
-            <div>
-              <SectionLabel>取得方式與說明</SectionLabel>
-              <PricingSection />
-            </div>
-            <div>
-              <SectionLabel>常見問題</SectionLabel>
-              <FAQ />
-            </div>
-            <div style={{ height: 8 }} />
-          </div>
-        </main>
+        )}
+        <div>
+          <SectionLabel>專屬權益</SectionLabel>
+          <BenefitCards />
+        </div>
+        <div>
+          <SectionLabel>取得方式與說明</SectionLabel>
+          <PricingSection />
+        </div>
+        <div>
+          <SectionLabel>常見問題</SectionLabel>
+          <FAQ />
+        </div>
+        <div style={{ height: 8 }} />
       </div>
-    </>
+    </Layout>
   );
 }
+    

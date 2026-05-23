@@ -1,5 +1,5 @@
 "use client";
-
+import Layout from "@/components/Layout";
 import { useState } from "react";
 
 // ════════════════════════════════════════════════════════════
@@ -289,87 +289,22 @@ function MyOrders() {
 // ════════════════════════════════════════════════════════════
 export default function MarketplacePage() {
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0a0b; color: #f0ece0; font-family: 'DM Sans', system-ui, sans-serif; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
-      `}</style>
-
-      <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0b" }}>
-
-        {/* Sidebar */}
-        <aside style={{ width: 240, minHeight: "100vh", background: "rgba(14,14,18,0.97)", borderRight: `0.5px solid rgba(201,168,76,0.12)`, position: "fixed", top: 0, left: 0, zIndex: 100, display: "flex", flexDirection: "column", paddingBottom: 24 }}>
-          <div style={{ padding: "20px 20px 18px", borderBottom: `0.5px solid rgba(201,168,76,0.12)`, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 8, overflow: "hidden", background: "#000", border: "0.5px solid rgba(201,168,76,0.25)", flexShrink: 0 }}>
-              <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-            </div>
-            <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: "#f0ece0", letterSpacing: 1 }}>
-              Mon<span style={{ color: "#C9A84C" }}>store</span>
-            </div>
-          </div>
-          <nav style={{ flex: 1, padding: "20px 12px", display: "flex", flexDirection: "column", gap: 2 }}>
-            {[
-              { label: "Dashboard",      icon: "⬡", href: "/",             active: false },
-              { label: "VIP Membership", icon: "◈", href: "/vip",          active: false },
-              { label: "Rewards",        icon: "✦", href: "/rewards",      active: false },
-              { label: "Marketplace",    icon: "◻", href: "/marketplace",  active: true  },
-              { label: "Founder Pass",   icon: "🥚", href: "/founder",     active: false },
-              { label: "Referral",       icon: "⟐", href: "/referral",     active: false },
-              { label: "Settings",       icon: "⊙", href: "/settings",     active: false },
-            ].map((item) => (
-              <a key={item.label} href={item.href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, textDecoration: "none", color: item.active ? "#E8C96A" : "#8a8578", fontSize: 13.5, background: item.active ? "rgba(201,168,76,0.1)" : "transparent", border: `0.5px solid ${item.active ? "rgba(201,168,76,0.25)" : "transparent"}`, fontFamily: F.body, position: "relative", transition: "all 0.2s" }}>
-                {item.active && <span style={{ position: "absolute", left: -1, top: "20%", height: "60%", width: 2, background: "#C9A84C", borderRadius: "0 2px 2px 0" }} />}
-                <span style={{ fontSize: 16, width: 20, textAlign: "center" }}>{item.icon}</span>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <div style={{ padding: "16px 12px 0", borderTop: `0.5px solid rgba(201,168,76,0.12)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, border: `0.5px solid rgba(201,168,76,0.12)` }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#E8C96A", fontFamily: F.display, flexShrink: 0 }}>CL</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 500, color: "#f0ece0" }}>Chinglu</div>
-                <div style={{ fontSize: 10, color: "#4a4740", fontFamily: F.mono }}>0x7f4a...3d8c</div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* 主內容 */}
-        <main style={{ marginLeft: 240, flex: 1, minHeight: "100vh" }}>
-          <header style={{ height: 64, borderBottom: `0.5px solid rgba(201,168,76,0.12)`, display: "flex", alignItems: "center", padding: "0 32px", position: "sticky", top: 0, zIndex: 50, background: "rgba(10,10,11,0.92)", backdropFilter: "blur(20px)" }}>
-            <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 400, color: "#f0ece0", letterSpacing: 0.5 }}>會員商城</div>
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, border: `0.5px solid rgba(201,168,76,0.12)` }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#E8C96A", fontFamily: F.display }}>CL</div>
-              <span style={{ fontFamily: F.mono, fontSize: 11, color: "#8a8578" }}>0x7f4a...3d8c</span>
-            </div>
-          </header>
-
-          <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
-
-            <div>
-              <SectionLabel>積分概況</SectionLabel>
-              <PointsBanner />
-            </div>
-
-            <div>
-              <SectionLabel>商品列表</SectionLabel>
-              <ProductGrid />
-            </div>
-
-            <div>
-              <SectionLabel>我的訂單</SectionLabel>
-              <MyOrders />
-            </div>
-
-            <div style={{ height: 8 }} />
-          </div>
-        </main>
+    <Layout activePath="/marketplace" title="會員商城">
+      <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
+        <div>
+          <SectionLabel>積分概況</SectionLabel>
+          <PointsBanner />
+        </div>
+        <div>
+          <SectionLabel>商品列表</SectionLabel>
+          <ProductGrid />
+        </div>
+        <div>
+          <SectionLabel>我的訂單</SectionLabel>
+          <MyOrders />
+        </div>
+        <div style={{ height: 8 }} />
       </div>
-    </>
+    </Layout>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Layout from "@/components/Layout";
 
 const user = {
   name: "Chinglu",
@@ -19,28 +20,18 @@ const user = {
   current: "$2.84M",
 };
 
-const navItems = [
-  { label: "Dashboard",      icon: "⬡",  href: "/",            active: true,  badge: null },
-  { label: "VIP Membership", icon: "◈",  href: "/vip",         active: false, badge: null },
-  { label: "Rewards",        icon: "✦",  href: "/rewards",     active: false, badge: null },
-  { label: "Marketplace",    icon: "◻",  href: "/marketplace", active: false, badge: null },
-  { label: "Founder Pass",   icon: "🥚", href: "/founder",     active: false, badge: null },
-  { label: "Referral",       icon: "⟐",  href: "/referral",    active: false, badge: null },
-  { label: "Settings",       icon: "⊙",  href: "/settings",    active: false, badge: null },
-];
-
 const stats = [
-  { label: "本月交易量",  value: "$2.84M", change: "+18.4% 本月", up: true,  icon: "📈" },
-  { label: "累計交易量",  value: "$14.2M", change: "+6.1% 累計",  up: true,  icon: "⬡" },
-  { label: "已賺取佣金",  value: "$3,408", change: "+22.1% 本月", up: true,  icon: "💎" },
-  { label: "獎勵積分",    value: "12,480", change: "-340 已兌換", up: false, icon: "✦" },
+  { label: "本月交易量", value: "$2.84M", change: "+18.4% 本月", up: true,  icon: "📈" },
+  { label: "累計交易量", value: "$14.2M", change: "+6.1% 累計",  up: true,  icon: "⬡" },
+  { label: "已賺取佣金", value: "$3,408", change: "+22.1% 本月", up: true,  icon: "💎" },
+  { label: "獎勵積分",   value: "12,480", change: "-340 已兌換", up: false, icon: "✦" },
 ];
 
 const multipliers = [
-  { label: "基礎交易倍率",       value: "1.0×",  highlight: false },
-  { label: "Gold VIP 獎勵",      value: "+1.0×", highlight: false },
-  { label: "Founder Pass 獎勵",  value: "+0.5×", highlight: true  },
-  { label: "推薦獎勵",           value: "+0.1×", highlight: false },
+  { label: "基礎交易倍率",      value: "1.0×",  highlight: false },
+  { label: "Gold VIP 獎勵",     value: "+1.0×", highlight: false },
+  { label: "Founder Pass 獎勵", value: "+0.5×", highlight: true  },
+  { label: "推薦獎勵",          value: "+0.1×", highlight: false },
 ];
 
 const tierBenefits = [
@@ -52,9 +43,9 @@ const tierBenefits = [
 ];
 
 const products = [
-  { name: "Founder 帽T",   desc: "限量重磅刺繡 Logo 連帽衫", price: "2,400 pts", value: "≈ $96 · 享 30% 折扣",  tag: "Gold+",        icon: "🧥", locked: false },
-  { name: "限量鍵盤",       desc: "Keychron 聯名款，金色專屬鍵帽，65% 配列", price: "5,800 pts", value: "≈ $232 · 享 30% 折扣", tag: "Gold+", icon: "⌨️", locked: false },
-  { name: "VIP 黑卡",       desc: "金屬質感實體會員卡，附禮賓服務", price: "12,000 pts", value: "需達 Founder 等級", tag: "Founder Only", icon: "🃏", locked: true },
+  { name: "Founder 帽T",  desc: "限量重磅刺繡 Logo 連帽衫",          price: "2,400 pts",  value: "≈ $96 · 享 30% 折扣",  tag: "Gold+",        icon: "🧥", locked: false },
+  { name: "限量鍵盤",      desc: "Keychron 聯名款，金色專屬鍵帽，65% 配列", price: "5,800 pts", value: "≈ $232 · 享 30% 折扣", tag: "Gold+",        icon: "⌨️", locked: false },
+  { name: "VIP 黑卡",      desc: "金屬質感實體會員卡，附禮賓服務",      price: "12,000 pts", value: "需達 Founder 等級",    tag: "Founder Only", icon: "🃏", locked: true  },
 ];
 
 const founderBenefits = [
@@ -82,61 +73,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
       {children}
     </div>
-  );
-}
-
-function Sidebar() {
-  return (
-    <aside style={{ width: 240, minHeight: "100vh", background: "rgba(14,14,18,0.97)", borderRight: `0.5px solid ${C.borderSubtle}`, display: "flex", flexDirection: "column", position: "fixed", top: 0, left: 0, zIndex: 100, paddingBottom: 24 }}>
-      <div style={{ padding: "20px 20px 18px", borderBottom: `0.5px solid ${C.borderSubtle}`, display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 38, height: 38, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
-          <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-        </div>
-        <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.textPrimary, letterSpacing: 1 }}>
-          Mon<span style={{ color: C.gold }}>store</span>
-        </div>
-      </div>
-      <nav style={{ flex: 1, padding: "20px 12px", display: "flex", flexDirection: "column", gap: 2 }}>
-        {navItems.map((item) => (
-          <a key={item.label} href={item.href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, textDecoration: "none", color: item.active ? C.goldLight : C.textSecondary, fontSize: 13.5, background: item.active ? "rgba(201,168,76,0.1)" : "transparent", border: `0.5px solid ${item.active ? C.borderMid : "transparent"}`, fontFamily: F.body, position: "relative", transition: "all 0.2s" }}>
-            {item.active && <span style={{ position: "absolute", left: -1, top: "20%", height: "60%", width: 2, background: C.gold, borderRadius: "0 2px 2px 0" }} />}
-            <span style={{ fontSize: 16, width: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{item.icon}</span>
-            {item.label}
-          </a>
-        ))}
-      </nav>
-      <div style={{ padding: "16px 12px 0", borderTop: `0.5px solid ${C.borderSubtle}` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: `1.5px solid ${C.goldDim}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 500, color: C.goldLight, fontFamily: F.display, flexShrink: 0 }}>{user.initials}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 500, color: C.textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user.name}</div>
-            <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.mono }}>{user.wallet}</div>
-          </div>
-          <span style={{ color: C.textMuted, fontSize: 14 }}>⋯</span>
-        </div>
-      </div>
-    </aside>
-  );
-}
-
-function Header() {
-  return (
-    <header style={{ height: 64, borderBottom: `0.5px solid ${C.borderSubtle}`, display: "flex", alignItems: "center", padding: "0 32px", gap: 16, position: "sticky", top: 0, zIndex: 50, background: "rgba(10,10,11,0.92)", backdropFilter: "blur(20px)" }}>
-      <div style={{ flex: 1, maxWidth: 400, position: "relative" }}>
-        <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: C.textMuted }}>⌕</span>
-        <input type="text" placeholder="搜尋會員、獎勵、商品..." style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, padding: "8px 12px 8px 36px", color: C.textPrimary, fontSize: 13, fontFamily: F.body, outline: "none" }} />
-      </div>
-      <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 8, border: `0.5px solid ${C.borderSubtle}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, position: "relative", color: C.textSecondary }}>
-          🔔
-          <div style={{ position: "absolute", top: 7, right: 7, width: 6, height: 6, background: C.gold, borderRadius: "50%", border: `1.5px solid ${C.bgPrimary}` }} />
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}`, cursor: "pointer" }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: `1.5px solid ${C.goldDim}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 500, color: C.goldLight, fontFamily: F.display }}>{user.initials}</div>
-          <span style={{ fontFamily: F.mono, fontSize: 11, color: C.textSecondary }}>{user.wallet}</span>
-        </div>
-      </div>
-    </header>
   );
 }
 
@@ -213,7 +149,7 @@ function VIPProgress() {
 function StatCards() {
   const [hovered, setHovered] = useState<number | null>(null);
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }} className="grid-4">
       {stats.map((s, i) => (
         <div key={s.label} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} style={{ background: hovered === i ? C.bgCardHover : C.bgCard, border: `0.5px solid ${hovered === i ? C.borderMid : C.borderSubtle}`, borderRadius: 12, padding: 20, transition: "all 0.25s ease", transform: hovered === i ? "translateY(-2px)" : "none", cursor: "default", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)", opacity: hovered === i ? 1 : 0, transition: "opacity 0.25s" }} />
@@ -284,7 +220,7 @@ function Marketplace() {
         <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5 }}>會員專屬商城</div>
         <a href="/marketplace" style={{ fontSize: 12, color: C.gold, cursor: "pointer", textDecoration: "none" }}>瀏覽全部商品 →</a>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
         {products.map((p, i) => (
           <div key={p.name} onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)} style={{ background: C.bgCard, border: `0.5px solid ${i === 2 || hov === i ? C.borderMid : C.borderSubtle}`, borderRadius: 12, overflow: "hidden", transition: "all 0.25s ease", transform: hov === i ? "translateY(-2px)" : "none", cursor: "pointer" }}>
             <div style={{ height: 140, background: i === 2 ? "linear-gradient(135deg, #141209, #1a1810)" : "linear-gradient(135deg, #111116, #1a1a22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, borderBottom: `0.5px solid ${C.borderSubtle}`, position: "relative" }}>
@@ -325,7 +261,7 @@ function FounderPass() {
           <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>剩餘張數</div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, position: "relative", zIndex: 1 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, position: "relative", zIndex: 1 }} className="grid-4">
         {founderBenefits.map((b) => (
           <div key={b.name} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: 16 }}>
             <span style={{ fontSize: 20, marginBottom: 10, color: C.gold, display: "block" }}>{b.icon}</span>
@@ -351,51 +287,36 @@ function FounderPass() {
 
 export default function DashboardPage() {
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0a0b; color: #f0ece0; font-family: 'DM Sans', system-ui, sans-serif; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
-        input { color-scheme: dark; }
-      `}</style>
-      <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0b" }}>
-        <Sidebar />
-        <main style={{ marginLeft: 240, flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-          <Header />
-          <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
-            <div>
-              <SectionLabel>會員總覽</SectionLabel>
-              <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 24, alignItems: "start" }}>
-                <MemberCard />
-                <VIPProgress />
-              </div>
-            </div>
-            <div>
-              <SectionLabel>交易統計</SectionLabel>
-              <StatCards />
-            </div>
-            <div>
-              <SectionLabel>獎勵與權益</SectionLabel>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-                <RewardsPanel />
-                <BenefitsPanel />
-              </div>
-            </div>
-            <div>
-              <SectionLabel>商城預覽</SectionLabel>
-              <Marketplace />
-            </div>
-            <div>
-              <SectionLabel>Founder Pass</SectionLabel>
-              <FounderPass />
-            </div>
-            <div style={{ height: 8 }} />
+    <Layout activePath="/" title="Dashboard">
+      <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
+        <div>
+          <SectionLabel>會員總覽</SectionLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 24, alignItems: "start" }} className="grid-2">
+            <MemberCard />
+            <VIPProgress />
           </div>
-        </main>
+        </div>
+        <div>
+          <SectionLabel>交易統計</SectionLabel>
+          <StatCards />
+        </div>
+        <div>
+          <SectionLabel>獎勵與權益</SectionLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }} className="grid-2">
+            <RewardsPanel />
+            <BenefitsPanel />
+          </div>
+        </div>
+        <div>
+          <SectionLabel>商城預覽</SectionLabel>
+          <Marketplace />
+        </div>
+        <div>
+          <SectionLabel>Founder Pass</SectionLabel>
+          <FounderPass />
+        </div>
+        <div style={{ height: 8 }} />
       </div>
-    </>
+    </Layout>
   );
 }
