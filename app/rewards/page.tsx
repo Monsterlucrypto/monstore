@@ -41,7 +41,7 @@ const multipliers = [
 const howToBoost = [
   { icon: "◈", title: "升級至 Founder",    desc: "達到 $4M 月交易量，倍率提升至 3.0×",       action: "查看進度 →",    href: "/vip"      },
   { icon: "⟐", title: "推薦新會員",         desc: "每推薦一位新會員額外獲得 +0.1× 倍率加成",   action: "取得推薦連結 →", href: "/referral" },
-  { icon: "◆", title: "取得 Founder Pass", desc: "一次性永久獲得 +0.5× 積分倍率加成",         action: "了解更多 →",    href: "/founder"  },
+  { icon: "◆", title: "Founder Membership", desc: "取得 Lu Membership，參與 Monthly Reward Pool 月回饋分配", action: "了解更多 →", href: "/founder" },
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -160,7 +160,7 @@ function MultiplierBreakdown() {
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>目前積分倍率</div>
+        <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>獎勵明細</div>
         <div style={{ fontFamily: F.mono, fontSize: 28, fontWeight: 700, color: C.goldLight }}>2.6×</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
@@ -189,7 +189,7 @@ function HowToBoost() {
   const [hov, setHov] = useState<number | null>(null);
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
-      <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 20 }}>如何提升積分倍率</div>
+      <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 20 }}>如何提升獎勵</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
         {howToBoost.map((b, i) => (
           <div key={i} onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)}
@@ -218,19 +218,9 @@ export default function RewardsPage() {
           <SectionLabel>積分折合美金</SectionLabel>
           <USDConverter />
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }} className="grid-2">
-          <div>
-            <SectionLabel>積分倍率說明</SectionLabel>
-            <MultiplierBreakdown />
-          </div>
-          <div>
-            <SectionLabel>兌換紀錄</SectionLabel>
-            <RedeemHistory />
-          </div>
-        </div>
         <div>
-          <SectionLabel>如何提升積分倍率</SectionLabel>
-          <HowToBoost />
+          <SectionLabel>兌換紀錄</SectionLabel>
+          <RedeemHistory />
         </div>
         <div style={{ height: 8 }} />
       </div>

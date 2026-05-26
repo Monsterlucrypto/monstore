@@ -7,7 +7,7 @@ const user = {
   name: "Chinglu",
   wallet: "0x7f4a...3d8c",
   initials: "CL",
-  tier: "Gold",
+  tier: "Lu",
   isFounder: true,
   monthlyVolume: "$2.84M",
   totalVolume: "$14.2M",
@@ -27,19 +27,12 @@ const stats = [
   { label: "獎勵積分",   value: "12,480", change: "-340 已兌換", up: false, icon: "✦" },
 ];
 
-const multipliers = [
-  { label: "基礎交易倍率",      value: "1.0×",  highlight: false },
-  { label: "Gold VIP 獎勵",     value: "+1.0×", highlight: false },
-  { label: "Founder Pass 獎勵", value: "+0.5×", highlight: true  },
-  { label: "推薦獎勵",          value: "+0.1×", highlight: false },
-];
 
 const tierBenefits = [
   { label: "優先客服支援",  active: true,  tier: "" },
   { label: "商城 30% 折扣", active: true,  tier: "" },
-  { label: "2.5× 積分倍率", active: true,  tier: "" },
-  { label: "私人交易訊號",  active: false, tier: "Founder" },
-  { label: "專屬客戶經理",  active: false, tier: "Founder" },
+  { label: "私人交易訊號",  active: false, tier: "Lu" },
+  { label: "專屬客戶經理",  active: false, tier: "Lu" },
 ];
 
 const products = [
@@ -49,10 +42,9 @@ const products = [
 ];
 
 const founderBenefits = [
-  { icon: "🥚", name: "永久 VIP",     desc: "無論月交易量，永遠鎖定 Founder 等級" },
-  { icon: "⟐",  name: "專屬存取權",   desc: "私人訊號頻道、優先搶購、Alpha 群組" },
-  { icon: "✦",  name: "3× 積分倍率",  desc: "所有交易量享最高倍率，永久生效" },
-  { icon: "◎",  name: "專屬客戶經理", desc: "個人帳戶經理，24/7 直線支援" },
+  { icon: "◈",  name: "永久 VIP",          desc: "無論月交易量，永遠鎖定 Lu 等級" },
+  { icon: "⟐",  name: "專屬存取權",        desc: "私人訊號頻道、優先搶購、Alpha 群組" },
+  { icon: "◎",  name: "1,000 Reward Units", desc: "參與 Monthly Reward Pool 月回饋分配" },
 ];
 
 const C = {
@@ -82,9 +74,9 @@ function MemberCard() {
       <div style={{ position: "absolute", top: -40, right: -40, width: 200, height: 200, background: "radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.goldLight, letterSpacing: 2 }}>金色的蛋</div>
+          <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.goldLight, letterSpacing: 2 }}>Monstore</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {user.isFounder && <span style={{ background: "rgba(201,168,76,0.15)", border: `0.5px solid ${C.borderStrong}`, color: C.gold, fontSize: 9, letterSpacing: 1.5, padding: "4px 10px", borderRadius: 20, textTransform: "uppercase", fontWeight: 500 }}>🥚 Founder</span>}
+            {user.isFounder && <span style={{ background: "rgba(201,168,76,0.15)", border: `0.5px solid ${C.borderStrong}`, color: C.gold, fontSize: 9, letterSpacing: 1.5, padding: "4px 10px", borderRadius: 20, textTransform: "uppercase", fontWeight: 500 }}>◈ Founder</span>}
             <span style={{ fontFamily: F.display, fontSize: 13, fontWeight: 600, color: C.gold, letterSpacing: 2 }}>{user.tier.toUpperCase()}</span>
           </div>
         </div>
@@ -113,18 +105,18 @@ function VIPProgress() {
           <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🏆</div>
           <div>
             <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>目前等級</div>
-            <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.goldLight, letterSpacing: 1 }}>Gold 會員</div>
+            <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.goldLight, letterSpacing: 1 }}>Lu Membership</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
-          {["Bronze", "Silver", "Gold", "Founder"].map((t, i) => (
-            <div key={t} title={t} style={{ height: 4, width: 28, borderRadius: 2, background: i < 2 ? C.gold : i === 2 ? `linear-gradient(90deg, ${C.gold} 60%, transparent)` : "rgba(255,255,255,0.04)", border: i < 3 ? `0.5px solid ${C.gold}` : `0.5px solid ${C.borderSubtle}` }} />
+          {["N", "O", "M", "Lu"].map((t, i) => (
+            <div key={t} title={t} style={{ height: 4, width: 28, borderRadius: 2, background: i < 3 ? C.gold : `linear-gradient(90deg, ${C.gold}, ${C.goldLight})`, border: `0.5px solid ${C.gold}` }} />
           ))}
         </div>
       </div>
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-          <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>距離 Founder 還差 <strong style={{ color: C.gold, fontFamily: F.mono }}>{user.remaining}</strong></div>
+          <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>已達最高 Lu Membership 等級 <strong style={{ color: C.gold, fontFamily: F.mono }}>✓</strong></div>
           <span style={{ fontFamily: F.mono, fontSize: 12, color: C.gold }}>{user.progressPct}%</span>
         </div>
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, height: 6, overflow: "hidden" }}>
@@ -135,12 +127,6 @@ function VIPProgress() {
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        {[{ label: "佣金費率", value: "0.12%" }, { label: "積分倍率", value: "2.5×" }].map((s) => (
-          <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, padding: 12 }}>
-            <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, marginBottom: 4, textTransform: "uppercase", fontFamily: F.body }}>{s.label}</div>
-            <div style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: C.goldLight }}>{s.value}</div>
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -163,32 +149,6 @@ function StatCards() {
   );
 }
 
-function RewardsPanel() {
-  return (
-    <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 24 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>積分倍率</div>
-        <span style={{ fontSize: 11, color: C.gold, cursor: "pointer" }}>查看全部 →</span>
-      </div>
-      {multipliers.map((m) => (
-        <div key={m.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `0.5px solid ${C.borderSubtle}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.highlight ? C.goldLight : C.gold, flexShrink: 0 }} />
-            <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body }}>{m.label}</span>
-          </div>
-          <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{m.value}</span>
-        </div>
-      ))}
-      <div style={{ background: "rgba(201,168,76,0.04)", borderRadius: 8, padding: 12, border: `0.5px solid ${C.borderSubtle}`, marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: C.gold, flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, fontFamily: F.body }}>總倍率</span>
-        </div>
-        <span style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: C.goldLight }}>2.6×</span>
-      </div>
-    </div>
-  );
-}
 
 function BenefitsPanel() {
   return (
@@ -252,13 +212,32 @@ function FounderPass() {
     <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 60%, #0d0d12 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 32, position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -60, right: -60, width: 260, height: 260, background: "radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, position: "relative", zIndex: 1 }}>
-        <div>
-          <div style={{ fontFamily: F.display, fontSize: 26, fontWeight: 300, color: C.textPrimary, letterSpacing: 1, marginBottom: 6 }}>加入核心圈子</div>
-          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 0.5, fontFamily: F.body }}>一次性永久升級 · 無月費 · 終身權益</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <svg width={114} height={60} viewBox="0 0 114 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="dp_gt" x1="0" y1="0" x2="114" y2="60" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#F5E070"/><stop offset="45%" stopColor="#E8C96A"/><stop offset="100%" stopColor="#B08020"/>
+              </linearGradient>
+              <linearGradient id="dp_shine" x1="0" y1="0" x2="0" y2="60" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.22)"/><stop offset="60%" stopColor="rgba(255,255,255,0)"/>
+              </linearGradient>
+            </defs>
+            <path d="M 5,0 H 109 Q 114,0 114,5 V 20 A 10,10 0 0,0 114,40 V 55 Q 114,60 109,60 H 5 Q 0,60 0,55 V 40 A 10,10 0 0,1 0,20 V 5 Q 0,0 5,0 Z" fill="url(#dp_gt)"/>
+            <path d="M 5,0 H 109 Q 114,0 114,5 V 20 A 10,10 0 0,0 114,40 V 55 Q 114,60 109,60 H 5 Q 0,60 0,55 V 40 A 10,10 0 0,1 0,20 V 5 Q 0,0 5,0 Z" fill="url(#dp_shine)"/>
+            <path d="M 5,0 H 109 Q 114,0 114,5 V 20 A 10,10 0 0,0 114,40 V 55 Q 114,60 109,60 H 5 Q 0,60 0,55 V 40 A 10,10 0 0,1 0,20 V 5 Q 0,0 5,0 Z" fill="none" stroke="rgba(255,245,180,0.5)" strokeWidth="0.75"/>
+            {[14,21,28,35,42,49,56,63,70,77,84,91,98].map((x,i) => <rect key={i} x={x} y={29.25} width={4} height={1.5} fill="rgba(80,50,5,0.3)" rx={0.5}/>)}
+            <text x="57" y="22" textAnchor="middle" fontFamily="'Cormorant Garamond',Georgia,serif" fontSize="13" fontWeight="600" fill="rgba(55,35,5,0.8)" letterSpacing="3">FOUNDER</text>
+            <text x="57" y="44" textAnchor="middle" fontFamily="'DM Sans',system-ui,sans-serif" fontSize="7" fontWeight="500" fill="rgba(55,35,5,0.6)" letterSpacing="2">MEMBERSHIP</text>
+          </svg>
+          <div>
+            <div style={{ fontFamily: F.display, fontSize: 13, color: C.gold, letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>Founder Membership</div>
+            <div style={{ fontFamily: F.display, fontSize: 26, fontWeight: 300, color: C.textPrimary, letterSpacing: 1, marginBottom: 6 }}>Lu · M · O · N</div>
+            <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 0.5, fontFamily: F.body }}>Reward Weight · Monthly Reward Pool · Ecosystem Growth</div>
+          </div>
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ fontFamily: F.display, fontSize: 36, fontWeight: 300, color: C.gold, lineHeight: 1 }}>273</div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>剩餘張數</div>
+          <div style={{ fontFamily: F.display, fontSize: 36, fontWeight: 300, color: C.gold, lineHeight: 1 }}>500</div>
+          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Genesis Units</div>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, position: "relative", zIndex: 1 }} className="grid-4">
@@ -271,15 +250,14 @@ function FounderPass() {
         ))}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 16, position: "relative", zIndex: 1, fontSize: 11, color: C.textMuted, fontFamily: F.body }}>
-        <span style={{ whiteSpace: "nowrap" }}>727 / 1,000 已售出</span>
+        <span style={{ whiteSpace: "nowrap" }}>Genesis Release 開放中</span>
         <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.04)", borderRadius: 2, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: "72.7%", background: `linear-gradient(90deg, ${C.goldDim}, ${C.gold})` }} />
+          <div style={{ height: "100%", width: "5%", background: `linear-gradient(90deg, ${C.goldDim}, ${C.gold})` }} />
         </div>
-        <span style={{ whiteSpace: "nowrap", color: C.gold }}>剩 273 張</span>
+        <span style={{ whiteSpace: "nowrap", color: C.gold }}>500 / 10,000 Units</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 24, position: "relative", zIndex: 1 }}>
-        <button style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "11px 28px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>取得 Founder Pass — 8,000 積分</button>
-        <button style={{ background: "transparent", border: `0.5px solid ${C.borderMid}`, color: C.textSecondary, padding: "11px 24px", borderRadius: 8, fontSize: 13, cursor: "pointer", fontFamily: F.body }}>了解更多</button>
+        <a href="/founder" style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "11px 28px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5, textDecoration: "none", display: "inline-block" }}>了解 Founder Membership →</a>
       </div>
     </div>
   );
@@ -302,10 +280,7 @@ export default function DashboardPage() {
         </div>
         <div>
           <SectionLabel>獎勵與權益</SectionLabel>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }} className="grid-2">
-            <RewardsPanel />
-            <BenefitsPanel />
-          </div>
+          <BenefitsPanel />
         </div>
         <div>
           <SectionLabel>商城預覽</SectionLabel>

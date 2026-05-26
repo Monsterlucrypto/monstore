@@ -17,7 +17,7 @@ const navItems = [
   { label: "VIP Membership", icon: "◈",  href: "/vip"         },
   { label: "Rewards",        icon: "✦",  href: "/rewards"     },
   { label: "Marketplace",    icon: "◻",  href: "/marketplace" },
-  { label: "Founder Pass",   icon: "🥚", href: "/founder"     },
+  { label: "Founder Pass",   icon: "◆", href: "/founder"     },
   { label: "Referral",       icon: "⟐",  href: "/referral"    },
   { label: "Settings",       icon: "⊙",  href: "/settings"    },
 ];
@@ -86,7 +86,13 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
             marginLeft: collapsed && !isMobile ? 0 : "auto",
           }}
         >
-          {isMobile ? "✕" : collapsed ? "▶" : "◀"}
+          {isMobile ? (
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2L10 6L2 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M10 2L2 6L10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          ) : collapsed ? (
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6L4 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6L8 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          )}
         </button>
       </div>
 

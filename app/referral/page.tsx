@@ -20,10 +20,10 @@ const PTS_TO_USD = 0.0666;
 const REFERRAL_RATE = 0.1;
 
 const founderTiers = [
-  { name: "Founder Tier", price: 5000, reward: 5000 * REFERRAL_RATE, pts: Math.round(5000 * REFERRAL_RATE / PTS_TO_USD), color: "#E8C96A", colorDim: "rgba(232,201,106,0.12)", colorBorder: "rgba(232,201,106,0.35)" },
-  { name: "Gold Tier",    price: 1000, reward: 1000 * REFERRAL_RATE, pts: Math.round(1000 * REFERRAL_RATE / PTS_TO_USD), color: "#C9A84C", colorDim: "rgba(201,168,76,0.12)", colorBorder: "rgba(201,168,76,0.3)"  },
-  { name: "Silver Tier",  price: 300,  reward: 300  * REFERRAL_RATE, pts: Math.round(300  * REFERRAL_RATE / PTS_TO_USD), color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)",  colorBorder: "rgba(168,169,173,0.25)" },
-  { name: "Bronze Tier",  price: 100,  reward: 100  * REFERRAL_RATE, pts: Math.round(100  * REFERRAL_RATE / PTS_TO_USD), color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)",   colorBorder: "rgba(205,127,50,0.25)"  },
+  { name: "Lu", price: 5000, reward: 5000 * REFERRAL_RATE, pts: Math.round(5000 * REFERRAL_RATE / PTS_TO_USD), color: "#E8C96A", colorDim: "rgba(232,201,106,0.12)", colorBorder: "rgba(232,201,106,0.35)" },
+  { name: "M",  price: 1000, reward: 1000 * REFERRAL_RATE, pts: Math.round(1000 * REFERRAL_RATE / PTS_TO_USD), color: "#C9A84C", colorDim: "rgba(201,168,76,0.12)", colorBorder: "rgba(201,168,76,0.3)"  },
+  { name: "O",  price: 300,  reward: 300  * REFERRAL_RATE, pts: Math.round(300  * REFERRAL_RATE / PTS_TO_USD), color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)",  colorBorder: "rgba(168,169,173,0.25)" },
+  { name: "N",  price: 100,  reward: 100  * REFERRAL_RATE, pts: Math.round(100  * REFERRAL_RATE / PTS_TO_USD), color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)",   colorBorder: "rgba(205,127,50,0.25)"  },
 ];
 
 const userReferral = {
@@ -35,14 +35,14 @@ const userReferral = {
 };
 
 const referralHistory = [
-  { date: "2024.12.10", wallet: "0x3a9f...8b2c", tier: "Gold Tier",    amount: 1000, pts: 1502, status: "已確認" },
-  { date: "2024.11.28", wallet: "0x7c1d...4e9a", tier: "Silver Tier",  amount: 300,  pts: 451,  status: "已確認" },
-  { date: "2024.11.15", wallet: "0x2f8e...1d7b", tier: "Bronze Tier",  amount: 100,  pts: 150,  status: "已確認" },
-  { date: "2024.10.30", wallet: "0x9b4a...6c3f", tier: "Founder Tier", amount: 5000, pts: 7519, status: "已確認" },
-  { date: "2024.10.12", wallet: "0x5e2c...9a1d", tier: "Gold Tier",    amount: 1000, pts: 1502, status: "已確認" },
-  { date: "2024.09.05", wallet: "0x1d7b...3f8e", tier: "Silver Tier",  amount: 300,  pts: 451,  status: "待確認"  },
-  { date: "2024.08.22", wallet: "0x8c3f...2a9b", tier: "Bronze Tier",  amount: 100,  pts: 150,  status: "待確認"  },
-  { date: "2024.07.14", wallet: "0x4e9a...7c1d", tier: "Gold Tier",    amount: 1000, pts: 1502, status: "已確認" },
+  { date: "2024.12.10", wallet: "0x3a9f...8b2c", tier: "M",  amount: 1000, pts: 1502, status: "已確認" },
+  { date: "2024.11.28", wallet: "0x7c1d...4e9a", tier: "O",  amount: 300,  pts: 451,  status: "已確認" },
+  { date: "2024.11.15", wallet: "0x2f8e...1d7b", tier: "N",  amount: 100,  pts: 150,  status: "已確認" },
+  { date: "2024.10.30", wallet: "0x9b4a...6c3f", tier: "Lu", amount: 5000, pts: 7519, status: "已確認" },
+  { date: "2024.10.12", wallet: "0x5e2c...9a1d", tier: "M",  amount: 1000, pts: 1502, status: "已確認" },
+  { date: "2024.09.05", wallet: "0x1d7b...3f8e", tier: "O",  amount: 300,  pts: 451,  status: "待確認"  },
+  { date: "2024.08.22", wallet: "0x8c3f...2a9b", tier: "N",  amount: 100,  pts: 150,  status: "待確認"  },
+  { date: "2024.07.14", wallet: "0x4e9a...7c1d", tier: "M",  amount: 1000, pts: 1502, status: "已確認" },
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {

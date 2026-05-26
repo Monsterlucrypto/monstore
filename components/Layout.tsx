@@ -11,7 +11,7 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, activePath, title }: LayoutProps) {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -19,7 +19,12 @@ export default function Layout({ children, activePath, title }: LayoutProps) {
     const check = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) setMobileOpen(false);
+      if (mobile) {
+        setMobileOpen(false);
+        setCollapsed(false); // mobile uses overlay, collapsed irrelevant
+      } else {
+        setCollapsed(false); // desktop defaults to expanded
+      }
     };
     check();
     window.addEventListener("resize", check);

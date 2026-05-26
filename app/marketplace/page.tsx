@@ -103,7 +103,6 @@ function PointsBanner() {
       </div>
       <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, textAlign: "right" }}>
         <div>Gold 會員享 <span style={{ color: C.gold }}>30% 折扣</span></div>
-        <div style={{ marginTop: 4 }}>積分倍率 <span style={{ color: C.gold, fontFamily: F.mono }}>2.6×</span></div>
       </div>
     </div>
   );
