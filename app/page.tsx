@@ -105,9 +105,10 @@ function Navbar() {
             onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
           >{item}</a>
         ))}
-        <a href="/dashboard" style={{ fontSize: 12, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "7px 18px", borderRadius: 8, textDecoration: "none", fontFamily: F.body }}>
-          Member Login →
-        </a>
+
+        <a href="/member" style={{ fontSize: 12, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "7px 18px", borderRadius: 8, textDecoration: "none", fontFamily: F.body }}>
+  Member →
+</a>
       </div>
 
       <button onClick={() => setOpen(!open)} className="mobile-nav-btn"
