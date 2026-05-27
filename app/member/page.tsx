@@ -41,6 +41,18 @@ const mockMembers = [
     memberSince: "2026",
     treasuryParticipation: "Active",
   },
+    {
+    uid: "67",
+    email: "jason@example.com",
+    name: "liu SB",
+    vip: "M",
+    rewardUnits: 676,
+    tradingVolume: "$67,676",
+    points: "8,500",
+    monthlyRewardEstimate: "$676",
+    memberSince: "2026-67",
+    treasuryParticipation: "Active",
+  },
    {
     uid: "549110911",
     email: "後臺沒顯示拉",
