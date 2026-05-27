@@ -122,9 +122,9 @@ function Navbar() {
             <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setOpen(false)}
               style={{ fontSize: 14, color: C.textSecondary, textDecoration: "none", fontFamily: F.body, padding: "8px 0", borderBottom: `0.5px solid ${C.borderSubtle}` }}>{item}</a>
           ))}
-          <a href="/dashboard" style={{ fontSize: 13, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "10px 18px", borderRadius: 8, textDecoration: "none", fontFamily: F.body, textAlign: "center" }}>
-            Member Login →
-          </a>
+          <a href="/member" style={{ fontSize: 13, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "10px 18px", borderRadius: 8, textDecoration: "none", fontFamily: F.body, textAlign: "center" }}>
+  Member →
+</a>
         </div>
       )}
     </nav>
