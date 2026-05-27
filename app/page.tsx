@@ -25,24 +25,24 @@ const F = {
 
 const vipTiers = [
   {
-    name: "Lu", units: "1,000", multiplier: "3.0×", discount: "50%",
+    name: "Lu", units: "1,290", multiplier: "3.0×", discount: "50%",
     perks: ["創始會員身份", "最高等級權益", "限量席位", "永久 VIP"],
     color: "#E8C96A", colorDim: "rgba(232,201,106,0.1)", colorBorder: "rgba(232,201,106,0.35)",
     isFounder: true,
   },
   {
-    name: "M", units: "200", multiplier: "2.5×", discount: "30%",
+    name: "M", units: "240", multiplier: "2.5×", discount: "30%",
     perks: ["高階會員身份", "高級商城權益", "私人訊號頻道"],
     color: "#C9A84C", colorDim: "rgba(201,168,76,0.1)", colorBorder: "rgba(201,168,76,0.3)",
     highlight: true,
   },
   {
-    name: "O", units: "50", multiplier: "1.5×", discount: "15%",
+    name: "O", units: "70", multiplier: "1.5×", discount: "15%",
     perks: ["進階會員權益", "更高積分倍率", "優先客服"],
     color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)", colorBorder: "rgba(168,169,173,0.25)",
   },
   {
-    name: "N", units: "10", multiplier: "1.0×", discount: "0%",
+    name: "N", units: "20", multiplier: "1.0×", discount: "0%",
     perks: ["基礎會員權益", "基礎商城折扣", "積分累積"],
     color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)", colorBorder: "rgba(205,127,50,0.25)",
   },
@@ -237,7 +237,7 @@ export default function LandingPage() {
                 讓交易量、消費與推薦貢獻，轉化為會員積分、VIP 等級與專屬權益。
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <a href="#founder" style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "13px 28px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5, textDecoration: "none", display: "inline-block" }}>
+                <a href="https://partner.bybit.com/b/aff_43090_153866" target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "13px 28px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5, textDecoration: "none", display: "inline-block" }}>
                   Join Membership
                 </a>
                 <a href="#founder" style={{ background: "transparent", border: `0.5px solid ${C.borderMid}`, color: C.textSecondary, padding: "13px 24px", borderRadius: 10, fontSize: 14, cursor: "pointer", fontFamily: F.body, textDecoration: "none", display: "inline-block" }}>
@@ -394,7 +394,7 @@ export default function LandingPage() {
               Founder 不是股權，不是股票，不是保證收益產品。Founder 是早期生態參與身份，擁有最高 Reward Units、永久 VIP、Founder Badge 與未來平台優先權益。
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-              {["1,000 Reward Units", "Permanent VIP Status", "Founder Badge", "Ecosystem Priority", "Monthly Reward Pool 最高權重"].map((item) => (
+              {["1,290 Reward Units", "Permanent VIP Status", "Founder Badge", "Ecosystem Priority", "Monthly Reward Pool 最高權重"].map((item) => (
                 <div key={item} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 14, color: C.gold }}>✦</span>
                   <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body }}>{item}</span>
@@ -410,7 +410,7 @@ export default function LandingPage() {
           <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 60%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: -30, right: -30, width: 180, height: 180, background: "radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
             <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, fontFamily: F.body }}>Founder Tier</div>
-            <div style={{ fontFamily: F.display, fontSize: 36, fontWeight: 300, color: C.gold, lineHeight: 1, marginBottom: 4 }}>1,000</div>
+            <div style={{ fontFamily: F.display, fontSize: 36, fontWeight: 300, color: C.gold, lineHeight: 1, marginBottom: 4 }}>1,290</div>
             <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginBottom: 24, letterSpacing: 1.5 }}>REWARD UNITS</div>
             <div style={{ height: "0.5px", background: C.borderMid, marginBottom: 20 }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
