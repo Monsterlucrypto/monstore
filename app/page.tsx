@@ -25,29 +25,28 @@ const F = {
 
 const vipTiers = [
   {
-    name: "Bronze", units: "10", multiplier: "1.0×", discount: "0%",
-    perks: ["基礎會員權益", "基礎商城折扣", "積分累積"],
-    color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)", colorBorder: "rgba(205,127,50,0.25)",
+    name: "Lu", units: "1,000", multiplier: "3.0×", discount: "50%",
+    perks: ["創始會員身份", "最高等級權益", "限量席位", "永久 VIP"],
+    color: "#E8C96A", colorDim: "rgba(232,201,106,0.1)", colorBorder: "rgba(232,201,106,0.35)",
+    isFounder: true,
   },
   {
-    name: "Silver", units: "50", multiplier: "1.5×", discount: "15%",
-    perks: ["進階會員權益", "更高積分倍率", "優先客服"],
-    color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)", colorBorder: "rgba(168,169,173,0.25)",
-  },
-  {
-    name: "Gold", units: "200", multiplier: "2.5×", discount: "30%",
+    name: "M", units: "200", multiplier: "2.5×", discount: "30%",
     perks: ["高階會員身份", "高級商城權益", "私人訊號頻道"],
     color: "#C9A84C", colorDim: "rgba(201,168,76,0.1)", colorBorder: "rgba(201,168,76,0.3)",
     highlight: true,
   },
   {
-    name: "Founder", units: "1,000", multiplier: "3.0×", discount: "50%",
-    perks: ["創始會員身份", "最高等級權益", "限量席位", "永久 VIP"],
-    color: "#E8C96A", colorDim: "rgba(232,201,106,0.1)", colorBorder: "rgba(232,201,106,0.35)",
-    isFounder: true,
+    name: "O", units: "50", multiplier: "1.5×", discount: "15%",
+    perks: ["進階會員權益", "更高積分倍率", "優先客服"],
+    color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)", colorBorder: "rgba(168,169,173,0.25)",
+  },
+  {
+    name: "N", units: "10", multiplier: "1.0×", discount: "0%",
+    perks: ["基礎會員權益", "基礎商城折扣", "積分累積"],
+    color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)", colorBorder: "rgba(205,127,50,0.25)",
   },
 ];
-
 const steps = [
   { num: "01", title: "加入 Monstore 會員", desc: "完成基本會員註冊，取得專屬會員 ID 與初始積分。" },
   { num: "02", title: "綁定交易 UID", desc: "透過 UID 綁定或推薦資料建立交易量追蹤，無需提供 API Key。" },

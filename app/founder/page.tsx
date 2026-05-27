@@ -26,7 +26,7 @@ const membershipTiers = [
   {
     name: "Lu",
     label: "Lu Access",
-    units: 1000,
+    units: 1290,
     price: 5000,
     slots: 20,
     remaining: 3,
@@ -37,7 +37,7 @@ const membershipTiers = [
   {
     name: "M",
     label: "M Access",
-    units: 200,
+    units: 240,
     price: 1000,
     slots: 180,
     remaining: 47,
@@ -48,7 +48,7 @@ const membershipTiers = [
   {
     name: "O",
     label: "O Access",
-    units: 50,
+    units: 70,
     price: 300,
     slots: 300,
     remaining: 112,
@@ -59,7 +59,7 @@ const membershipTiers = [
   {
     name: "N",
     label: "N Access",
-    units: 10,
+    units: 20,
     price: 100,
     slots: 500,
     remaining: 284,
@@ -306,7 +306,7 @@ function GenesisRelease() {
           <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Phase One</div>
           <div style={{ fontFamily: F.display, fontSize: 26, fontWeight: 300, color: C.textPrimary, letterSpacing: 1, marginBottom: 10 }}>Genesis Release</div>
           <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
-            Founder Membership 不會一次全部開放。第一階段僅釋出總量的 5%～10%，確保早期成員具備稀缺性與完整的 Ecosystem 參與價值。
+            Founder Membership 不會一次全部開放。第一階段僅釋出總量的 10%，確保早期成員具備稀缺性與完整的 Ecosystem 參與價值。
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -317,8 +317,8 @@ function GenesisRelease() {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, position: "relative", zIndex: 1 }}>
         {[
-          { label: "Total Future Supply", value: "10,000 Units", sub: "長期生態總上限" },
-          { label: "Genesis Release", value: "500 ~ 1,000 Units", sub: "第一階段開放量" },
+          { label: "Total Future Supply", value: "100,000 Units", sub: "長期生態總上限" },
+          { label: "Genesis Release", value: "10,000 Units", sub: "第一階段開放量" },
           { label: "未開放 Units", value: "不參與分配", sub: "僅已啟用 Units 計入回饋" },
         ].map((s) => (
           <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: 18 }}>

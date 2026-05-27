@@ -13,13 +13,13 @@ const F = {
 };
 
 const navItems = [
-  { label: "Dashboard",      icon: "⬡",  href: "/"            },
+  { label: "Dashboard",      icon: "⬡",  href: "/dashboard"            },
   { label: "VIP Membership", icon: "◈",  href: "/vip"         },
   { label: "Rewards",        icon: "✦",  href: "/rewards"     },
   { label: "Marketplace",    icon: "◻",  href: "/marketplace" },
   { label: "Founder Pass",   icon: "◆", href: "/founder"     },
   { label: "Referral",       icon: "⟐",  href: "/referral"    },
-  { label: "Settings",       icon: "⊙",  href: "/settings"    },
+  
 ];
 
 interface SidebarProps {
@@ -59,41 +59,40 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
         flexShrink: 0,
       }}>
         {/* Logo 圖片 */}
-        <div style={{ width: 34, height: 34, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
-          <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-        </div>
+       <div
+  onClick={collapsed && !isMobile ? onToggle : undefined}
+  style={{ width: 43, height: 43, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0, cursor: collapsed && !isMobile ? "pointer" : "default" }}
+>
+  <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+</div>
 
         {/* 品牌名稱 */}
         {(!collapsed || isMobile) && (
-          <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, letterSpacing: 1, whiteSpace: "nowrap", flex: 1 }}>
-            Mon<span style={{ color: C.gold }}>store</span>
-          </div>
+          <a href="/" style={{ fontFamily: F.display, fontSize: 30, fontWeight: 500, color: C.textPrimary, letterSpacing: 1, whiteSpace: "nowrap", flex: 1, textDecoration: "none", cursor: "pointer" }}>
+  Mon<span style={{ color: C.gold }}>store</span>
+</a>
         )}
 
         {/* 按鈕：手機顯示 ✕，桌機顯示 ◀/▶ */}
-        <button
-          onClick={onToggle}
-          style={{
-            background: "transparent",
-            border: `0.5px solid ${C.borderSubtle}`,
-            borderRadius: 6,
-            width: 28, height: 28,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-            color: C.textMuted,
-            fontSize: isMobile ? 14 : 11,
-            flexShrink: 0,
-            marginLeft: collapsed && !isMobile ? 0 : "auto",
-          }}
-        >
-          {isMobile ? (
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2L10 6L2 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M10 2L2 6L10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          ) : collapsed ? (
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6L4 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          ) : (
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6L8 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          )}
-        </button>
+       {(!collapsed || isMobile) && (
+  <button
+    onClick={onToggle}
+    style={{
+      background: "transparent",
+      border: `0.5px solid ${C.borderSubtle}`,
+      borderRadius: 6,
+      width: 28, height: 28,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      cursor: "pointer",
+      color: C.textMuted,
+      fontSize: isMobile ? 14 : 11,
+      flexShrink: 0,
+      marginLeft: "auto",
+    }}
+  >
+    {isMobile ? "✕" : "◀"}
+  </button>
+)}
       </div>
 
       {/* Nav */}
@@ -114,7 +113,7 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
                 borderRadius: 8,
                 textDecoration: "none",
                 color: isActive ? C.goldLight : C.textSecondary,
-                fontSize: 13.5,
+                fontSize: 16,
                 background: isActive ? "rgba(201,168,76,0.1)" : "transparent",
                 border: `0.5px solid ${isActive ? C.borderMid : "transparent"}`,
                 fontFamily: F.body,
