@@ -106,6 +106,13 @@ const faqs = [
   { q: "會員購買的金額會進入 Monthly Reward Pool 嗎？", a: "不會。會員購買 Membership / Reward Weight 的收入屬於平台發展資金，用於營運、Treasury、開發與社群建設，不列入當月 Monthly Reward Pool 分配。" },
 ];
 
+const poolMembers = [
+  { nickname: "Chinglu", tier: "Lu", units: 1290, lastAirdrop: "NT$4,128", color: "#E8C96A", colorDim: "rgba(232,201,106,0.15)", colorGlow: "rgba(232,201,106,0.4)" },
+  { nickname: "Rex",     tier: "M",  units: 240,  lastAirdrop: "NT$768",   color: "#C9A84C", colorDim: "rgba(201,168,76,0.12)",  colorGlow: "rgba(201,168,76,0.3)"  },
+  { nickname: "Yuki",    tier: "M",  units: 240,  lastAirdrop: "NT$768",   color: "#C9A84C", colorDim: "rgba(201,168,76,0.12)",  colorGlow: "rgba(201,168,76,0.3)"  },
+  { nickname: "Nana",    tier: "O",  units: 70,   lastAirdrop: "NT$224",   color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)",  colorGlow: "rgba(168,169,173,0.2)" },
+  { nickname: "Marcus",  tier: "N",  units: 20,   lastAirdrop: "NT$64",    color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)",   colorGlow: "rgba(205,127,50,0.2)"  },
+];
 function GoldenTicket({ size = 80, passId }: { size?: number; passId?: string }) {
   const w = Math.round(size * 1.9);
   const h = size;
@@ -213,36 +220,197 @@ function HeroBanner() {
   );
 }
 
+function RewardPoolBubbles() {
+  const [hov, setHov] = useState<number | null>(null);
+  const totalUnits = poolMembers.reduce((s, m) => s + m.units, 0);
+  const maxUnits = Math.max(...poolMembers.map(m => m.units));
+
+  // 泡泡大小：最大 unit 對應最大半徑 64px，最小 28px
+  const getR = (units: number) => {
+    const min = 28, max = 64;
+    return Math.round(min + (units / maxUnits) * (max - min));
+  };
+
+  // 固定排版位置（SVG 600×300）
+  const positions = [
+    { x: 110, y: 130 },
+    { x: 260, y: 90  },
+    { x: 400, y: 120 },
+    { x: 200, y: 220 },
+    { x: 490, y: 220 },
+  ];
+
+  return (
+    <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 100%)", border: `0.5px solid rgba(201,168,76,0.2)`, borderRadius: 16, padding: 24, height: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: 3, color: "#4a4740", textTransform: "uppercase", marginBottom: 6, fontFamily: "'DM Sans', system-ui, sans-serif" }}>Reward Pool Allocation</div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 22, fontWeight: 700, color: "#E8C96A" }}>{totalUnits.toLocaleString()}</span>
+          <span style={{ fontSize: 11, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>Total Units · {poolMembers.length} Members</span>
+        </div>
+      </div>
+
+      {/* SVG 泡泡圖 */}
+      <div style={{ flex: 1, position: "relative" }}>
+        <svg
+          viewBox="0 0 600 300"
+          style={{ width: "100%", height: "auto", overflow: "visible" }}
+        >
+          <defs>
+            {poolMembers.map((m, i) => (
+              <radialGradient key={i} id={`glow_${i}`} cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stopColor={m.color} stopOpacity="0.25" />
+                <stop offset="100%" stopColor={m.color} stopOpacity="0" />
+              </radialGradient>
+            ))}
+          </defs>
+
+          {poolMembers.map((m, i) => {
+            const r = getR(m.units);
+            const { x, y } = positions[i];
+            const pct = ((m.units / totalUnits) * 100).toFixed(1);
+            const isHov = hov === i;
+            const isLu = m.tier === "Lu";
+
+            return (
+              <g
+                key={i}
+                onMouseEnter={() => setHov(i)}
+                onMouseLeave={() => setHov(null)}
+                style={{ cursor: "pointer" }}
+              >
+                {/* 外圈光暈 */}
+                <circle
+                  cx={x} cy={y}
+                  r={isHov ? r + 18 : isLu ? r + 12 : r + 6}
+                  fill={`url(#glow_${i})`}
+                  style={{ transition: "all 0.3s ease" }}
+                />
+                {/* 主泡泡 */}
+                <circle
+                  cx={x} cy={y} r={isHov ? r + 4 : r}
+                  fill={m.colorDim}
+                  stroke={m.color}
+                  strokeWidth={isLu ? 1.5 : 0.75}
+                  strokeOpacity={isHov ? 1 : 0.6}
+                  style={{ transition: "all 0.3s ease" }}
+                />
+                {/* Lu 皇冠 */}
+                {isLu && (
+                  <text x={x} y={y - r + 14} textAnchor="middle" fontSize="14" fill={m.color}>♔</text>
+                )}
+                {/* 暱稱 */}
+                <text
+                  x={x} y={isLu ? y - 6 : y - 4}
+                  textAnchor="middle"
+                  fontFamily="'DM Sans', system-ui, sans-serif"
+                  fontSize={isHov ? 13 : 12}
+                  fontWeight="600"
+                  fill={m.color}
+                  style={{ transition: "all 0.3s ease" }}
+                >
+                  {m.nickname}
+                </text>
+                {/* Units */}
+                <text
+                  x={x} y={isLu ? y + 10 : y + 10}
+                  textAnchor="middle"
+                  fontFamily="'Space Mono', monospace"
+                  fontSize={10}
+                  fill={m.color}
+                  fillOpacity={0.7}
+                >
+                  {m.units.toLocaleString()} u
+                </text>
+                {/* Hover 時顯示 % */}
+                {isHov && (
+                  <text
+                    x={x} y={y + 24}
+                    textAnchor="middle"
+                    fontFamily="'Space Mono', monospace"
+                    fontSize={10}
+                    fill="#E8C96A"
+                  >
+                    {pct}% of Pool
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* 圖例列表 */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {poolMembers.map((m, i) => {
+          const pct = ((m.units / totalUnits) * 100).toFixed(1);
+          const barW = `${(m.units / totalUnits) * 100}%`;
+          return (
+            <div key={i}
+              onMouseEnter={() => setHov(i)}
+              onMouseLeave={() => setHov(null)}
+              style={{ cursor: "pointer", transition: "opacity 0.2s", opacity: hov !== null && hov !== i ? 0.4 : 1 }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, color: "#f0ece0", fontFamily: "'DM Sans', system-ui, sans-serif" }}>{m.nickname}</span>
+                  <span style={{ fontSize: 10, color: m.color, background: m.colorDim, border: `0.5px solid ${m.color}40`, padding: "1px 6px", borderRadius: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{m.tier}</span>
+                </div>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: "#8a8578" }}>{m.units.toLocaleString()} u</span>
+<span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: "#5ea96e" }}>{m.lastAirdrop}</span>
+                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: m.color, minWidth: 40, textAlign: "right" }}>{pct}%</span>
+                </div>
+              </div>
+              <div style={{ height: 3, background: "rgba(255,255,255,0.04)", borderRadius: 2, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: barW, background: `linear-gradient(90deg, ${m.color}80, ${m.color})`, borderRadius: 2, transition: "opacity 0.2s" }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function MyFounderStatus() {
   if (!userFounder.hasPass) return null;
   return (
-    <div style={{ background: "linear-gradient(135deg, #0a1208 0%, #0a0a0b 100%)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(94,169,110,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <GoldenTicket size={44} passId={userFounder.passId} />
-        </div>
-        <div>
-          <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: "#5ea96e", letterSpacing: 0.5 }}>已持有 Lu Membership</div>
-          <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>1,000 Reward Units · 所有 Founder 權益已啟用</div>
-        </div>
-        <div style={{ marginLeft: "auto", background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 8, padding: "6px 14px" }}>
-          <div style={{ fontSize: 9, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: F.body, marginBottom: 2 }}>Pass ID</div>
-          <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: "#5ea96e" }}>{userFounder.passId}</div>
-        </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-        {[
-          { label: "取得日期", value: userFounder.acquiredDate },
-          { label: "綁定錢包", value: userFounder.wallet },
-          { label: "Reward Units", value: "1,000 Units" },
-        ].map((s) => (
-          <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, padding: 14 }}>
-            <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontFamily: F.body }}>{s.label}</div>
-            <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.textPrimary }}>{s.value}</div>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="grid-2">
+
+      {/* ── 左側：原本車票 + 會員資訊 ── */}
+      <div style={{ background: "linear-gradient(135deg, #0a1208 0%, #0a0a0b 100%)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(94,169,110,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <GoldenTicket size={44} passId={userFounder.passId} />
           </div>
-        ))}
+          <div>
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 500, color: "#5ea96e", letterSpacing: 0.5 }}>已持有 Lu Membership</div>
+            <div style={{ fontSize: 12, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 2 }}>1,290 Reward Units · 所有 Founder 權益已啟用</div>
+          </div>
+          <div style={{ marginLeft: "auto", background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 8, padding: "6px 14px" }}>
+            <div style={{ fontSize: 9, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>Pass ID</div>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, color: "#5ea96e" }}>{userFounder.passId}</div>
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          {[
+            { label: "取得日期",     value: userFounder.acquiredDate },
+            { label: "綁定錢包",     value: userFounder.wallet },
+            { label: "Reward Units", value: "1,290 Units" },
+          ].map((s) => (
+            <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(201,168,76,0.12)", borderRadius: 8, padding: 14 }}>
+              <div style={{ fontSize: 10, color: "#4a4740", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{s.label}</div>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, color: "#f0ece0" }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* ── 右側：Reward Pool 泡泡視覺化 ── */}
+      <RewardPoolBubbles />
     </div>
   );
 }
