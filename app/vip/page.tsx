@@ -22,12 +22,11 @@ const user = {
 };
 
 const tiers = [
-  { id: "n",  name: "N",  label: "N Access",  icon: "◎", requirement: "$0 – $500K",                    color: "#cd7f32", colorDim: "rgba(205,127,50,0.15)",  colorBorder: "rgba(205,127,50,0.3)",  discount: "0%",  support: "標準",    signals: false, manager: false, founderMembership: false },
-  { id: "o",  name: "O",  label: "O Access",  icon: "◈", requirement: "$500K – $1.5M",                 color: "#a8a9ad", colorDim: "rgba(168,169,173,0.15)", colorBorder: "rgba(168,169,173,0.3)", discount: "15%", support: "優先",    signals: false, manager: false, founderMembership: false },
-  { id: "m",  name: "M",  label: "M Access",  icon: "✦", requirement: "$1.5M – $4M",                   color: "#C9A84C", colorDim: "rgba(201,168,76,0.15)",  colorBorder: "rgba(201,168,76,0.3)",  discount: "30%", support: "優先",    signals: false, manager: false, founderMembership: false },
-  { id: "lu", name: "Lu", label: "Lu Access", icon: "◆", requirement: "$4M+ 或 Founder Membership",    color: "#E8C96A", colorDim: "rgba(232,201,106,0.15)", colorBorder: "rgba(232,201,106,0.4)", discount: "50%", support: "專屬經理", signals: true,  manager: true,  founderMembership: true  },
+  { id: "n",  name: "Normal", label: "Normal Access", icon: "◆", requirement: "$0 – $200K",      color: "#cd7f32", colorDim: "rgba(205,127,50,0.15)",  colorBorder: "rgba(205,127,50,0.3)",  commission: "0.20%", pointsRate: "1.0×", discount: "0%",  support: "標準",    signals: false, manager: false, founderMembership: false },
+  { id: "o",  name: "Silver", label: "Silver Access", icon: "◆",  requirement: "$200K – $500K",   color: "#a8a9ad", colorDim: "rgba(168,169,173,0.15)", colorBorder: "rgba(168,169,173,0.3)", commission: "0.16%", pointsRate: "1.5×", discount: "15%", support: "優先",    signals: false, manager: false, founderMembership: false },
+  { id: "m",  name: "Gold", label: "Gold Access", icon: "◆",  requirement: "$500K – $1.5M",   color: "#C9A84C", colorDim: "rgba(201,168,76,0.15)",  colorBorder: "rgba(201,168,76,0.3)",  commission: "0.12%", pointsRate: "2.5×", discount: "30%", support: "優先",    signals: false, manager: false, founderMembership: false, current: true },
+  { id: "lu", name: "Diamond", label: "Diamond Access", icon: "💎", requirement: "$1.5M+",           color: "#E8C96A", colorDim: "rgba(232,201,106,0.15)", colorBorder: "rgba(232,201,106,0.4)", commission: "0.08%", pointsRate: "3.0×", discount: "50%", support: "專屬經理", signals: true,  manager: true,  founderMembership: true  },
 ];
-
 const history = [
   { date: "2024.11.03", from: "O", to: "M", volume: "$1.52M", note: "突破月交易量門檻"   },
   { date: "2024.03.18", from: "N", to: "O", volume: "$512K",  note: "達成累計交易量目標" },
