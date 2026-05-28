@@ -1,6 +1,10 @@
 "use client";
 import Layout from "@/components/Layout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { members } from "@/data/members";
+import type { Member } from "@/data/members";
+
+const UID_KEY = "monstore_uid";
 
 // ════════════════════════════════════════════════════════════
 // 設計 Token
@@ -30,20 +34,18 @@ const F = {
 // 模擬資料
 // ════════════════════════════════════════════════════════════
 
-const userPoints = 12480;
-
 type FilterType = "全部" | "Gold+" | "Founder Only";
 
 const products = [
-  { id: 1, name: "Founder 帽T",       desc: "限量重磅刺繡 Logo 連帽衫，黑金配色",      price: 2400,  value: "$96",  tag: "Gold+",        icon: "🧥", locked: false, stock: 48  },
-  { id: 2, name: "限量鍵盤",           desc: "Keychron 聯名款，金色專屬鍵帽，65% 配列", price: 5800,  value: "$232", tag: "Gold+",        icon: "⌨️", locked: false, stock: 12  },
-  { id: 3, name: "黃銅桌墊",           desc: "極厚皮革桌墊，燙金 Logo，限量 200 件",    price: 3200,  value: "$128", tag: "Gold+",        icon: "🟫", locked: false, stock: 67  },
-  { id: 4, name: "精緻徽章組",         desc: "三件組金屬琺瑯徽章，收藏級工藝",          price: 800,   value: "$32",  tag: "Gold+",        icon: "🏅", locked: false, stock: 200 },
-  { id: 5, name: "VIP 黑卡",           desc: "金屬質感實體會員卡，附禮賓服務資格",      price: 12000, value: "$480", tag: "Founder Only", icon: "🃏", locked: true,  stock: 50  },
-  { id: 6, name: "私人活動邀請券",      desc: "線下 VIP 晚宴入場資格，含伴侶票",        price: 8000,  value: "$320", tag: "Founder Only", icon: "🎫", locked: true,  stock: 20  },
-  { id: 7, name: "Founder 帽子",       desc: "羊毛混紡六片帽，刺繡金色 Logo",           price: 1600,  value: "$64",  tag: "Gold+",        icon: "🧢", locked: false, stock: 89  },
-  { id: 8, name: "限量香氛蠟燭",       desc: "聯名調香師製作，檀香木質調，附禮盒",      price: 2000,  value: "$80",  tag: "Gold+",        icon: "🕯️", locked: false, stock: 35  },
-  { id: 9, name: "專屬桌曆",           desc: "2025 限量精裝桌曆，燙金封面",             price: 600,   value: "$24",  tag: "Gold+",        icon: "📅", locked: false, stock: 150 },
+  { id: 1, name: "Founder 帽T",       desc: "限量重磅刺繡 Logo 連帽衫，黑金配色",      price: 2400,  value: "NT$2,400",  tag: "Gold+",        icon: "🧥", locked: false, stock: 48  },
+  { id: 2, name: "限量鍵盤",           desc: "Keychron 聯名款，金色專屬鍵帽，65% 配列", price: 5800,  value: "NT$5,800",  tag: "Gold+",        icon: "⌨️", locked: false, stock: 12  },
+  { id: 3, name: "黃銅桌墊",           desc: "極厚皮革桌墊，燙金 Logo，限量 200 件",    price: 3200,  value: "NT$3,200",  tag: "Gold+",        icon: "🟫", locked: false, stock: 67  },
+  { id: 4, name: "精緻徽章組",         desc: "三件組金屬琺瑯徽章，收藏級工藝",          price: 800,   value: "NT$800",    tag: "Gold+",        icon: "🏅", locked: false, stock: 200 },
+  { id: 5, name: "VIP 黑卡",           desc: "金屬質感實體會員卡，附禮賓服務資格",      price: 12000, value: "NT$12,000", tag: "Founder Only", icon: "🃏", locked: true,  stock: 50  },
+  { id: 6, name: "私人活動邀請券",      desc: "線下 VIP 晚宴入場資格，含伴侶票",        price: 8000,  value: "NT$8,000",  tag: "Founder Only", icon: "🎫", locked: true,  stock: 20  },
+  { id: 7, name: "Founder 帽子",       desc: "羊毛混紡六片帽，刺繡金色 Logo",           price: 1600,  value: "NT$1,600",  tag: "Gold+",        icon: "🧢", locked: false, stock: 89  },
+  { id: 8, name: "限量香氛蠟燭",       desc: "聯名調香師製作，檀香木質調，附禮盒",      price: 2000,  value: "NT$2,000",  tag: "Gold+",        icon: "🕯️", locked: false, stock: 35  },
+  { id: 9, name: "專屬桌曆",           desc: "2025 限量精裝桌曆，燙金封面",             price: 600,   value: "NT$600",    tag: "Gold+",        icon: "📅", locked: false, stock: 150 },
 ];
 
 const orders = [
@@ -83,7 +85,8 @@ function StatusBadge({ status }: { status: string }) {
 // ════════════════════════════════════════════════════════════
 
 // 積分餘額橫幅
-function PointsBanner() {
+function PointsBanner({ member }: { member: Member | null }) {
+  const pts = member ? parseFloat(member.points) || 0 : 0;
   return (
     <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 60%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: "20px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
@@ -91,32 +94,39 @@ function PointsBanner() {
         <div>
           <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>可用積分</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{userPoints.toLocaleString()}</span>
-            <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>pts</span>
+            <span style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{pts.toFixed(2)}</span>
+            <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>USDT</span>
           </div>
         </div>
         <div style={{ width: "0.5px", height: 40, background: C.borderMid }} />
         <div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>折合美金</div>
-          <div style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: "#5ea96e" }}>${(userPoints * 0.0666).toFixed(2)}</div>
+          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>折合台幣</div>
+          <div style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: "#5ea96e" }}>NT${Math.round(pts).toLocaleString()}</div>
         </div>
       </div>
       <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, textAlign: "right" }}>
-        <div>Gold 會員享 <span style={{ color: C.gold }}>30% 折扣</span></div>
+        <div>1 積分 = <span style={{ color: C.gold }}>NT$1</span></div>
       </div>
     </div>
   );
 }
 
 // 商品列表
-function ProductGrid() {
+function ProductGrid({ member }: { member: Member | null }) {
   const [filter, setFilter] = useState<FilterType>("全部");
   const [hov, setHov] = useState<number | null>(null);
   const [redeemed, setRedeemed] = useState<number | null>(null);
+  const userPoints = member ? parseFloat(member.points) || 0 : 0;
+  const hasFounderPass = !!member?.founderPass;
+
+  // Founder Only 商品：有 Founder Pass 才解鎖
+  const resolvedProducts = products.map((p) =>
+    p.tag === "Founder Only" ? { ...p, locked: !hasFounderPass } : p
+  );
 
   const filters: FilterType[] = ["全部", "Gold+", "Founder Only"];
 
-  const filtered = products.filter((p) => {
+  const filtered = resolvedProducts.filter((p) => {
     if (filter === "全部") return true;
     return p.tag === filter;
   });
@@ -191,7 +201,7 @@ function ProductGrid() {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: p.locked ? C.textMuted : C.goldLight }}>{p.price.toLocaleString()} pts</div>
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body }}>市值 {p.value} · Gold 享 30% off</div>
+                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body }}>市值 {p.value}</div>
                 </div>
                 <button
                   disabled={p.locked || userPoints < p.price}
@@ -219,7 +229,7 @@ function ProductGrid() {
 
       {/* 兌換確認 Modal */}
       {redeemed !== null && (() => {
-        const p = products.find((x) => x.id === redeemed)!;
+        const p = resolvedProducts.find((x) => x.id === redeemed)!;
         return (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
             <div style={{ background: "#141418", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 32, width: 400, position: "relative" }}>
@@ -236,7 +246,7 @@ function ProductGrid() {
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>兌換後餘額</span>
-                  <span style={{ fontSize: 13, fontFamily: F.mono, color: C.goldLight }}>{(userPoints - p.price).toLocaleString()} pts</span>
+                  <span style={{ fontSize: 13, fontFamily: F.mono, color: C.goldLight }}>{(userPoints - p.price).toFixed(2)} USDT</span>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 12 }}>
@@ -287,16 +297,30 @@ function MyOrders() {
 // 頁面主元件
 // ════════════════════════════════════════════════════════════
 export default function MarketplacePage() {
+  const [member, setMember] = useState<Member | null>(null);
+
+  useEffect(() => {
+    const uid = localStorage.getItem(UID_KEY);
+    if (!uid) return;
+    const found = members.find((m) => m.uid === uid);
+    if (found) setMember(found);
+  }, []);
+
   return (
     <Layout activePath="/marketplace" title="會員商城">
       <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
+        {!member && (
+          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: "0.5px solid rgba(201,168,76,0.12)", borderRadius: 10, fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 13, color: "#4a4740" }}>
+            ← 請先前往 <a href="/member" style={{ color: "#C9A84C", textDecoration: "none" }}>Member Access</a> 頁面輸入 UID 查詢會員資料
+          </div>
+        )}
         <div>
-          <SectionLabel>積分概況</SectionLabel>
-          <PointsBanner />
+          <SectionLabel>積分概況{member ? ` · ${member.name}` : ""}</SectionLabel>
+          <PointsBanner member={member} />
         </div>
         <div>
           <SectionLabel>商品列表</SectionLabel>
-          <ProductGrid />
+          <ProductGrid member={member} />
         </div>
         <div>
           <SectionLabel>我的訂單</SectionLabel>

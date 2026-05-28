@@ -25,39 +25,61 @@ const F = {
 
 const vipTiers = [
   {
-    name: "Lu", units: "1,290", multiplier: "3.0×", discount: "50%",
-    perks: ["創始會員身份", "最高等級權益", "限量席位", "永久 VIP"],
-    color: "#E8C96A", colorDim: "rgba(232,201,106,0.1)", colorBorder: "rgba(232,201,106,0.35)",
-    isFounder: true,
+    name: "Normal",
+    range: "50K – 300K",
+    perks: [
+      "每月 50 NTD 電商折價券（無低消）",
+      "95折優惠券 × 1（低消 500）",
+    ],
+    color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)", colorBorder: "rgba(205,127,50,0.25)",
   },
   {
-    name: "M", units: "240", multiplier: "2.5×", discount: "30%",
-    perks: ["高階會員身份", "高級商城權益", "私人訊號頻道"],
+    name: "Silver",
+    range: "300K – 1M",
+    perks: [
+      "每月抽獎資格 × 1",
+      "每月 100 NTD 電商折價券（無低消）× 2",
+      "9折優惠券 × 2（低消 500）",
+      "VIP 群組",
+    ],
+    color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)", colorBorder: "rgba(168,169,173,0.25)",
+  },
+  {
+    name: "Gold",
+    range: "1M – 5M",
+    perks: [
+      "每月抽獎資格 × 3",
+      "每月 100 NTD 電商折價券（無低消）× 2",
+      "85折優惠券 × 2（低消 500）",
+      "VIP 群組",
+    ],
     color: "#C9A84C", colorDim: "rgba(201,168,76,0.1)", colorBorder: "rgba(201,168,76,0.3)",
     highlight: true,
   },
   {
-    name: "O", units: "70", multiplier: "1.5×", discount: "15%",
-    perks: ["進階會員權益", "更高積分倍率", "優先客服"],
-    color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)", colorBorder: "rgba(168,169,173,0.25)",
-  },
-  {
-    name: "N", units: "20", multiplier: "1.0×", discount: "0%",
-    perks: ["基礎會員權益", "基礎商城折扣", "積分累積"],
-    color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)", colorBorder: "rgba(205,127,50,0.25)",
+    name: "Diamond",
+    range: "5M 以上",
+    perks: [
+      "每月抽獎資格 × 10",
+      "每月 100 NTD 電商折價券（無低消）× 5",
+      "VIP 群組",
+      "專人客服",
+    ],
+    color: "#E8C96A", colorDim: "rgba(232,201,106,0.1)", colorBorder: "rgba(232,201,106,0.35)",
+    isTop: true,
   },
 ];
 const steps = [
-  { num: "01", title: "加入 Monstore 會員", desc: "完成基本會員註冊，取得專屬會員 ID 與初始積分。" },
-  { num: "02", title: "綁定交易 UID", desc: "透過 UID 綁定或推薦資料建立交易量追蹤，無需提供 API Key。" },
-  { num: "03", title: "累積交易量與積分", desc: "交易量、推薦貢獻與消費行為自動轉換為積分與 VIP 進度。" },
-  { num: "04", title: "解鎖專屬會員權益", desc: "享受商城折扣、Founder 權益、月度 Reward Pool 參與資格。" },
+  { num: "01", title: "加入 Monstore 會員", desc: "完成基本會員註冊，取得專屬會員 ID。" },
+  { num: "02", title: "綁定交易 UID", desc: "透過 UID 綁定建立交易量追蹤，無需提供 API Key。" },
+  { num: "03", title: "累積交易量", desc: "交易量自動累積，達到門檻後晉升對應 VIP 等級。" },
+  { num: "04", title: "解鎖專屬會員權益", desc: "享受電商折價券、優惠券、每月抽獎資格與 VIP 群組等專屬福利。" },
 ];
 
 const features = [
-  { icon: "📈", title: "Trading Rewards", desc: "交易量自動累積積分與 VIP 進度，每一筆交易都在為你的會員等級加分。" },
-  { icon: "◈", title: "Membership System", desc: "Bronze 到 Founder 四個等級，不同等級享有不同返佣比例、積分倍率與商城折扣。" },
-  { icon: "◻", title: "Marketplace", desc: "積分可直接用於商城折扣與會員專屬商品兌換，讓會員價值真實可見。" },
+  { icon: "📈", title: "Trading Rewards", desc: "交易量自動累積 VIP 進度，每一筆交易都在為你的會員等級加分。" },
+  { icon: "◈", title: "Membership System", desc: "Normal 到 Diamond 四個等級，依累積交易量門檻解鎖不同等級的電商折價券、優惠券與抽獎資格。" },
+  { icon: "◻", title: "Exclusive Benefits", desc: "電商折價券無最低消費限制，優惠券享折扣優惠，高等級會員更可加入 VIP 群組並享有專人客服。" },
 ];
 
 const pools = [
@@ -259,7 +281,7 @@ export default function LandingPage() {
           Web3 會員經濟平台
         </h2>
         <p style={{ fontSize: 15, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 48, maxWidth: 600 }}>
-          Monstore 將交易返佣、電商與會員制度結合，讓會員的交易量與消費行為累積成可見的會員價值。平台不是交易所，不保管用戶資產，也不要求 API Key。
+          Monstore 將交易返佣與會員制度結合，讓會員的交易量累積成可見的 VIP 等級與專屬電商福利。平台不是交易所，不保管用戶資產，也不要求 API Key。
         </p>
         <div className="feature-grid">
           {features.map((f) => (
@@ -305,34 +327,27 @@ export default function LandingPage() {
           四個會員等級
         </h2>
         <p style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, marginBottom: 48, maxWidth: 500 }}>
-          從 Bronze 到 Founder，每個等級享有不同的 Reward Units、積分倍率與商城折扣。
+          依據累積交易量晉升等級，享有電商折價券、優惠券與抽獎等專屬會員福利。
         </p>
         <div className="vip-grid">
           {vipTiers.map((tier) => (
             <div key={tier.name}
-              style={{ background: tier.highlight ? "rgba(201,168,76,0.06)" : C.bgCard, border: `0.5px solid ${tier.isFounder ? tier.colorBorder : tier.highlight ? C.borderStrong : C.borderSubtle}`, borderRadius: 16, padding: 24, position: "relative", overflow: "hidden", transition: "transform 0.2s", cursor: "default" }}
+              style={{ background: tier.highlight ? "rgba(201,168,76,0.06)" : tier.isTop ? "rgba(232,201,106,0.05)" : C.bgCard, border: `0.5px solid ${tier.isTop ? tier.colorBorder : tier.highlight ? C.borderStrong : C.borderSubtle}`, borderRadius: 16, padding: 24, position: "relative", overflow: "hidden", transition: "transform 0.2s", cursor: "default" }}
               onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-4px)")}
               onMouseLeave={e => (e.currentTarget.style.transform = "none")}
             >
-              {tier.isFounder && (
-                <div style={{ position: "absolute", top: 12, right: 12, fontSize: 9, color: tier.color, background: tier.colorDim, border: `0.5px solid ${tier.colorBorder}`, padding: "2px 8px", borderRadius: 4, letterSpacing: 1, fontFamily: F.body, textTransform: "uppercase" }}>Limited</div>
+              {tier.isTop && (
+                <div style={{ position: "absolute", top: 12, right: 12, fontSize: 9, color: tier.color, background: tier.colorDim, border: `0.5px solid ${tier.colorBorder}`, padding: "2px 8px", borderRadius: 4, letterSpacing: 1, fontFamily: F.body, textTransform: "uppercase" }}>Top</div>
               )}
               <div style={{ fontFamily: F.display, fontSize: 24, fontWeight: 500, color: tier.color, letterSpacing: 1, marginBottom: 4 }}>{tier.name}</div>
-              <div style={{ fontFamily: F.mono, fontSize: 28, fontWeight: 700, color: tier.color, marginBottom: 4 }}>{tier.units}</div>
-              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body, marginBottom: 20 }}>Reward Units</div>
+              <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: tier.color, marginBottom: 4 }}>{tier.range}</div>
+              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body, marginBottom: 20 }}>累積交易量</div>
               <div style={{ height: "0.5px", background: tier.colorBorder, marginBottom: 16 }} />
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {[{ label: "積分倍率", value: tier.multiplier }, { label: "商城折扣", value: tier.discount }].map((s) => (
-                  <div key={s.label} style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{s.label}</span>
-                    <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color: tier.color }}>{s.value}</span>
-                  </div>
-                ))}
-                <div style={{ height: "0.5px", background: C.borderSubtle, margin: "4px 0" }} />
                 {tier.perks.map((p) => (
-                  <div key={p} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 12, color: tier.color }}>✓</span>
-                    <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: F.body }}>{p}</span>
+                  <div key={p} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                    <span style={{ fontSize: 12, color: tier.color, flexShrink: 0, marginTop: 1 }}>✓</span>
+                    <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{p}</span>
                   </div>
                 ))}
               </div>

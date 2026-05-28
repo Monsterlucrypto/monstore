@@ -17,10 +17,10 @@ const F = {
 };
 
 const vipColors: Record<string, string> = {
-  Lu: "#E8C96A",
-  M:  "#C9A84C",
-  O:  "#a8a9ad",
-  N:  "#cd7f32",
+  Diamond: "#E8C96A",
+  Gold:    "#C9A84C",
+  Silver:  "#a8a9ad",
+  Normal:  "#cd7f32",
 };
 
 const rankStyle = (rank: number) => {
@@ -73,7 +73,7 @@ export default function LeaderboardPage() {
                 <div style={{ fontFamily: F.mono, fontSize: 24, fontWeight: 700, color: rs.color, marginBottom: 4 }}>{formatVolume(m.tradingVolume)}</div>
                 <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginBottom: 16 }}>{pct}% of total</div>
                 <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-                  <span style={{ fontSize: 10, color: vipColors[m.vip], background: `${vipColors[m.vip]}20`, border: `0.5px solid ${vipColors[m.vip]}50`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body, letterSpacing: 1 }}>VIP {m.vip}</span>
+                  <span style={{ fontSize: 10, color: vipColors[m.vip], background: `${vipColors[m.vip]}20`, border: `0.5px solid ${vipColors[m.vip]}50`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body, letterSpacing: 1 }}>{m.vip}</span>
                   <span style={{ fontSize: 10, color: m.founderPass ? "#5ea96e" : C.textMuted, background: m.founderPass ? "rgba(94,169,110,0.1)" : "rgba(255,255,255,0.03)", border: `0.5px solid ${m.founderPass ? "rgba(94,169,110,0.3)" : C.borderSubtle}`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body }}>
                     {m.founderPass ? "✦ Founder" : "No Pass"}
                   </span>

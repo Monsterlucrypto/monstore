@@ -1,6 +1,10 @@
 "use client";
 import Layout from "@/components/Layout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { members, FOUNDER_CONFIG } from "@/data/members";
+import type { Member } from "@/data/members";
+
+const UID_KEY = "monstore_uid";
 
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
@@ -15,13 +19,6 @@ const F = {
   mono: "'Space Mono', monospace",
 };
 
-const userFounder = {
-  hasPass: true,
-  passId: "LU-0291",
-  acquiredDate: "2024.03.18",
-  wallet: "0x7f4a...3d8c",
-};
-
 const membershipTiers = [
   {
     name: "Lu",
@@ -29,7 +26,9 @@ const membershipTiers = [
     units: 1290,
     price: 5000,
     slots: 20,
-    remaining: 3,
+    remaining: 20,
+    onSale: 2,   // 10% of 20
+    locked: 18,
     color: "#E8C96A",
     colorDim: "rgba(232,201,106,0.12)",
     colorBorder: "rgba(232,201,106,0.35)",
@@ -40,7 +39,9 @@ const membershipTiers = [
     units: 240,
     price: 1000,
     slots: 180,
-    remaining: 47,
+    remaining: 180,
+    onSale: 18,  // 10% of 180
+    locked: 162,
     color: "#C9A84C",
     colorDim: "rgba(201,168,76,0.12)",
     colorBorder: "rgba(201,168,76,0.3)",
@@ -51,7 +52,9 @@ const membershipTiers = [
     units: 70,
     price: 300,
     slots: 300,
-    remaining: 112,
+    remaining: 300,
+    onSale: 30,  // 10% of 300
+    locked: 270,
     color: "#a8a9ad",
     colorDim: "rgba(168,169,173,0.1)",
     colorBorder: "rgba(168,169,173,0.25)",
@@ -62,7 +65,9 @@ const membershipTiers = [
     units: 20,
     price: 100,
     slots: 500,
-    remaining: 284,
+    remaining: 500,
+    onSale: 50,  // 10% of 500
+    locked: 450,
     color: "#cd7f32",
     colorDim: "rgba(205,127,50,0.1)",
     colorBorder: "rgba(205,127,50,0.25)",
@@ -160,11 +165,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function HeroBanner() {
+function HeroBanner({ member }: { member: Member | null }) {
   return (
     <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 50%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 20, padding: "48px 40px", position: "relative", overflow: "hidden", textAlign: "center" }}>
       <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 400, height: 400, background: "radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 20, right: 20, fontSize: 10, color: C.textMuted, letterSpacing: 2, fontFamily: F.body, textTransform: "uppercase" }}>Genesis Release</div>
+      <div style={{ position: "absolute", top: 20, right: 20, fontSize: 10, color: C.textMuted, letterSpacing: 2, fontFamily: F.body, textTransform: "uppercase" }}>Phase One</div>
       <div style={{ marginBottom: 20, position: "relative", zIndex: 1, display: "flex", justifyContent: "center" }}>
         <GoldenTicket size={72} />
       </div>
@@ -177,11 +182,6 @@ function HeroBanner() {
       </div>
 
       <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 24, background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderMid}`, borderRadius: 12, padding: "20px 32px", marginBottom: 32, position: "relative", zIndex: 1 }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.gold, lineHeight: 1 }}>500</div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Genesis Units</div>
-        </div>
-        <div style={{ width: "0.5px", height: 50, background: C.borderMid }} />
         <div style={{ textAlign: "center" }}>
           <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.textSecondary, lineHeight: 1 }}>10,000</div>
           <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Total Future Supply</div>
@@ -204,10 +204,10 @@ function HeroBanner() {
         </div>
       </div>
 
-      {userFounder.hasPass ? (
+      {member?.founderPass ? (
         <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.3)", borderRadius: 10, padding: "14px 28px", position: "relative", zIndex: 1 }}>
           <span style={{ fontSize: 16, color: "#5ea96e" }}>✓</span>
-          <span style={{ fontSize: 14, color: "#5ea96e", fontFamily: F.body, fontWeight: 500 }}>你已持有 Lu Membership</span>
+          <span style={{ fontSize: 14, color: "#5ea96e", fontFamily: F.body, fontWeight: 500 }}>你已持有 {member.founderPass} Membership</span>
         </div>
       ) : (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, position: "relative", zIndex: 1 }}>
@@ -374,32 +374,33 @@ function RewardPoolBubbles() {
   );
 }
 
-function MyFounderStatus() {
-  if (!userFounder.hasPass) return null;
+function MyFounderStatus({ member }: { member: Member }) {
+  const fp = member.founderPass!;
+  const cfg = FOUNDER_CONFIG[fp];
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="grid-2">
 
-      {/* ── 左側：原本車票 + 會員資訊 ── */}
+      {/* ── 左側：車票 + 會員資訊 ── */}
       <div style={{ background: "linear-gradient(135deg, #0a1208 0%, #0a0a0b 100%)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(94,169,110,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <GoldenTicket size={44} passId={userFounder.passId} />
+            <GoldenTicket size={44} passId={`${fp}-${member.uid.slice(-4)}`} />
           </div>
           <div>
-            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 500, color: "#5ea96e", letterSpacing: 0.5 }}>已持有 Lu Membership</div>
-            <div style={{ fontSize: 12, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 2 }}>1,290 Reward Units · 所有 Founder 權益已啟用</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 500, color: "#5ea96e", letterSpacing: 0.5 }}>已持有 {fp} Membership</div>
+            <div style={{ fontSize: 12, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 2 }}>{cfg.units.toLocaleString()} Reward Units · 所有 Founder 權益已啟用</div>
           </div>
           <div style={{ marginLeft: "auto", background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 8, padding: "6px 14px" }}>
-            <div style={{ fontSize: 9, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>Pass ID</div>
-            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, color: "#5ea96e" }}>{userFounder.passId}</div>
+            <div style={{ fontSize: 9, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>Pass Tier</div>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, color: "#5ea96e" }}>{fp}</div>
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {[
-            { label: "取得日期",     value: userFounder.acquiredDate },
-            { label: "綁定錢包",     value: userFounder.wallet },
-            { label: "Reward Units", value: "1,290 Units" },
+            { label: "會員名稱",     value: member.name },
+            { label: "Member Since", value: member.memberSince },
+            { label: "Reward Units", value: `${cfg.units.toLocaleString()} Units` },
           ].map((s) => (
             <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(201,168,76,0.12)", borderRadius: 8, padding: 14 }}>
               <div style={{ fontSize: 10, color: "#4a4740", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{s.label}</div>
@@ -420,7 +421,6 @@ function MembershipUnits() {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
       {membershipTiers.map((t, i) => {
-        const soldPct = Math.round(((t.slots - t.remaining) / t.slots) * 100);
         return (
           <div
             key={t.name}
@@ -440,19 +440,28 @@ function MembershipUnits() {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>參考價格</span>
-                <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textSecondary }}>NT${t.price.toLocaleString()}</span>
+                <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textSecondary }}>${t.price.toLocaleString()} USDT</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>剩餘名額</span>
-                <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color: t.remaining < 20 ? "#c96060" : C.textPrimary }}>{t.remaining} / {t.slots}</span>
+                <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>總名額</span>
+                <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textPrimary }}>{t.slots}</span>
+              </div>
+              <div style={{ height: "0.5px", background: C.borderSubtle }} />
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, color: "#5ea96e", fontFamily: F.body }}>販售中</span>
+                <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color: "#5ea96e" }}>{t.onSale}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>鎖定中</span>
+                <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textMuted }}>{t.locked}</span>
               </div>
             </div>
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
-                <span>已售出</span><span style={{ color: t.color }}>{soldPct}%</span>
+                <span>販售中比例</span><span style={{ color: t.color }}>10%</span>
               </div>
               <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 3, height: 4, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${soldPct}%`, background: `linear-gradient(90deg, ${t.color}80, ${t.color})`, borderRadius: 3 }} />
+                <div style={{ height: "100%", width: "10%", background: `linear-gradient(90deg, ${t.color}80, ${t.color})`, borderRadius: 3 }} />
               </div>
             </div>
             <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, background: `linear-gradient(135deg, ${t.color}25, ${t.color}10)`, border: `0.5px solid ${t.colorBorder}`, color: t.color, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
@@ -476,11 +485,6 @@ function GenesisRelease() {
           <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
             Founder Membership 不會一次全部開放。第一階段僅釋出總量的 10%，確保早期成員具備稀缺性與完整的 Ecosystem 參與價值。
           </div>
-        </div>
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontFamily: F.display, fontSize: 13, color: C.textMuted, letterSpacing: 2, marginBottom: 4 }}>Genesis</div>
-          <div style={{ fontFamily: F.display, fontSize: 40, fontWeight: 300, color: C.gold, lineHeight: 1 }}>500</div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Units Released</div>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, position: "relative", zIndex: 1 }}>
@@ -562,9 +566,8 @@ function TreasurySection() {
 
 function RevenueAllocation() {
   const segments = [
-    { label: "Platform Operations", labelZh: "平台營運與成長", pct: 60, color: C.goldDim, desc: "用於技術開發、合作拓展、品牌建設、團隊運作與平台基礎設施維護。" },
+    { label: "Platform Operations", labelZh: "平台營運與成長", pct: 80, color: C.goldDim, desc: "用於技術開發、合作拓展、品牌建設、團隊運作、平台基礎設施維護及長期金庫儲備。" },
     { label: "Monthly Reward Pool", labelZh: "每月會員回饋池", pct: 20, color: C.gold, desc: "每月自動分配給 Founder Membership 持有者，依 Reward Units 比例計算。" },
-    { label: "Monstore Treasury", labelZh: "平台金庫", pct: 20, color: "#5ea96e", desc: "注入平台長期金庫，用於生態儲備、回購預備與風險緩衝。" },
   ];
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 32 }}>
@@ -575,11 +578,10 @@ function RevenueAllocation() {
         </div>
       </div>
       <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", height: 12, marginBottom: 24 }}>
-        <div style={{ width: "60%", background: `linear-gradient(90deg, ${C.goldDim}, #8a6030)` }} />
+        <div style={{ width: "80%", background: `linear-gradient(90deg, ${C.goldDim}, #8a6030)` }} />
         <div style={{ width: "20%", background: `linear-gradient(90deg, ${C.gold}, ${C.goldLight})` }} />
-        <div style={{ width: "20%", background: "linear-gradient(90deg, #3a7a50, #5ea96e)" }} />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {segments.map((s) => (
           <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 12, padding: 20 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
@@ -594,7 +596,7 @@ function RevenueAllocation() {
       </div>
       <div style={{ marginTop: 20, padding: "12px 18px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8 }}>
         <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
-          ✦ 會員購買 Membership / Reward Weight 的收入屬於<strong style={{ color: C.textSecondary }}>平台發展資金</strong>，可用於營運、Treasury、開發、品牌與社群建設，不列入當月 Monthly Reward Pool 分配。
+          ✦ 會員購買 Membership / Reward Weight 的收入屬於<strong style={{ color: C.textSecondary }}>平台發展資金</strong>，可用於營運、開發、品牌與社群建設，不列入當月 Monthly Reward Pool 分配。
         </div>
       </div>
     </div>
@@ -634,7 +636,7 @@ function RewardDistributionExample() {
               <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.goldLight }}>NT${pool.toLocaleString()}</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {[{ l: "Platform Operations (60%)", v: "NT$18,000" }, { l: "Treasury (20%)", v: "NT$6,000" }].map((r) => (
+              {[{ l: "Platform Operations (80%)", v: "NT$24,000" }].map((r) => (
                 <div key={r.l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 16px", background: "rgba(255,255,255,0.01)", borderRadius: 6 }}>
                   <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{r.l}</span>
                   <span style={{ fontFamily: F.mono, fontSize: 11, color: C.textMuted }}>{r.v}</span>
@@ -700,7 +702,7 @@ function TreasurySeed() {
       <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(94,169,110,0.04)", border: "0.5px solid rgba(94,169,110,0.2)", borderRadius: 10 }}>
         <div>
           <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>Initial Treasury Seed</div>
-          <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: "#5ea96e" }}>NT$100,000 ~ NT$300,000</div>
+          <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: "#5ea96e" }}>10,000 USDT</div>
         </div>
         <div style={{ marginLeft: "auto", fontSize: 11, color: C.textMuted, fontFamily: F.body, textAlign: "right", lineHeight: 1.6 }}>
           不對應 Reward Weight<br />不計入回饋分配
@@ -840,14 +842,23 @@ function FAQ() {
 }
 
 export default function FounderPassPage() {
+  const [member, setMember] = useState<Member | null>(null);
+
+  useEffect(() => {
+    const uid = localStorage.getItem(UID_KEY);
+    if (!uid) return;
+    const found = members.find((m) => m.uid === uid);
+    if (found) setMember(found);
+  }, []);
+
   return (
     <Layout activePath="/founder" title="Founder Membership">
       <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
-        <HeroBanner />
-        {userFounder.hasPass && (
+        <HeroBanner member={member} />
+        {member?.founderPass && (
           <div>
-            <SectionLabel>我的狀態</SectionLabel>
-            <MyFounderStatus />
+            <SectionLabel>我的狀態 · {member.name}</SectionLabel>
+            <MyFounderStatus member={member} />
           </div>
         )}
         <div>
@@ -855,7 +866,7 @@ export default function FounderPassPage() {
           <MembershipUnits />
         </div>
         <div>
-          <SectionLabel>Genesis Release · 第一階段開放</SectionLabel>
+          <SectionLabel>Phase One · 第一階段開放</SectionLabel>
           <GenesisRelease />
         </div>
         <div>
