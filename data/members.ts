@@ -74,7 +74,7 @@ const rawMembers = [
     founderPass: null as FounderPassTier,
   },
   {
-    uid: "546187833",
+    uid: "930531",
     name: "Ann",
     vip: "Normal" as const,
     tradingVolume: 5946.41,
@@ -83,7 +83,7 @@ const rawMembers = [
     commissions: 1.01,
     memberSince: "2026.02.11",
     treasuryParticipation: "Active" as const,
-    founderPass: null as FounderPassTier,
+    founderPass:"Lu" as FounderPassTier,
   },
   {
     uid: "549046149",
@@ -180,6 +180,18 @@ const rawMembers = [
     memberSince: "2026.05.27",
     treasuryParticipation: "Pending" as const,
     founderPass: null as FounderPassTier,
+  },
+  {
+    uid: "31260502",
+    name: "MonsterLu",
+    vip: "Normal" as const,
+    tradingVolume: 3000,
+    tradingVolumeDisplay: "$3,000",
+    points: "10000",
+    commissions: 10000,
+    memberSince: "2026.04.07",
+    treasuryParticipation: "Active" as const,
+    founderPass: "Lu" as FounderPassTier,
   },
   {
     uid: "546783969",

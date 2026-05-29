@@ -23,6 +23,13 @@ const vipColors: Record<string, string> = {
   Normal:  "#cd7f32",
 };
 
+const vipIcon: Record<string, string> = {
+  Diamond: "♦",
+  Gold:    "♦",
+  Silver:  "♦",
+  Normal:  "♦",
+};
+
 const rankStyle = (rank: number) => {
   if (rank === 1) return { color: "#E8C96A", glow: "rgba(232,201,106,0.15)", icon: "🥇" };
   if (rank === 2) return { color: "#a8a9ad", glow: "rgba(168,169,173,0.1)",  icon: "🥈" };
@@ -48,12 +55,12 @@ export default function LeaderboardPage() {
         {/* 頁面標題 */}
         <div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, borderRadius: 20, padding: "4px 14px", marginBottom: 16 }}>
-            <span style={{ fontSize: 10, color: C.gold, letterSpacing: 2, textTransform: "uppercase", fontFamily: F.body }}>✦ Trading Leaderboard</span>
+            <span style={{ fontSize: 10, color: C.gold, letterSpacing: 2, textTransform: "uppercase", fontFamily: F.body }}>✦ 本月交易排行榜</span>
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 20, flexWrap: "wrap" }}>
-            <div style={{ fontFamily: F.display, fontSize: 32, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5 }}>交易量排行榜</div>
+            <div style={{ fontFamily: F.display, fontSize: 32, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5 }}>本月交易排行榜</div>
             <div style={{ fontFamily: F.mono, fontSize: 13, color: C.textMuted }}>
-              總交易量 {formatVolume(totalVolume)} · {leaderboard.length} 名會員
+              總交易量 {formatVolume(totalVolume)} · 前十名
             </div>
           </div>
         </div>
@@ -62,19 +69,18 @@ export default function LeaderboardPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
           {top3.map((m) => {
             const rs = rankStyle(m.rank);
-            const pct = totalVolume > 0 ? ((m.tradingVolume / totalVolume) * 100).toFixed(1) : "0.0";
             return (
-              <div key={m.uid} style={{ background: `linear-gradient(135deg, ${rs.glow} 0%, rgba(20,20,24,0.8) 100%)`, border: `0.5px solid ${rs.color}40`, borderRadius: 16, padding: 24, position: "relative", overflow: "hidden", textAlign: "center" }}>
+              <div key={m.uid} style={{ background: `linear-gradient(135deg, ${rs.glow} 0%, rgba(20,20,24,0.8) 100%)`, border: `0.5px solid ${rs.color}40`, borderRadius: 16, padding: "28px 24px", position: "relative", overflow: "hidden", textAlign: "center" }}>
                 <div style={{ position: "absolute", top: -20, left: "50%", transform: "translateX(-50%)", width: 120, height: 120, background: `radial-gradient(circle, ${rs.glow} 0%, transparent 70%)`, pointerEvents: "none" }} />
                 <div style={{ fontSize: 32, marginBottom: 8 }}>{rs.icon}</div>
                 <div style={{ fontSize: 11, color: rs.color, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>Rank #{m.rank}</div>
                 <div style={{ fontFamily: F.display, fontSize: 28, fontWeight: 400, color: C.textPrimary, marginBottom: 4 }}>{m.name}</div>
-                <div style={{ fontFamily: F.mono, fontSize: 11, color: C.textMuted, marginBottom: 16 }}>UID: {m.uid}</div>
-                <div style={{ fontFamily: F.mono, fontSize: 24, fontWeight: 700, color: rs.color, marginBottom: 4 }}>{formatVolume(m.tradingVolume)}</div>
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginBottom: 16 }}>{pct}% of total</div>
-                <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-                  <span style={{ fontSize: 10, color: vipColors[m.vip], background: `${vipColors[m.vip]}20`, border: `0.5px solid ${vipColors[m.vip]}50`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body, letterSpacing: 1 }}>{m.vip}</span>
-                  <span style={{ fontSize: 10, color: m.founderPass ? "#5ea96e" : C.textMuted, background: m.founderPass ? "rgba(94,169,110,0.1)" : "rgba(255,255,255,0.03)", border: `0.5px solid ${m.founderPass ? "rgba(94,169,110,0.3)" : C.borderSubtle}`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body }}>
+                <div style={{ fontFamily: F.mono, fontSize: 24, fontWeight: 700, color: rs.color, marginBottom: 20 }}>{formatVolume(m.tradingVolume)}</div>
+                <div style={{ display: "flex", justifyContent: "center", gap: 10 }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: vipColors[m.vip], background: `${vipColors[m.vip]}20`, border: `1px solid ${vipColors[m.vip]}60`, padding: "6px 16px", borderRadius: 20, fontFamily: F.body, letterSpacing: 1 }}>
+                    <span style={{ marginRight: 5, color: vipColors[m.vip] }}>{vipIcon[m.vip]}</span>{m.vip}
+                  </span>
+                  <span style={{ fontSize: 13, color: m.founderPass ? "#5ea96e" : C.textMuted, background: m.founderPass ? "rgba(94,169,110,0.1)" : "rgba(255,255,255,0.03)", border: `0.5px solid ${m.founderPass ? "rgba(94,169,110,0.3)" : C.borderSubtle}`, padding: "6px 14px", borderRadius: 20, fontFamily: F.body }}>
                     {m.founderPass ? "✦ Founder" : "No Pass"}
                   </span>
                 </div>
@@ -91,7 +97,6 @@ export default function LeaderboardPage() {
             ))}
           </div>
           {rest.map((m, i) => {
-            const pct = totalVolume > 0 ? ((m.tradingVolume / totalVolume) * 100).toFixed(1) : "0.0";
             return (
               <div
                 key={m.uid}
@@ -102,14 +107,12 @@ export default function LeaderboardPage() {
                 <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.textMuted }}>#{m.rank}</div>
                 <div>
                   <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 400, color: C.textPrimary, marginBottom: 2 }}>{m.name}</div>
-                  <div style={{ fontFamily: F.mono, fontSize: 10, color: C.textMuted }}>UID: {m.uid}</div>
                 </div>
                 <div>
                   <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: m.tradingVolume > 0 ? C.textPrimary : C.textMuted }}>{formatVolume(m.tradingVolume)}</div>
-                  {m.tradingVolume > 0 && <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>{pct}% of total</div>}
                 </div>
-                <span style={{ fontSize: 11, color: vipColors[m.vip], background: `${vipColors[m.vip]}20`, border: `0.5px solid ${vipColors[m.vip]}50`, padding: "4px 10px", borderRadius: 20, fontFamily: F.body, display: "inline-block" }}>
-                  {m.vip}
+                <span style={{ fontSize: 13, fontWeight: 600, color: vipColors[m.vip], background: `${vipColors[m.vip]}20`, border: `1px solid ${vipColors[m.vip]}60`, padding: "5px 12px", borderRadius: 20, fontFamily: F.body, display: "inline-block" }}>
+                  <span style={{ marginRight: 4 }}>{vipIcon[m.vip]}</span>{m.vip}
                 </span>
                 <span style={{ fontSize: 11, color: m.founderPass ? "#5ea96e" : C.textMuted, fontFamily: F.body }}>
                   {m.founderPass ? "✦ Founder" : "—"}

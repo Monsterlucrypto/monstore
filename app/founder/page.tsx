@@ -167,55 +167,69 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function HeroBanner({ member }: { member: Member | null }) {
   return (
-    <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 50%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 20, padding: "48px 40px", position: "relative", overflow: "hidden", textAlign: "center" }}>
-      <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 400, height: 400, background: "radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+    <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 50%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 20, padding: "48px 40px", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: -80, left: "30%", transform: "translateX(-50%)", width: 400, height: 400, background: "radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", top: 20, right: 20, fontSize: 10, color: C.textMuted, letterSpacing: 2, fontFamily: F.body, textTransform: "uppercase" }}>Phase One</div>
-      <div style={{ marginBottom: 20, position: "relative", zIndex: 1, display: "flex", justifyContent: "center" }}>
-        <GoldenTicket size={72} />
-      </div>
-      <div style={{ fontFamily: F.display, fontSize: 13, fontWeight: 400, color: C.gold, letterSpacing: 4, marginBottom: 12, textTransform: "uppercase", position: "relative", zIndex: 1 }}>Founder Membership</div>
-      <div style={{ fontFamily: F.display, fontSize: 46, fontWeight: 300, color: C.textPrimary, letterSpacing: 2, marginBottom: 8, position: "relative", zIndex: 1 }}>
-        Lu · M · O · N
-      </div>
-      <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginBottom: 32, letterSpacing: 0.5, position: "relative", zIndex: 1 }}>
-        Reward Weight · Monthly Reward Pool · Ecosystem Growth
-      </div>
 
-      <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 24, background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderMid}`, borderRadius: 12, padding: "20px 32px", marginBottom: 32, position: "relative", zIndex: 1 }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.textSecondary, lineHeight: 1 }}>10,000</div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Total Future Supply</div>
-        </div>
-        <div style={{ width: "0.5px", height: 50, background: C.borderMid }} />
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.textSecondary, lineHeight: 1 }}>5%</div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Phase One Release</div>
-        </div>
-      </div>
+      {/* 左右並排 */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
 
-      <div style={{ maxWidth: 500, margin: "0 auto 32px", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.textMuted, fontFamily: F.mono, marginBottom: 8 }}>
-          <span>0 Units</span>
-          <span style={{ color: C.gold }}>Genesis Release 開放中</span>
-          <span>10,000 Units</span>
-        </div>
-        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, height: 8, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: "5%", background: `linear-gradient(90deg, ${C.goldDim}, ${C.gold}, ${C.goldLight})`, borderRadius: 4 }} />
-        </div>
-      </div>
+        {/* 左側：原有 hero 內容 */}
+        <div style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
+          <div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}>
+            <GoldenTicket size={72} />
+          </div>
+          <div style={{ fontFamily: F.display, fontSize: 13, fontWeight: 400, color: C.gold, letterSpacing: 4, marginBottom: 12, textTransform: "uppercase" }}>Founder Membership</div>
+          <div style={{ fontFamily: F.display, fontSize: 46, fontWeight: 300, color: C.textPrimary, letterSpacing: 2, marginBottom: 8 }}>
+            Lu · M · O · N
+          </div>
+          <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginBottom: 32, letterSpacing: 0.5 }}>
+            Reward Weight · Monthly Reward Pool · Ecosystem Growth
+          </div>
 
-      {member?.founderPass ? (
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.3)", borderRadius: 10, padding: "14px 28px", position: "relative", zIndex: 1 }}>
-          <span style={{ fontSize: 16, color: "#5ea96e" }}>✓</span>
-          <span style={{ fontSize: 14, color: "#5ea96e", fontFamily: F.body, fontWeight: 500 }}>你已持有 {member.founderPass} Membership</span>
+          <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 24, background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderMid}`, borderRadius: 12, padding: "20px 32px", marginBottom: 32 }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.textSecondary, lineHeight: 1 }}>10,000</div>
+              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Total Future Supply</div>
+            </div>
+            <div style={{ width: "0.5px", height: 50, background: C.borderMid }} />
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.textSecondary, lineHeight: 1 }}>10%</div>
+              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Phase One Release</div>
+            </div>
+          </div>
+
+          <div style={{ maxWidth: 400, margin: "0 auto 32px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.textMuted, fontFamily: F.mono, marginBottom: 8 }}>
+              <span>0 Units</span>
+              <span style={{ color: C.gold }}>Genesis Release 開放中</span>
+              <span>10,000 Units</span>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, height: 8, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: "10%", background: `linear-gradient(90deg, ${C.goldDim}, ${C.gold}, ${C.goldLight})`, borderRadius: 4 }} />
+            </div>
+          </div>
+
+          {member?.founderPass ? (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.3)", borderRadius: 10, padding: "14px 28px" }}>
+              <span style={{ fontSize: 16, color: "#5ea96e" }}>✓</span>
+              <span style={{ fontSize: 14, color: "#5ea96e", fontFamily: F.body, fontWeight: 500 }}>你已持有 {member.founderPass} Membership</span>
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+              <button style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "13px 32px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
+                立即申請 Founder Membership
+              </button>
+            </div>
+          )}
         </div>
-      ) : (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, position: "relative", zIndex: 1 }}>
-          <button style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "13px 32px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
-            立即申請 Founder Membership
-          </button>
+
+        {/* 右側：泡泡圖 */}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <RewardPoolBubbles />
         </div>
-      )}
+
+      </div>
     </div>
   );
 }
@@ -224,6 +238,11 @@ function RewardPoolBubbles() {
   const [hov, setHov] = useState<number | null>(null);
   const totalUnits = poolMembers.reduce((s, m) => s + m.units, 0);
   const maxUnits = Math.max(...poolMembers.map(m => m.units));
+  // 計算總分潤與各會員回饋總額
+  const totalAirdrop = poolMembers.reduce((s, m) => {
+    const num = parseInt(m.lastAirdrop.replace(/[^0-9]/g, ""), 10);
+    return s + (isNaN(num) ? 0 : num);
+  }, 0);
 
   // 泡泡大小：最大 unit 對應最大半徑 64px，最小 28px
   const getR = (units: number) => {
@@ -243,10 +262,22 @@ function RewardPoolBubbles() {
   return (
     <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 100%)", border: `0.5px solid rgba(201,168,76,0.2)`, borderRadius: 16, padding: 24, height: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <div style={{ fontSize: 10, letterSpacing: 3, color: "#4a4740", textTransform: "uppercase", marginBottom: 6, fontFamily: "'DM Sans', system-ui, sans-serif" }}>Reward Pool Allocation</div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 22, fontWeight: 700, color: "#E8C96A" }}>{totalUnits.toLocaleString()}</span>
-          <span style={{ fontSize: 11, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>Total Units · {poolMembers.length} Members</span>
+        <div style={{ fontSize: 10, letterSpacing: 3, color: "#4a4740", textTransform: "uppercase", marginBottom: 8, fontFamily: "'DM Sans', system-ui, sans-serif" }}>Reward Pool Allocation</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 20, fontWeight: 700, color: "#E8C96A" }}>{totalUnits.toLocaleString()}</span>
+              <span style={{ fontSize: 10, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>Units · {poolMembers.length} Members</span>
+            </div>
+          </div>
+          <div style={{ width: "0.5px", height: 28, background: "rgba(201,168,76,0.2)", flexShrink: 0 }} />
+          <div>
+            <div style={{ fontSize: 9, color: "#4a4740", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>本月分潤池</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 20, fontWeight: 700, color: "#5ea96e" }}>NT${totalAirdrop.toLocaleString()}</span>
+              <span style={{ fontSize: 10, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>已分配回饋</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -410,8 +441,25 @@ function MyFounderStatus({ member }: { member: Member }) {
         </div>
       </div>
 
-      {/* ── 右側：Reward Pool 泡泡視覺化 ── */}
-      <RewardPoolBubbles />
+      {/* ── 右側：Founder 權益速覽 ── */}
+      <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", fontFamily: F.body }}>Founder 專屬權益</div>
+        {[
+          { icon: "◈", label: "永久 VIP", desc: "永遠鎖定最高等級，不受升降級影響" },
+          { icon: "⟐", label: "專屬存取權", desc: "私人訊號頻道、Alpha 測試群組邀請" },
+          { icon: "◎", label: "專屬客戶經理", desc: "24/7 直線聯繫，2 小時內回覆" },
+          { icon: "◻", label: "商城 50% 折扣", desc: "所有商城商品積分折扣，含限量商品" },
+          { icon: "⬡", label: "VIP 黑卡", desc: "實體金屬會員卡，全球禮賓服務" },
+        ].map((item) => (
+          <div key={item.label} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10 }}>
+            <span style={{ fontSize: 16, color: C.gold, flexShrink: 0, marginTop: 1 }}>{item.icon}</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, fontFamily: F.body, marginBottom: 2 }}>{item.label}</div>
+              <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.5 }}>{item.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
