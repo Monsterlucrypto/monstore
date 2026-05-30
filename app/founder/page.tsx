@@ -19,6 +19,25 @@ const F = {
   mono: "'Space Mono', monospace",
 };
 
+// 解析 founderPass 字串為各等級持有數量
+// 支援格式："Lu" / "Lu,M" / "Lu,Lu,M" 等多張
+function parseFounderPasses(fp: string | undefined): Record<string, number> {
+  if (!fp) return {};
+  const counts: Record<string, number> = {};
+  fp.split(",").map(s => s.trim()).filter(Boolean).forEach(tier => {
+    counts[tier] = (counts[tier] || 0) + 1;
+  });
+  return counts;
+}
+
+function totalFounderUnits(fp: string | undefined): number {
+  const counts = parseFounderPasses(fp);
+  return Object.entries(counts).reduce((sum, [tier, qty]) => {
+    const cfg = FOUNDER_CONFIG[tier];
+    return sum + (cfg ? cfg.units * qty : 0);
+  }, 0);
+}
+
 const membershipTiers = [
   {
     name: "Lu",
@@ -89,16 +108,6 @@ const benefits = [
     icon: "◎", name: "專屬客戶經理",
     desc: "分配個人帳戶經理，24/7 直線聯繫，優先處理所有問題。",
     detail: "客戶經理將在 2 小時內回覆所有請求，提供專屬優化建議與帳戶分析報告。",
-  },
-  {
-    icon: "◻", name: "商城 50% 折扣",
-    desc: "所有商城商品享有 50% 積分折扣，包含限量商品。",
-    detail: "包含 Lu Only 專屬商品的兌換資格，以及每季限量商品的優先兌換權。",
-  },
-  {
-    icon: "⬡", name: "VIP 黑卡",
-    desc: "實體金屬會員卡，全球禮賓服務資格，機場貴賓室免費使用。",
-    detail: "卡片採用 316L 不鏽鋼製作，雷射雕刻專屬編號，附全球 30+ 城市禮賓服務。",
   },
 ];
 
@@ -211,9 +220,11 @@ function HeroBanner({ member }: { member: Member | null }) {
           </div>
 
           {member?.founderPass ? (
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.3)", borderRadius: 10, padding: "14px 28px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.3)", borderRadius: 10, padding: "14px 28px", flexWrap: "wrap", justifyContent: "center" }}>
               <span style={{ fontSize: 16, color: "#5ea96e" }}>✓</span>
-              <span style={{ fontSize: 14, color: "#5ea96e", fontFamily: F.body, fontWeight: 500 }}>你已持有 {member.founderPass} Membership</span>
+              <span style={{ fontSize: 14, color: "#5ea96e", fontFamily: F.body, fontWeight: 500 }}>
+                已持有：{Object.entries(parseFounderPasses(member.founderPass)).map(([tier, qty]) => `${tier} ×${qty}`).join("　")}
+              </span>
             </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
@@ -406,57 +417,57 @@ function RewardPoolBubbles() {
 }
 
 function MyFounderStatus({ member }: { member: Member }) {
-  const fp = member.founderPass!;
-  const cfg = FOUNDER_CONFIG[fp];
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="grid-2">
+  const counts = parseFounderPasses(member.founderPass);
+  const totalUnits = totalFounderUnits(member.founderPass);
+  const tierEntries = Object.entries(counts); // [["Lu",1],["M",2], ...]
+  const primaryTier = tierEntries[0]?.[0] ?? "N";
 
-      {/* ── 左側：車票 + 會員資訊 ── */}
-      <div style={{ background: "linear-gradient(135deg, #0a1208 0%, #0a0a0b 100%)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(94,169,110,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <GoldenTicket size={44} passId={`${fp}-${member.uid.slice(-4)}`} />
+  return (
+    <div style={{ background: "linear-gradient(135deg, #0a1208 0%, #0a0a0b 100%)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 16, padding: 32, position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: -40, right: -40, width: 260, height: 260, background: "radial-gradient(circle, rgba(94,169,110,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+      {/* Header row */}
+      <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 28 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <GoldenTicket size={56} passId={`${primaryTier}-${member.uid.slice(-4)}`} />
+        </div>
+        <div>
+          <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 500, color: "#5ea96e", letterSpacing: 0.5 }}>
+            Founder Membership 持有狀態
           </div>
-          <div>
-            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 500, color: "#5ea96e", letterSpacing: 0.5 }}>已持有 {fp} Membership</div>
-            <div style={{ fontSize: 12, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 2 }}>{cfg.units.toLocaleString()} Reward Units · 所有 Founder 權益已啟用</div>
-          </div>
-          <div style={{ marginLeft: "auto", background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 8, padding: "6px 14px" }}>
-            <div style={{ fontSize: 9, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>Pass Tier</div>
-            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, color: "#5ea96e" }}>{fp}</div>
+          <div style={{ fontSize: 13, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 4 }}>
+            累計 {totalUnits.toLocaleString()} Reward Units · 所有 Founder 權益已啟用
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-          {[
-            { label: "會員名稱",     value: member.name },
-            { label: "Member Since", value: member.memberSince },
-            { label: "Reward Units", value: `${cfg.units.toLocaleString()} Units` },
-          ].map((s) => (
-            <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(201,168,76,0.12)", borderRadius: 8, padding: 14 }}>
-              <div style={{ fontSize: 10, color: "#4a4740", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{s.label}</div>
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, color: "#f0ece0" }}>{s.value}</div>
-            </div>
-          ))}
+        <div style={{ marginLeft: "auto", background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 10, padding: "10px 20px", textAlign: "center" }}>
+          <div style={{ fontSize: 9, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 4 }}>Total Passes</div>
+          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 18, fontWeight: 700, color: "#5ea96e" }}>{tierEntries.reduce((s,[,q])=>s+q,0)}</div>
         </div>
       </div>
 
-      {/* ── 右側：Founder 權益速覽 ── */}
-      <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", fontFamily: F.body }}>Founder 專屬權益</div>
+      {/* Per-tier pass badges */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 24 }}>
+        {tierEntries.map(([tier, qty]) => (
+          <div key={tier} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(232,201,106,0.08)", border: "0.5px solid rgba(232,201,106,0.3)", borderRadius: 8, padding: "8px 16px" }}>
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, fontWeight: 700, color: "#E8C96A" }}>{tier}</span>
+            <span style={{ fontSize: 12, color: "#8a8578", fontFamily: "'DM Sans', system-ui, sans-serif" }}>×{qty}</span>
+            <span style={{ fontSize: 11, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+              ({((FOUNDER_CONFIG[tier]?.units ?? 0) * qty).toLocaleString()} Units)
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Stats row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
         {[
-          { icon: "◈", label: "永久 VIP", desc: "永遠鎖定最高等級，不受升降級影響" },
-          { icon: "⟐", label: "專屬存取權", desc: "私人訊號頻道、Alpha 測試群組邀請" },
-          { icon: "◎", label: "專屬客戶經理", desc: "24/7 直線聯繫，2 小時內回覆" },
-          { icon: "◻", label: "商城 50% 折扣", desc: "所有商城商品積分折扣，含限量商品" },
-          { icon: "⬡", label: "VIP 黑卡", desc: "實體金屬會員卡，全球禮賓服務" },
-        ].map((item) => (
-          <div key={item.label} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10 }}>
-            <span style={{ fontSize: 16, color: C.gold, flexShrink: 0, marginTop: 1 }}>{item.icon}</span>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, fontFamily: F.body, marginBottom: 2 }}>{item.label}</div>
-              <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.5 }}>{item.desc}</div>
-            </div>
+          { label: "會員名稱",     value: member.name },
+          { label: "Member Since", value: member.memberSince },
+          { label: "Reward Units", value: `${totalUnits.toLocaleString()} Units` },
+        ].map((s) => (
+          <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: "22px 24px" }}>
+            <div style={{ fontSize: 10, color: "#4a4740", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{s.label}</div>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 22, fontWeight: 700, color: "#f0ece0", lineHeight: 1 }}>{s.value}</div>
           </div>
         ))}
       </div>

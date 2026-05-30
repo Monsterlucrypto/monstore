@@ -34,25 +34,22 @@ const F = {
 // 模擬資料
 // ════════════════════════════════════════════════════════════
 
-type FilterType = "全部" | "Gold+" | "Founder Only";
+type FilterType = "全部" | "折價券" | "配件" | "Founder Pass";
 
 const products = [
-  { id: 1, name: "Founder 帽T",       desc: "限量重磅刺繡 Logo 連帽衫，黑金配色",      price: 2400,  value: "NT$2,400",  tag: "Gold+",        icon: "🧥", locked: false, stock: 48  },
-  { id: 2, name: "限量鍵盤",           desc: "Keychron 聯名款，金色專屬鍵帽，65% 配列", price: 5800,  value: "NT$5,800",  tag: "Gold+",        icon: "⌨️", locked: false, stock: 12  },
-  { id: 3, name: "黃銅桌墊",           desc: "極厚皮革桌墊，燙金 Logo，限量 200 件",    price: 3200,  value: "NT$3,200",  tag: "Gold+",        icon: "🟫", locked: false, stock: 67  },
-  { id: 4, name: "精緻徽章組",         desc: "三件組金屬琺瑯徽章，收藏級工藝",          price: 800,   value: "NT$800",    tag: "Gold+",        icon: "🏅", locked: false, stock: 200 },
-  { id: 5, name: "VIP 黑卡",           desc: "金屬質感實體會員卡，附禮賓服務資格",      price: 12000, value: "NT$12,000", tag: "Founder Only", icon: "🃏", locked: true,  stock: 50  },
-  { id: 6, name: "私人活動邀請券",      desc: "線下 VIP 晚宴入場資格，含伴侶票",        price: 8000,  value: "NT$8,000",  tag: "Founder Only", icon: "🎫", locked: true,  stock: 20  },
-  { id: 7, name: "Founder 帽子",       desc: "羊毛混紡六片帽，刺繡金色 Logo",           price: 1600,  value: "NT$1,600",  tag: "Gold+",        icon: "🧢", locked: false, stock: 89  },
-  { id: 8, name: "限量香氛蠟燭",       desc: "聯名調香師製作，檀香木質調，附禮盒",      price: 2000,  value: "NT$2,000",  tag: "Gold+",        icon: "🕯️", locked: false, stock: 35  },
-  { id: 9, name: "專屬桌曆",           desc: "2025 限量精裝桌曆，燙金封面",             price: 600,   value: "NT$600",    tag: "Gold+",        icon: "📅", locked: false, stock: 150 },
+  // ── 折價券 ──
+  { id: 1, name: "NT$250 折價券",      desc: "低消 NT$1,000 適用，每筆訂單限用一張",        price: 200,   tag: "折價券",      icon: "🎟️", locked: false },
+  { id: 2, name: "NT$500 折價券",      desc: "低消 NT$2,000 適用，每筆訂單限用一張",        price: 350,   tag: "折價券",      icon: "🎫", locked: false },
+  // ── 配件 ──
+  { id: 3, name: "30cm Type-C 充電線", desc: "Type-C to Type-C，30cm 短線，編織材質",       price: 200,   tag: "配件",        icon: "🔌", locked: false },
+  { id: 4, name: "20W 充電頭",         desc: "GaN 20W 快充充電頭，支援 PD 快充協議",         price: 500,   tag: "配件",        icon: "🔋", locked: false },
+  // ── Founder Pass ──
+  { id: 5, name: "M Founder Pass",     desc: "Monstore 創始會員 M 等級，240 Reward Units，永久 Founder 權益", price: 60000, tag: "Founder Pass", icon: "◆", locked: false, founderTier: "M" },
+  { id: 6, name: "O Founder Pass",     desc: "Monstore 創始會員 O 等級，70 Reward Units，永久 Founder 權益", price: 20000, tag: "Founder Pass", icon: "◆", locked: false, founderTier: "O" },
+  { id: 7, name: "N Founder Pass",     desc: "Monstore 創始會員 N 等級，20 Reward Units，永久 Founder 權益", price: 6000,  tag: "Founder Pass", icon: "◆", locked: false, founderTier: "N" },
 ];
 
-const orders = [
-  { id: "ORD-2024-008", date: "2024.12.15", item: "Founder 帽T",   points: 2400, status: "已完成" },
-  { id: "ORD-2024-005", date: "2024.11.02", item: "限量鍵盤",       points: 5800, status: "審核通過" },
-  { id: "ORD-2024-003", date: "2024.09.28", item: "精緻徽章組",     points: 800,  status: "審核中" },
-];
+const orders: { id: string; date: string; item: string; points: number; status: string }[] = [];
 
 // ════════════════════════════════════════════════════════════
 // 共用元件
@@ -120,11 +117,9 @@ function ProductGrid({ member }: { member: Member | null }) {
   const hasFounderPass = !!member?.founderPass;
 
   // Founder Only 商品：有 Founder Pass 才解鎖
-  const resolvedProducts = products.map((p) =>
-    p.tag === "Founder Only" ? { ...p, locked: !hasFounderPass } : p
-  );
+  const resolvedProducts = products.map((p) => ({ ...p }));
 
-  const filters: FilterType[] = ["全部", "Gold+", "Founder Only"];
+  const filters: FilterType[] = ["全部", "折價券", "配件", "Founder Pass"];
 
   const filtered = resolvedProducts.filter((p) => {
     if (filter === "全部") return true;
@@ -176,16 +171,39 @@ function ProductGrid({ member }: { member: Member | null }) {
             }}
           >
             {/* 商品圖片區 */}
-            <div style={{ height: 140, background: p.locked ? "linear-gradient(135deg, #141209, #1a1810)" : "linear-gradient(135deg, #111116, #1a1a22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 52, borderBottom: `0.5px solid ${C.borderSubtle}`, position: "relative" }}>
-              <span style={{ opacity: p.locked ? 0.4 : 1 }}>{p.icon}</span>
+            <div style={{ height: 140, background: p.tag === "Founder Pass" ? "linear-gradient(135deg, #1a1508, #0e0e12)" : p.locked ? "linear-gradient(135deg, #141209, #1a1810)" : "linear-gradient(135deg, #111116, #1a1a22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 52, borderBottom: `0.5px solid ${C.borderSubtle}`, position: "relative" }}>
+              {p.tag === "Founder Pass" && p.founderTier ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                  {/* SVG Ticket */}
+                  <svg width="110" height="46" viewBox="0 0 110 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id={`tg_${p.id}`} x1="0" y1="0" x2="110" y2="46" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#F5E070" />
+                        <stop offset="45%" stopColor="#E8C96A" />
+                        <stop offset="100%" stopColor="#B08020" />
+                      </linearGradient>
+                      <linearGradient id={`ts_${p.id}`} x1="0" y1="0" x2="0" y2="46" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.22)" />
+                        <stop offset="60%" stopColor="rgba(255,255,255,0)" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M5,0 H105 Q110,0 110,5 V16 A7,7 0 0,0 110,30 V41 Q110,46 105,46 H5 Q0,46 0,41 V30 A7,7 0 0,1 0,16 V5 Q0,0 5,0 Z" fill={`url(#tg_${p.id})`} />
+                    <path d="M5,0 H105 Q110,0 110,5 V16 A7,7 0 0,0 110,30 V41 Q110,46 105,46 H5 Q0,46 0,41 V30 A7,7 0 0,1 0,16 V5 Q0,0 5,0 Z" fill={`url(#ts_${p.id})`} />
+                    <path d="M5,0 H105 Q110,0 110,5 V16 A7,7 0 0,0 110,30 V41 Q110,46 105,46 H5 Q0,46 0,41 V30 A7,7 0 0,1 0,16 V5 Q0,0 5,0 Z" fill="none" stroke="rgba(255,245,180,0.55)" strokeWidth="0.6" />
+                    {Array.from({length: 12}).map((_,i) => <rect key={i} x={14+i*7} y={22} width={4} height={1.5} fill="rgba(80,50,5,0.3)" rx={0.5} />)}
+                    <text x="55" y="17" textAnchor="middle" fontFamily="'Cormorant Garamond',Georgia,serif" fontSize="10" fontWeight="600" fill="rgba(55,35,5,0.8)" letterSpacing="3">FOUNDER</text>
+                    <text x="55" y="36" textAnchor="middle" fontFamily="'DM Sans',system-ui,sans-serif" fontSize="8" fontWeight="500" fill="rgba(55,35,5,0.6)" letterSpacing="2">MEMBERSHIP</text>
+                  </svg>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 13, fontWeight: 700, color: "#E8C96A", letterSpacing: 3 }}>{p.founderTier} ACCESS</span>
+                </div>
+              ) : (
+                <span style={{ opacity: p.locked ? 0.4 : 1 }}>{p.icon}</span>
+              )}
               {/* 標籤 */}
-              <div style={{ position: "absolute", top: 10, left: 10, background: "rgba(201,168,76,0.15)", border: `0.5px solid ${C.borderMid}`, color: C.gold, fontSize: 9, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>
+              <div style={{ position: "absolute", top: 10, left: 10, background: p.tag === "Founder Pass" ? "rgba(232,201,106,0.2)" : "rgba(201,168,76,0.12)", border: `0.5px solid ${p.tag === "Founder Pass" ? C.borderStrong : C.borderMid}`, color: p.tag === "Founder Pass" ? C.goldLight : C.gold, fontSize: 9, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>
                 {p.tag}
               </div>
-              {/* 庫存 */}
-              <div style={{ position: "absolute", top: 10, right: 10, fontSize: 10, color: C.textMuted, fontFamily: F.mono }}>
-                剩 {p.stock}
-              </div>
+
               {/* 鎖定遮罩 */}
               {p.locked && (
                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(10,10,11,0.5)" }}>
@@ -201,7 +219,6 @@ function ProductGrid({ member }: { member: Member | null }) {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: p.locked ? C.textMuted : C.goldLight }}>{p.price.toLocaleString()} pts</div>
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body }}>市值 {p.value}</div>
                 </div>
                 <button
                   disabled={p.locked || userPoints < p.price}
@@ -269,6 +286,9 @@ function MyOrders() {
         <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>我的訂單</div>
         <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.mono }}>共 {orders.length} 筆</span>
       </div>
+      {orders.length === 0 && (
+        <div style={{ padding: "32px 0", textAlign: "center", fontSize: 13, color: C.textMuted, fontFamily: F.body }}>尚無兌換紀錄</div>
+      )}
 
       {/* 表頭 */}
       <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 2fr 1fr 1fr", gap: 16, padding: "0 0 12px", borderBottom: `0.5px solid ${C.borderSubtle}`, marginBottom: 4 }}>

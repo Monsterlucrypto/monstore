@@ -166,7 +166,7 @@ function StatCards({ member }: { member: Member }) {
 
   const stats = [
     { label: "Trading Volume", value: member.tradingVolumeDisplay,                    change: "累計交易量",                                   up: member.tradingVolume > 0, icon: "📈" },
-    { label: "Trading Rank",   value: `#${member.tradingRank}`,                       change: "全球排名",                                     up: true,                     icon: "⬡"  },
+    { label: "Trading Rank",   value: `#${member.tradingRank}`,                       change: "全會員排名",                                     up: true,                     icon: "⬡"  },
     { label: "Points (USDT)",  value: member.points,                                  change: "等於返佣 USDT",                                up: parseFloat(member.points) > 0, icon: "✦" },
     { label: "Founder Pass",   value: fp ?? "—",                                      change: cfg ? `${cfg.units.toLocaleString()} Units` : "無 Pass", up: !!fp,          icon: "💎" },
   ];
@@ -186,48 +186,89 @@ function StatCards({ member }: { member: Member }) {
   );
 }
 
-// ─── BenefitsPanel ─────────────────────────────────────────────────────────
+// ─── CouponPanel ────────────────────────────────────────────────────────────
+// 每個 VIP 等級每月可兌換的折價券數量上限
+const COUPON_QUOTA: Record<string, { c250: number; c500: number }> = {
+  Normal:  { c250: 1, c500: 0 },
+  Silver:  { c250: 2, c500: 1 },
+  Gold:    { c250: 3, c500: 2 },
+  Diamond: { c250: 5, c500: 3 },
+};
+
 function BenefitsPanel({ member }: { member: Member }) {
-  const fp = member.founderPass;
-  const vip = member.vip;
+  const quota = COUPON_QUOTA[member.vip] ?? COUPON_QUOTA["Normal"];
+  // mock: 假設已使用 0 張（實際應從訂單紀錄計算）
+  const used250 = 0;
+  const used500 = 0;
+  const remain250 = Math.max(0, quota.c250 - used250);
+  const remain500 = Math.max(0, quota.c500 - used500);
 
-  const isGoldPlus     = vip === "Gold" || vip === "Diamond" || !!fp;
-  const isPrivSignal   = vip === "Diamond" || fp === "Lu";
-  const isDedicatedMgr = vip === "Diamond" || fp === "Lu" || fp === "M";
+  const tierColor = TIER_COLORS[member.vip] ?? C.gold;
 
-  const benefits = [
-    { label: "優先客服支援",  active: true,           badge: "啟用中"         },
-    { label: "商城 30% 折扣", active: isGoldPlus,     badge: isGoldPlus     ? "啟用中" : "Gold+"         },
-    { label: "私人交易訊號",  active: isPrivSignal,   badge: isPrivSignal   ? "啟用中" : "Diamond / Lu"  },
-    { label: "專屬客戶經理",  active: isDedicatedMgr, badge: isDedicatedMgr ? "啟用中" : "Diamond / M+"  },
+  const coupons = [
+    {
+      name: "NT$250 折價券",
+      desc: "低消 NT$1,000 適用",
+      pts: 200,
+      quota: quota.c250,
+      remain: remain250,
+      available: quota.c250 > 0,
+    },
+    {
+      name: "NT$500 折價券",
+      desc: "低消 NT$2,000 適用",
+      pts: 350,
+      quota: quota.c500,
+      remain: remain500,
+      available: quota.c500 > 0,
+    },
   ];
 
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 24 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>等級權益</div>
-        <span style={{ fontSize: 11, color: C.gold, cursor: "pointer" }}>比較等級 →</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+        <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>優惠券</div>
+        <span style={{ fontSize: 10, color: tierColor, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body, letterSpacing: 1 }}>{member.vip} 方案</span>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {benefits.map((b, i) => (
-          <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < benefits.length - 1 ? `0.5px solid ${C.borderSubtle}` : "none" }}>
-            <span style={{ fontSize: 14, color: b.active ? C.gold : C.textMuted }}>{b.active ? "✓" : "◯"}</span>
-            <span style={{ fontSize: 13, color: b.active ? C.textSecondary : C.textMuted, fontFamily: F.body }}>{b.label}</span>
-            <span style={{ marginLeft: "auto", fontSize: 10, color: b.active ? C.gold : C.textMuted, background: b.active ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.03)", border: `0.5px solid ${C.borderSubtle}`, padding: "2px 8px", borderRadius: 4, letterSpacing: 1, fontFamily: F.body, flexShrink: 0 }}>
-              {b.badge}
-            </span>
+      <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginBottom: 18 }}>本月可兌換數量（依 VIP 等級）</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {coupons.map((c) => (
+          <div key={c.name} style={{ background: c.available ? "rgba(201,168,76,0.04)" : "rgba(255,255,255,0.02)", border: `0.5px solid ${c.available ? C.borderMid : C.borderSubtle}`, borderRadius: 10, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: c.available ? C.textPrimary : C.textMuted, fontFamily: F.body }}>{c.name}</div>
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>{c.desc} · {c.pts} pts</div>
+              </div>
+              {c.available ? (
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontFamily: F.mono, fontSize: 22, fontWeight: 700, color: remain250 > 0 || c.name.includes("500") && remain500 > 0 ? C.goldLight : C.textMuted, lineHeight: 1 }}>{c.remain}</div>
+                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>/ {c.quota} 張剩餘</div>
+                </div>
+              ) : (
+                <span style={{ fontSize: 10, color: C.textMuted, background: "rgba(255,255,255,0.03)", border: `0.5px solid ${C.borderSubtle}`, padding: "3px 10px", borderRadius: 4, fontFamily: F.body }}>需升級 Silver+</span>
+              )}
+            </div>
+            {c.available && (
+              <div style={{ height: 4, background: "rgba(255,255,255,0.04)", borderRadius: 2, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${(c.remain / c.quota) * 100}%`, background: `linear-gradient(90deg, ${C.goldDim}, ${C.gold})`, borderRadius: 2, transition: "width 0.5s ease" }} />
+              </div>
+            )}
           </div>
         ))}
       </div>
+      <a href="/marketplace" style={{ display: "block", marginTop: 14, fontSize: 11, color: C.gold, fontFamily: F.body, textDecoration: "none", textAlign: "right" }}>前往商城兌換 →</a>
     </div>
   );
 }
 
 // ─── Marketplace ───────────────────────────────────────────────────────────
 const products = [
-  { name: "Founder 帽T",  desc: "限量重磅刺繡 Logo 連帽衫",               price: "2,400 pts",  value: "≈ $96 · 享 30% 折扣",  tag: "Gold+",        icon: "🧥", locked: false },
-  { name: "限量鍵盤",     desc: "Keychron 聯名款，金色專屬鍵帽，65% 配列", price: "5,800 pts",  value: "≈ $232 · 享 30% 折扣", tag: "Gold+",        icon: "⌨️", locked: false },
-  { name: "VIP 黑卡",     desc: "金屬質感實體會員卡，附禮賓服務",           price: "12,000 pts", value: "需達 Founder 等級",    tag: "Founder Only", icon: "🃏", locked: true  },
+  { name: "NT$250 折價券",      desc: "低消 NT$1,000 適用，每筆訂單限用一張", price: "200 pts",   tag: "折價券",      icon: "🎟️", isFounderPass: false, founderTier: null },
+  { name: "NT$500 折價券",      desc: "低消 NT$2,000 適用，每筆訂單限用一張", price: "350 pts",   tag: "折價券",      icon: "🎫", isFounderPass: false, founderTier: null },
+  { name: "30cm Type-C 充電線", desc: "Type-C to Type-C，30cm 短線，編織材質", price: "200 pts",   tag: "配件",        icon: "🔌", isFounderPass: false, founderTier: null },
+  { name: "20W 充電頭",         desc: "GaN 20W 快充，支援 PD 快充協議",        price: "500 pts",   tag: "配件",        icon: "🔋", isFounderPass: false, founderTier: null },
+  { name: "N Founder Pass",     desc: "20 Reward Units，永久 Founder 權益",    price: "6,000 pts", tag: "Founder Pass", icon: "◆", isFounderPass: true,  founderTier: "N"  },
+  { name: "O Founder Pass",     desc: "70 Reward Units，永久 Founder 權益",    price: "20,000 pts",tag: "Founder Pass", icon: "◆", isFounderPass: true,  founderTier: "O"  },
 ];
 
 function Marketplace() {
@@ -240,21 +281,41 @@ function Marketplace() {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
         {products.map((p, i) => (
-          <div key={p.name} onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)} style={{ background: C.bgCard, border: `0.5px solid ${i === 2 || hov === i ? C.borderMid : C.borderSubtle}`, borderRadius: 12, overflow: "hidden", transition: "all 0.25s ease", transform: hov === i ? "translateY(-2px)" : "none", cursor: "pointer" }}>
-            <div style={{ height: 140, background: i === 2 ? "linear-gradient(135deg, #141209, #1a1810)" : "linear-gradient(135deg, #111116, #1a1a22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, borderBottom: `0.5px solid ${C.borderSubtle}`, position: "relative" }}>
-              {p.icon}
-              <div style={{ position: "absolute", top: 10, left: 10, background: "rgba(201,168,76,0.15)", border: `0.5px solid ${C.borderMid}`, color: C.gold, fontSize: 9, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>{p.tag}</div>
+          <div key={p.name} onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)}
+            style={{ background: C.bgCard, border: `0.5px solid ${hov === i ? C.borderMid : C.borderSubtle}`, borderRadius: 12, overflow: "hidden", transition: "all 0.25s ease", transform: hov === i ? "translateY(-2px)" : "none", cursor: "pointer" }}>
+            {/* Image area */}
+            <div style={{ height: 130, background: p.isFounderPass ? "linear-gradient(135deg, #1a1508, #0e0e12)" : "linear-gradient(135deg, #111116, #1a1a22)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: p.isFounderPass ? 6 : 0, borderBottom: `0.5px solid ${C.borderSubtle}`, position: "relative" }}>
+              {p.isFounderPass ? (
+                <>
+                  <svg width="96" height="40" viewBox="0 0 96 40" fill="none">
+                    <defs>
+                      <linearGradient id={`tg_${i}`} x1="0" y1="0" x2="96" y2="40" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#F5E070"/>
+                        <stop offset="45%" stopColor="#E8C96A"/>
+                        <stop offset="100%" stopColor="#B08020"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M5,0 H91 Q96,0 96,5 V13 A6,6 0 0,0 96,27 V35 Q96,40 91,40 H5 Q0,40 0,35 V27 A6,6 0 0,1 0,13 V5 Q0,0 5,0 Z" fill={`url(#tg_${i})`}/>
+                    <path d="M5,0 H91 Q96,0 96,5 V13 A6,6 0 0,0 96,27 V35 Q96,40 91,40 H5 Q0,40 0,35 V27 A6,6 0 0,1 0,13 V5 Q0,0 5,0 Z" fill="none" stroke="rgba(255,245,180,0.5)" strokeWidth="0.6"/>
+                    {Array.from({length:10}).map((_,k)=><rect key={k} x={13+k*7} y={19} width={4} height={1.5} fill="rgba(80,50,5,0.3)" rx={0.5}/>)}
+                    <text x="48" y="14" textAnchor="middle" fontFamily="'Cormorant Garamond',Georgia,serif" fontSize="9" fontWeight="600" fill="rgba(55,35,5,0.8)" letterSpacing="3">FOUNDER</text>
+                    <text x="48" y="30" textAnchor="middle" fontFamily="'DM Sans',system-ui,sans-serif" fontSize="7" fill="rgba(55,35,5,0.6)" letterSpacing="2">MEMBERSHIP</text>
+                  </svg>
+                  <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 700, color: "#E8C96A", letterSpacing: 2 }}>{p.founderTier} ACCESS</span>
+                </>
+              ) : (
+                <span style={{ fontSize: 44 }}>{p.icon}</span>
+              )}
+              <div style={{ position: "absolute", top: 8, left: 8, background: p.isFounderPass ? "rgba(232,201,106,0.2)" : "rgba(201,168,76,0.12)", border: `0.5px solid ${p.isFounderPass ? C.borderStrong : C.borderMid}`, color: p.isFounderPass ? C.goldLight : C.gold, fontSize: 9, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>{p.tag}</div>
             </div>
+            {/* Info */}
             <div style={{ padding: 14 }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, marginBottom: 4, fontFamily: F.body }}>{p.name}</div>
               <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 10, fontFamily: F.body }}>{p.desc}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div>
-                  <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{p.price}</div>
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body }}>{p.value}</div>
-                </div>
-                <button disabled={p.locked} style={{ fontSize: 11, color: p.locked ? C.textMuted : C.gold, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, padding: "5px 12px", borderRadius: 6, cursor: p.locked ? "not-allowed" : "pointer", opacity: p.locked ? 0.5 : 1, fontFamily: F.body }}>
-                  {p.locked ? "已鎖定" : "立即兌換"}
+                <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{p.price}</div>
+                <button style={{ fontSize: 11, color: C.gold, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, padding: "5px 12px", borderRadius: 6, cursor: "pointer", fontFamily: F.body }}>
+                  立即兌換
                 </button>
               </div>
             </div>

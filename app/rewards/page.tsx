@@ -22,36 +22,33 @@ const F = {
 
 const PTS_TO_NTD = 1;
 
-// ─── 根據 VIP + founderPass 計算倍率明細 ──────────────────────────────────
-function getMultipliers(member: Member) {
-  const rows: { label: string; value: string; desc: string; color: string }[] = [];
+// ─── 根據 VIP + founderPass 計算獎勵明細 ──────────────────────────────────
+function getRewardRows(member: Member) {
+  const rows: { label: string; desc: string; color: string }[] = [];
 
   // 基礎
-  rows.push({ label: "基礎交易倍率", value: "1.0×", desc: "所有會員基本倍率", color: C.textSecondary });
+  rows.push({ label: "基礎交易獎勵", desc: "每筆交易皆可累積基點", color: C.textSecondary });
 
   // VIP 加成
-  const vipBonus: Record<string, { v: string; desc: string }> = {
-    Silver:  { v: "+0.5×", desc: "Silver 等級專屬加成" },
-    Gold:    { v: "+1.0×", desc: "Gold 等級專屬加成"   },
-    Diamond: { v: "+2.0×", desc: "Diamond 等級專屬加成" },
+  const vipBonus: Record<string, string> = {
+    Silver:  "Silver 等級專屬獎勵",
+    Gold:    "Gold 等級專屬獎勵",
+    Diamond: "Diamond 等級專屬獎勵",
   };
   if (vipBonus[member.vip]) {
-    rows.push({ label: `${member.vip} VIP 獎勵`, value: vipBonus[member.vip].v, desc: vipBonus[member.vip].desc, color: C.gold });
+    rows.push({ label: `${member.vip} VIP 獎勵`, desc: vipBonus[member.vip], color: C.gold });
   }
 
   // Founder Pass 加成
-  const fpBonus: Record<string, string> = { Lu: "+1.0×", M: "+0.7×", O: "+0.5×", N: "+0.3×" };
-  if (member.founderPass && fpBonus[member.founderPass]) {
-    rows.push({ label: "Founder Pass 獎勵", value: fpBonus[member.founderPass], desc: `持有 ${member.founderPass} Founder Pass 加成`, color: C.goldLight });
+  const fpDesc: Record<string, string> = { Lu: "Lu Founder Pass 持有者專屬獎勵", M: "M Founder Pass 持有者專屬獎勵", O: "O Founder Pass 持有者專屬獎勵", N: "N Founder Pass 持有者專屬獎勵" };
+  if (member.founderPass && fpDesc[member.founderPass]) {
+    rows.push({ label: "Founder Pass 獎勵", desc: fpDesc[member.founderPass], color: C.goldLight });
   }
 
-  // 計算總倍率
-  const total = rows.reduce((sum, r) => {
-    const n = parseFloat(r.value.replace("+", "").replace("×", ""));
-    return sum + n;
-  }, 0);
+  // 商城消費
+  rows.push({ label: "商城消費獎勵", desc: "購買商城中的商品也可以累積基點", color: C.goldLight });
 
-  return { rows, total: `${total.toFixed(1)}×` };
+  return rows;
 }
 
 // ─── 根據 member 計算積分數據 ──────────────────────────────────────────────
@@ -67,9 +64,9 @@ function getSummary(member: Member) {
 }
 
 const howToBoost = [
-  { icon: "◈", title: "升級至更高 VIP",    desc: "交易量越高等級越高，倍率最高可達 3.0×",      action: "查看進度 →",    href: "/vip"      },
-  { icon: "⟐", title: "推薦新會員",         desc: "每推薦一位新會員額外獲得 +0.1× 倍率加成",    action: "取得推薦連結 →", href: "/referral" },
+  { icon: "◈", title: "升級至更高 VIP",    desc: "交易量越高等級越高，享有更豐富的獎勵回饋",   action: "查看進度 →",    href: "/vip"      },
   { icon: "◆", title: "Founder Membership", desc: "取得 Founder Pass，參與 Monthly Reward Pool 月回饋分配", action: "了解更多 →", href: "/founder" },
+  { icon: "⬡", title: "商城消費累積基點",   desc: "購買商城中的商品也可以累積基點，消費即賺點",  action: "前往商城 →",    href: "/shop"     },
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -160,32 +157,22 @@ function NTDConverter({ member }: { member: Member }) {
   );
 }
 
-// ─── Multiplier Breakdown ──────────────────────────────────────────────────
+// ─── Reward Breakdown ──────────────────────────────────────────────────────
 function MultiplierBreakdown({ member }: { member: Member }) {
-  const { rows, total } = getMultipliers(member);
+  const rows = getRewardRows(member);
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>獎勵明細</div>
-        <div style={{ fontFamily: F.mono, fontSize: 28, fontWeight: 700, color: C.goldLight }}>{total}</div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+      <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 24 }}>獎勵明細</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {rows.map((m, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.color, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-                <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body }}>{m.label}</span>
-                <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: m.color }}>{m.value}</span>
-              </div>
+              <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, marginBottom: 2 }}>{m.label}</div>
               <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{m.desc}</div>
             </div>
           </div>
         ))}
-      </div>
-      <div style={{ background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, borderRadius: 8, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, fontFamily: F.body }}>總倍率</span>
-        <span style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: C.goldLight }}>{total}</span>
       </div>
     </div>
   );
@@ -247,7 +234,7 @@ export default function RewardsPage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }} className="grid-2">
               <div>
-                <SectionLabel>獎勵倍率明細</SectionLabel>
+                <SectionLabel>獎勵明細</SectionLabel>
                 <MultiplierBreakdown member={member} />
               </div>
               <div>

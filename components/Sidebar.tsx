@@ -13,14 +13,13 @@ const F = {
 };
 
 const navItems = [
-  { label: "Dashboard",      icon: "⬡",  href: "/dashboard"            },
-  { label: "VIP Membership", icon: "◈",  href: "/vip"         },
-  { label: "Leaderboard", icon: "🏆", href: "/leaderboard" },
-  { label: "Rewards",        icon: "✦",  href: "/rewards"     },
-  { label: "Marketplace",    icon: "◻",  href: "/marketplace" },
-  { label: "Founder Pass",   icon: "◆", href: "/founder"     },
-  { label: "Referral",       icon: "⟐",  href: "/referral"    },
-  
+  { label: "Dashboard",       icon: "⬡",  href: "/dashboard"        },
+  { label: "Platform Status", icon: "◎",  href: "/platform-status"  },
+  { label: "VIP Membership",  icon: "◈",  href: "/vip"              },
+  { label: "Founder Pass",    icon: "◆",  href: "/founder"          },
+  { label: "Leaderboard",     icon: "🏆", href: "/leaderboard"      },
+  { label: "Rewards",         icon: "✦",  href: "/rewards"          },
+  { label: "Marketplace",     icon: "◻",  href: "/marketplace"      },
 ];
 
 interface SidebarProps {
