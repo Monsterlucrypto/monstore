@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Layout from "@/components/Layout";
+import { members } from "@/data/members";
 
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
@@ -22,7 +23,7 @@ const F = {
 const overview = [
   { label: "Monthly Revenue",        sub: "本月平台總收入", value: "NT$29,760", change: "+18.4%", changeLabel: "vs last month", icon: "◈", positive: true },
   { label: "Total Orders",           sub: "本月訂單總數",   value: "42 Orders",  change: "+12.0%", changeLabel: "vs last month", icon: "⟐", positive: true },
-  { label: "Referral Commissions",   sub: "本月推薦佣金",   value: "NT$7,832",   change: "+23.0%", changeLabel: "vs last month", icon: "◎", positive: true },
+  { label: "Referral Commissions",   sub: "累計手續費佣金",  value: `$${members.reduce((s,m)=>s+m.commissions,0).toFixed(2)} USDT`, change: `${members.filter(m=>m.commissions>0).length} 位會員有佣金`, changeLabel: "", icon: "◎", positive: true },
   { label: "Treasury Balance",       sub: "財庫目前餘額",   value: "NT$10,000",  change: "NT$2,500", changeLabel: "this month",  icon: "◆", positive: true },
 ];
 
@@ -220,26 +221,51 @@ function RewardPoolStatus() {
 }
 
 function CommunityGrowth() {
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const thisMonth = now.getMonth() + 1;
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastYear = lastMonthDate.getFullYear();
+  const lastMonth = lastMonthDate.getMonth() + 1;
+  const parseSince = (s: string) => { const [y, m] = s.split(".").map(Number); return { year: y, month: m }; };
+  const joinedThisMonth = members.filter(m => { const { year, month } = parseSince(m.memberSince); return year === thisYear && month === thisMonth; }).length;
+  const totalMembers   = members.length;
+  const lastMonthTotal = totalMembers - joinedThisMonth;
+  const growthPct      = lastMonthTotal > 0 ? ((joinedThisMonth / lastMonthTotal) * 100).toFixed(1) : null;
+  const founderHolders = members.filter(m => m.founderPass !== null).length;
+  const activeMembers  = members.filter(m => m.tradingVolume > 0).length;
+
+  const stats = [
+    { label: "Current Members", sub: "目前總會員數",       value: totalMembers,   color: C.gold,    newThisMonth: joinedThisMonth, growthPct },
+    { label: "Founder Holders", sub: "創始會員持有人數",   value: founderHolders, color: "#E8C96A", newThisMonth: null as null,    growthPct: null as null },
+    { label: "Active Members",  sub: "活躍中的會員", value: activeMembers,  color: C.green,   newThisMonth: null as null,    growthPct: null as null },
+  ];
+
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
       <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 24 }}>Community Growth</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
-        {community.map((c) => (
+        {stats.map((c) => (
           <div key={c.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 12, padding: 20 }}>
             <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{c.label}</div>
             <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body, marginBottom: 12 }}>{c.sub}</div>
-            <div style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: c.color, marginBottom: 10, lineHeight: 1 }}>{c.value.toLocaleString()}</div>
-            <div style={{ height: "0.5px", background: C.borderSubtle, marginBottom: 10 }} />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>+{c.newThisMonth} 本月新增</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: C.green, fontFamily: F.mono }}>{c.change}</span>
-            </div>
+            <div style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: c.color, lineHeight: 1, marginBottom: c.newThisMonth !== null ? 10 : 0 }}>{c.value.toLocaleString()}</div>
+            {c.newThisMonth !== null && (
+              <>
+                <div style={{ height: "0.5px", background: C.borderSubtle, marginBottom: 10 }} />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>+{c.newThisMonth} 本月新增</span>
+                  {c.growthPct && <span style={{ fontSize: 11, fontWeight: 600, color: C.green, fontFamily: F.mono }}>+{c.growthPct}%</span>}
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
     </div>
   );
 }
+
 
 function TreasuryHealth() {
   const runwayPct = Math.min((treasury.runway / 12) * 100, 100);
