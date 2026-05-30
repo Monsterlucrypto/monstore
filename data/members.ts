@@ -39,16 +39,16 @@ export const FOUNDER_CONFIG: Record<string, { units: number; price: number }> = 
 const rawMembers = [
 
 {
-  uid: "TEST",
-  name: "大帥哥",
+  uid: "222",
+  name: "測試用",
   vip: "Normal" as const,
-  tradingVolume: 222
+  tradingVolume: 222 ,
   tradingVolumeDisplay: "$222",
   points: "0.022",
   commissions: 0.022,
   memberSince: "2026.02.22",
   treasuryParticipation: "Active" as const,
-  founderPass: null as FounderPassTier,
+  founderPass: "N" as FounderPassTier,
 },
 
  {
