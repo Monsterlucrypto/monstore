@@ -21,7 +21,7 @@ const F = {
 
 // 解析 founderPass 字串為各等級持有數量
 // 支援格式："Lu" / "Lu,M" / "Lu,Lu,M" 等多張
-function parseFounderPasses(fp: string | undefined): Record<string, number> {
+function parseFounderPasses(fp: string | null | undefined): Record<string, number> {
   if (!fp) return {};
   const counts: Record<string, number> = {};
   fp.split(",").map(s => s.trim()).filter(Boolean).forEach(tier => {
@@ -30,7 +30,7 @@ function parseFounderPasses(fp: string | undefined): Record<string, number> {
   return counts;
 }
 
-function totalFounderUnits(fp: string | undefined): number {
+function totalFounderUnits(fp: string | null | undefined): number {
   const counts = parseFounderPasses(fp);
   return Object.entries(counts).reduce((sum, [tier, qty]) => {
     const cfg = FOUNDER_CONFIG[tier];
@@ -223,7 +223,7 @@ function HeroBanner({ member }: { member: Member | null }) {
             <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.3)", borderRadius: 10, padding: "14px 28px", flexWrap: "wrap", justifyContent: "center" }}>
               <span style={{ fontSize: 16, color: "#5ea96e" }}>✓</span>
               <span style={{ fontSize: 14, color: "#5ea96e", fontFamily: F.body, fontWeight: 500 }}>
-                已持有：{Object.entries(parseFounderPasses(member.founderPass)).map(([tier, qty]) => `${tier} ×${qty}`).join("　")}
+                已持有：{Object.entries(parseFounderPasses(member.founderPass ?? undefined)).map(([tier, qty]) => `${tier} ×${qty}`).join("　")}
               </span>
             </div>
           ) : (
@@ -417,8 +417,8 @@ function RewardPoolBubbles() {
 }
 
 function MyFounderStatus({ member }: { member: Member }) {
-  const counts = parseFounderPasses(member.founderPass);
-  const totalUnits = totalFounderUnits(member.founderPass);
+  const counts = parseFounderPasses(member.founderPass ?? undefined);
+  const totalUnits = totalFounderUnits(member.founderPass ?? undefined);
   const tierEntries = Object.entries(counts); // [["Lu",1],["M",2], ...]
   const primaryTier = tierEntries[0]?.[0] ?? "N";
 
