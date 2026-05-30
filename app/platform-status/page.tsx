@@ -1,11 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Layout from "@/components/Layout";
-import { members } from "@/data/members";
-import type { Member } from "@/data/members";
-
-const UID_KEY = "monstore_uid";
 
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
@@ -23,20 +19,17 @@ const F = {
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
 
-// 從 members 加總手續費
-const totalCommissionsUSDT = members.reduce((s, m) => s + m.commissions, 0);
-
 const overview = [
-  { label: "Monthly Revenue",      sub: "本月平台總收入", value: "NT$29,760",                                          change: "+18.4%", changeLabel: "vs last month", icon: "◈", positive: true },
-  { label: "Total Orders",         sub: "本月訂單總數",   value: "42 Orders",                                          change: "+12.0%", changeLabel: "vs last month", icon: "⟐", positive: true },
-  { label: "Referral Commissions", sub: "累計推薦佣金",   value: `$${totalCommissionsUSDT.toFixed(2)} USDT`,           change: `${members.filter(m=>m.commissions>0).length} 位會員`, changeLabel: "有佣金", icon: "◎", positive: true },
-  { label: "Treasury Balance",     sub: "財庫目前餘額",   value: "NT$10,000",                                          change: "NT$2,500", changeLabel: "this month",  icon: "◆", positive: true },
+  { label: "Monthly Revenue",        sub: "本月平台總收入", value: "NT$29,760", change: "+18.4%", changeLabel: "vs last month", icon: "◈", positive: true },
+  { label: "Total Orders",           sub: "本月訂單總數",   value: "42 Orders",  change: "+12.0%", changeLabel: "vs last month", icon: "⟐", positive: true },
+  { label: "Referral Commissions",   sub: "本月推薦佣金",   value: "NT$7,832",   change: "+23.0%", changeLabel: "vs last month", icon: "◎", positive: true },
+  { label: "Treasury Balance",       sub: "財庫目前餘額",   value: "NT$10,000",  change: "NT$2,500", changeLabel: "this month",  icon: "◆", positive: true },
 ];
 
 const revenueBreakdown = [
-  { label: "交易所推薦收入", value: 18640, pct: 62.6, color: "#E8C96A" },
-  { label: "商城銷售收入", value: 8256,  pct: 27.7, color: "#C9A84C" },
-  { label: "其他來源收入", value: 2864,  pct: 9.6,  color: "#7a6130" },
+  { label: "Trading Referral Revenue", sub: "交易推薦收入", value: 18640, pct: 62.6, color: "#E8C96A" },
+  { label: "Marketplace Revenue",      sub: "商城銷售收入", value: 8256,  pct: 27.7, color: "#C9A84C" },
+  { label: "Other Revenue",            sub: "其他來源收入", value: 2864,  pct: 9.6,  color: "#7a6130" },
 ];
 const totalRevenue = revenueBreakdown.reduce((s, r) => s + r.value, 0);
 
@@ -47,7 +40,11 @@ const rewardPool = {
   revenue: 29760,
 };
 
-// community 改為從 members 動態計算
+const community = [
+  { label: "Current Members",  sub: "目前總會員數",      value: 248,  newThisMonth: 31,  change: "+14.3%", color: C.gold },
+  { label: "Founder Holders",  sub: "創始會員持有人數",  value: 5,    newThisMonth: 1,   change: "+25.0%", color: "#E8C96A" },
+  { label: "Active Traders",   sub: "本月活躍交易會員",  value: 183,  newThisMonth: 22,  change: "+13.7%", color: C.green },
+];
 
 const treasury = {
   balance: 10000,
@@ -223,82 +220,20 @@ function RewardPoolStatus() {
 }
 
 function CommunityGrowth() {
-  const now = new Date();
-  const thisYear  = now.getFullYear();
-  const thisMonth = now.getMonth() + 1; // 1-12
-
-  // 上個月的年月
-  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const lastYear  = lastMonthDate.getFullYear();
-  const lastMonth = lastMonthDate.getMonth() + 1;
-
-  // 解析 memberSince "2026.05.24" → { year, month }
-  const parseSince = (s: string) => {
-    const [y, m] = s.split(".").map(Number);
-    return { year: y, month: m };
-  };
-
-  // 本月新加入
-  const joinedThisMonth = members.filter(m => {
-    const { year, month } = parseSince(m.memberSince);
-    return year === thisYear && month === thisMonth;
-  }).length;
-
-  // 上個月加入
-  const joinedLastMonth = members.filter(m => {
-    const { year, month } = parseSince(m.memberSince);
-    return year === lastYear && month === lastMonth;
-  }).length;
-
-  const totalMembers   = members.length;
-  const founderHolders = members.filter(m => m.founderPass !== null).length;
-  const activeMembers  = members.filter(m => m.tradingVolume > 0).length;
-
-  // 上個月底的總會員數（= 今天總數 - 本月新加入）
-  const lastMonthTotal = totalMembers - joinedThisMonth;
-  const memberGrowthPct = lastMonthTotal > 0
-    ? ((joinedThisMonth / lastMonthTotal) * 100).toFixed(1)
-    : null;
-
-  const stats = [
-    {
-      label: "Current Members", sub: "目前總會員數",
-      value: totalMembers, color: C.gold,
-      newThisMonth: joinedThisMonth,
-      growthPct: memberGrowthPct,
-    },
-    {
-      label: "Founder Holders", sub: "創始會員持有人數",
-      value: founderHolders, color: "#E8C96A",
-      newThisMonth: null, growthPct: null,
-    },
-    {
-      label: "Active Members", sub: "活躍中的會員",
-      value: activeMembers, color: C.green,
-      newThisMonth: null, growthPct: null,
-    },
-  ];
-
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
       <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 24 }}>Community Growth</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
-        {stats.map((c) => (
+        {community.map((c) => (
           <div key={c.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 12, padding: 20 }}>
             <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{c.label}</div>
             <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body, marginBottom: 12 }}>{c.sub}</div>
-            <div style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: c.color, lineHeight: 1, marginBottom: c.newThisMonth !== null ? 10 : 0 }}>{c.value.toLocaleString()}</div>
-            {c.newThisMonth !== null && (
-              <>
-                <div style={{ height: "0.5px", background: C.borderSubtle, marginBottom: 10 }} />
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>+{c.newThisMonth} 本月新增</span>
-                  {c.growthPct !== null && (
-                    <span style={{ fontSize: 11, fontWeight: 600, color: C.green, fontFamily: F.mono }}>+{c.growthPct}%</span>
-                  )}
-                </div>
-              </>
-            )}
+            <div style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: c.color, marginBottom: 10, lineHeight: 1 }}>{c.value.toLocaleString()}</div>
+            <div style={{ height: "0.5px", background: C.borderSubtle, marginBottom: 10 }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>+{c.newThisMonth} 本月新增</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: C.green, fontFamily: F.mono }}>{c.change}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -402,49 +337,17 @@ function GenesisFounderStatus() {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PlatformStatusPage() {
-  const [member, setMember] = useState<Member | null>(null);
-
-  useEffect(() => {
-    const uid = localStorage.getItem(UID_KEY);
-    if (!uid) return;
-    const found = members.find((m) => m.uid === uid);
-    if (found) setMember(found);
-  }, []);
-
   return (
     <Layout activePath="/platform-status" title="Platform Status">
       <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
-
-        {/* 未登入提示 */}
-        {!member && (
-          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: `0.5px solid rgba(201,168,76,0.12)`, borderRadius: 10, fontFamily: F.body, fontSize: 13, color: C.textMuted }}>
-            ← 請先前往 <a href="/member" style={{ color: C.gold, textDecoration: "none" }}>Member Access</a> 頁面輸入 UID 查詢會員資料
-          </div>
-        )}
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
           <div>
             <div style={{ fontFamily: F.display, fontSize: 32, fontWeight: 300, color: C.textPrimary, letterSpacing: 1, marginBottom: 6 }}>Platform Status</div>
-            <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>
-              Monstore · 營運狀態與成長數據儀表板{member ? ` · ${member.name}` : ""}
-            </div>
+            <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>Monstore · 營運狀態與成長數據儀表板</div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            {member && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, borderRadius: 8, padding: "6px 14px" }}>
-                <span style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>VIP</span>
-                <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color: C.goldLight }}>{member.vip}</span>
-                {member.founderPass && (
-                  <>
-                    <span style={{ fontSize: 10, color: C.textMuted }}>·</span>
-                    <span style={{ fontSize: 10, color: C.gold, fontFamily: F.body }}>Founder {member.founderPass}</span>
-                  </>
-                )}
-              </div>
-            )}
-            <LiveBadge />
-          </div>
+          <LiveBadge />
         </div>
 
         <div>
