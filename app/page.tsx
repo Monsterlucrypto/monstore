@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 
 const C = {
   gold: "#C9A84C",
@@ -102,7 +101,6 @@ const pools = [
 ];
 
 function Navbar() {
-  const [open, setOpen] = useState(false);
   return (
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
@@ -119,36 +117,9 @@ function Navbar() {
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 28 }} className="desktop-nav">
-        {["About", "VIP", "Founder", "Treasury"].map((item) => (
-          <a key={item} href={`#${item.toLowerCase()}`}
-            style={{ fontSize: 13, color: C.textSecondary, textDecoration: "none", fontFamily: F.body, letterSpacing: 0.3 }}
-            onMouseEnter={e => (e.currentTarget.style.color = C.textPrimary)}
-            onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
-          >{item}</a>
-        ))}
-
-        <a href="/member" style={{ fontSize: 12, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "7px 18px", borderRadius: 8, textDecoration: "none", fontFamily: F.body }}>
-  Member →
-</a>
-      </div>
-
-      <button onClick={() => setOpen(!open)} className="mobile-nav-btn"
-        style={{ background: "transparent", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, width: 36, height: 36, display: "none", alignItems: "center", justifyContent: "center", cursor: "pointer", color: C.textSecondary, fontSize: 18 }}>
-        {open ? "✕" : "☰"}
-      </button>
-
-      {open && (
-        <div style={{ position: "fixed", top: 64, left: 0, right: 0, background: "rgba(10,10,11,0.98)", borderBottom: `0.5px solid ${C.borderSubtle}`, padding: "16px 24px", display: "flex", flexDirection: "column", gap: 12, zIndex: 99 }}>
-          {["About", "VIP", "Founder", "Treasury"].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setOpen(false)}
-              style={{ fontSize: 14, color: C.textSecondary, textDecoration: "none", fontFamily: F.body, padding: "8px 0", borderBottom: `0.5px solid ${C.borderSubtle}` }}>{item}</a>
-          ))}
-          <a href="/member" style={{ fontSize: 13, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "10px 18px", borderRadius: 8, textDecoration: "none", fontFamily: F.body, textAlign: "center" }}>
-  Member →
-</a>
-        </div>
-      )}
+      <a href="/member" style={{ fontSize: 12, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "7px 18px", borderRadius: 8, textDecoration: "none", fontFamily: F.body }}>
+        Member →
+      </a>
     </nav>
   );
 }
@@ -214,8 +185,7 @@ export default function LandingPage() {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
 
-        .desktop-nav { display: flex; }
-        .mobile-nav-btn { display: none !important; }
+
         .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
         .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
@@ -229,8 +199,6 @@ export default function LandingPage() {
           .pool-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-nav-btn { display: flex !important; }
           .hero-grid { grid-template-columns: 1fr; gap: 40px; }
           .feature-grid { grid-template-columns: 1fr; }
           .steps-grid { grid-template-columns: 1fr; }

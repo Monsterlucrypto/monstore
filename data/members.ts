@@ -53,7 +53,7 @@ const rawMembers = [
 
  {
   uid: "565008268",
-  name: "郭科劼",
+  name: "老豆",
   vip: "Normal" as const,
   tradingVolume: 21966.66,
   tradingVolumeDisplay: "$21,966",
