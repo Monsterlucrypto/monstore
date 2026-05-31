@@ -9,10 +9,55 @@ const UID_KEY = "monstore_uid";
 
 // ─── Tier definitions (static, display only) ──────────────────────────────
 const TIERS = [
-  { id: "Normal",  name: "Normal",  label: "Normal Access",  icon: "◆", requirement: "$0 – $300K",    color: "#cd7f32", colorDim: "rgba(205,127,50,0.15)",  colorBorder: "rgba(205,127,50,0.3)",  discount: "0%",  support: "標準", signals: false, manager: false, founderMembership: false },
-  { id: "Silver",  name: "Silver",  label: "Silver Access",  icon: "◆", requirement: "$300K – $1M",   color: "#a8a9ad", colorDim: "rgba(168,169,173,0.15)", colorBorder: "rgba(168,169,173,0.3)", discount: "15%", support: "優先", signals: false, manager: false, founderMembership: false },
-  { id: "Gold",    name: "Gold",    label: "Gold Access",    icon: "◆", requirement: "$1M – $5M",     color: "#C9A84C", colorDim: "rgba(201,168,76,0.15)",  colorBorder: "rgba(201,168,76,0.3)",  discount: "30%", support: "優先", signals: false, manager: false, founderMembership: false },
-  { id: "Diamond", name: "Diamond", label: "Diamond Access", icon: "💎", requirement: "$5M+ / Founder", color: "#b0e0ff", colorDim: "rgba(176,224,255,0.12)", colorBorder: "rgba(176,224,255,0.35)", discount: "50%", support: "專屬經理", signals: true, manager: true, founderMembership: true },
+  {
+    id: "Normal", name: "Normal", label: "Normal Access", icon: "◆",
+    requirement: "50K – 300K",
+    color: "#cd7f32", colorDim: "rgba(205,127,50,0.15)", colorBorder: "rgba(205,127,50,0.3)",
+    signals: false,
+    perks: [
+      "每月 50 NTD 電商折價券（無低消）",
+      "95折優惠券 × 1（低消 500）",
+    ],
+  },
+  {
+    id: "Silver", name: "Silver", label: "Silver Access", icon: "◆",
+    requirement: "300K – 1M",
+    color: "#a8a9ad", colorDim: "rgba(168,169,173,0.15)", colorBorder: "rgba(168,169,173,0.3)",
+    signals: true,
+    perks: [
+      "每月抽獎資格 × 1",
+      "每月 100 NTD 電商折價券（無低消）× 2",
+      "9折優惠券 × 2（低消 500）",
+      "私人交易訊號",
+      "VIP 群組",
+    ],
+  },
+  {
+    id: "Gold", name: "Gold", label: "Gold Access", icon: "◆",
+    requirement: "1M – 5M",
+    color: "#C9A84C", colorDim: "rgba(201,168,76,0.15)", colorBorder: "rgba(201,168,76,0.3)",
+    signals: true,
+    perks: [
+      "每月抽獎資格 × 3",
+      "每月 100 NTD 電商折價券（無低消）× 2",
+      "85折優惠券 × 2（低消 500）",
+      "私人交易訊號",
+      "VIP 群組",
+    ],
+  },
+  {
+    id: "Diamond", name: "Diamond", label: "Diamond Access", icon: "💎",
+    requirement: "5M 以上",
+    color: "#b0e0ff", colorDim: "rgba(176,224,255,0.12)", colorBorder: "rgba(176,224,255,0.35)",
+    signals: true,
+    perks: [
+      "每月抽獎資格 × 10",
+      "每月 100 NTD 電商折價券（無低消）× 5",
+      "私人交易訊號",
+      "VIP 群組",
+      "專人客服",
+    ],
+  },
 ];
 
 // ─── Progress calculation ──────────────────────────────────────────────────
@@ -79,7 +124,6 @@ function CurrentStatusCard({ member }: { member: Member }) {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {[
-            { label: "商城折扣",    value: tier.discount },
             { label: "Trading Vol", value: member.tradingVolumeDisplay },
             { label: "Rank",        value: `#${member.tradingRank}` },
           ].map((s) => (
@@ -109,9 +153,8 @@ function CurrentStatusCard({ member }: { member: Member }) {
             </div>
             <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
               達到 <span style={{ color: nextTier.color }}>{nextTier.name}</span> 等級可獲得：
-              {nextTier.manager && " 專屬客戶經理、"}
-              {nextTier.signals && " 私人交易訊號、"}
-              {nextTier.discount !== tier.discount && ` ${nextTier.discount} 商城折扣`}
+              {nextTier.signals && !tier.signals && " 私人交易訊號、"}
+              {" 更多月度抽獎與折價券權益"}
             </div>
             <a href="/founder" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, color: C.gold, fontFamily: F.body, textDecoration: "none" }}>
               ◆ 了解 Founder Membership →
@@ -159,17 +202,10 @@ function TierCards({ currentVip }: { currentVip: string }) {
             <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginBottom: 16, lineHeight: 1.5 }}>{tier.requirement}</div>
             <div style={{ height: "0.5px", background: tier.colorBorder, marginBottom: 16 }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[{ label: "商城折扣", value: tier.discount }, { label: "客服支援", value: tier.support }].map((s) => (
-                <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{s.label}</span>
-                  <span style={{ fontSize: 12, fontFamily: F.mono, fontWeight: 700, color: tier.color }}>{s.value}</span>
-                </div>
-              ))}
-              <div style={{ height: "0.5px", background: C.borderSubtle, margin: "4px 0" }} />
-              {[{ label: "私人訊號", value: tier.signals }, { label: "專屬經理", value: tier.manager }, { label: "Founder Membership", value: tier.founderMembership }].map((s) => (
-                <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{s.label}</span>
-                  <span style={{ fontSize: 13, color: s.value ? "#5ea96e" : C.textMuted }}>{s.value ? "✓" : "✗"}</span>
+              {tier.perks.map((perk) => (
+                <div key={perk} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <span style={{ fontSize: 12, color: tier.color, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{perk}</span>
                 </div>
               ))}
             </div>
@@ -188,13 +224,14 @@ function TierCards({ currentVip }: { currentVip: string }) {
 // ─── Benefits Table ────────────────────────────────────────────────────────
 function BenefitsTable({ currentVip }: { currentVip: string }) {
   const rows = [
-    { label: "月交易量門檻",       values: ["$0+", "$300K+", "$1M+", "$5M+ / Founder"] },
-    { label: "商城折扣",            values: ["0%", "15%", "30%", "50%"] },
-    { label: "客服支援",            values: ["標準", "優先", "優先", "專屬經理"] },
-    { label: "私人交易訊號",        values: ["✗", "✗", "✗", "✓"] },
-    { label: "Founder Membership", values: ["✗", "✗", "✗", "✓"] },
-    { label: "優先商品搶購",        values: ["✗", "✗", "✓", "✓"] },
-    { label: "專屬活動邀請",        values: ["✗", "✗", "✓", "✓"] },
+    { label: "累積交易量門檻",           values: ["50K – 300K", "300K – 1M", "1M – 5M", "5M 以上"] },
+    { label: "每月電商折價券",            values: ["50 NTD × 1", "100 NTD × 2", "100 NTD × 2", "100 NTD × 5"] },
+    { label: "每月優惠券",                values: ["95折 × 1", "9折 × 2", "85折 × 2", "—"] },
+    { label: "優惠券低消",                values: ["$500", "$500", "$500", "—"] },
+    { label: "每月抽獎資格",              values: ["✗", "× 1", "× 3", "× 10"] },
+    { label: "私人交易訊號",              values: ["✗", "✓", "✓", "✓"] },
+    { label: "VIP 群組",                  values: ["✗", "✓", "✓", "✓"] },
+    { label: "專人客服",                  values: ["✗", "✗", "✗", "✓"] },
   ];
   const currentIdx = TIERS.findIndex((t) => t.id === currentVip);
 
@@ -222,8 +259,9 @@ function BenefitsTable({ currentVip }: { currentVip: string }) {
                 const isCurrent = vi === currentIdx;
                 const isCheck   = val === "✓";
                 const isCross   = val === "✗";
+                const isDash    = val === "—";
                 return (
-                  <td key={vi} style={{ padding: "14px 20px", textAlign: "center", fontFamily: isCross || isCheck ? F.body : F.mono, fontSize: isCheck || isCross ? 14 : 12, fontWeight: 700, color: isCross ? C.textMuted : isCheck ? "#5ea96e" : isCurrent ? C.gold : TIERS[vi].color, background: isCurrent ? "rgba(201,168,76,0.04)" : "transparent" }}>
+                  <td key={vi} style={{ padding: "14px 20px", textAlign: "center", fontFamily: isCross || isCheck ? F.body : F.mono, fontSize: isCheck || isCross ? 14 : 12, fontWeight: 700, color: isCross || isDash ? C.textMuted : isCheck ? "#5ea96e" : isCurrent ? C.gold : TIERS[vi].color, background: isCurrent ? "rgba(201,168,76,0.04)" : "transparent" }}>
                     {val}
                   </td>
                 );
