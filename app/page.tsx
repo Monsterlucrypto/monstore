@@ -227,7 +227,7 @@ export default function LandingPage() {
                 讓交易量、消費與推薦貢獻，轉化為會員積分、VIP 等級與專屬權益。
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <a href="https://partner.bybit.com/b/aff_43090_153866" target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "13px 28px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5, textDecoration: "none", display: "inline-block" }}>
+                <a href="https://partner.bybit.com/b/153866" target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "13px 28px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5, textDecoration: "none", display: "inline-block" }}>
                   Join Membership
                 </a>
                 <a href="#founder" style={{ background: "transparent", border: `0.5px solid ${C.borderMid}`, color: C.textSecondary, padding: "13px 24px", borderRadius: 10, fontSize: 14, cursor: "pointer", fontFamily: F.body, textDecoration: "none", display: "inline-block" }}>
@@ -428,9 +428,9 @@ export default function LandingPage() {
               加入早期會員，參與 Monstore 交易會員經濟的第一階段。
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <button style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "14px 32px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
-                Join Community
-              </button>
+              <a href="https://partner.bybit.com/b/153866" target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "14px 32px", borderRadius: 10, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5, textDecoration: "none", display: "inline-block" }}>
+  Join Community
+</a>
               <button style={{ background: "transparent", border: `0.5px solid ${C.borderMid}`, color: C.textSecondary, padding: "14px 28px", borderRadius: 10, fontSize: 14, cursor: "pointer", fontFamily: F.body }}>
                 Founder Access →
               </button>
