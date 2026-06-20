@@ -12,8 +12,8 @@ export type Member = {
   vip: "Diamond" | "Gold" | "Silver" | "Normal";
   tradingVolume: number;        // 交易量（數字，方便排序）
   tradingVolumeDisplay: string; // 顯示用字串
-  points: string;               // 積分（等於 Commissions USDT）
-  commissions: number;          // 返佣 USDT
+  commissions: number;          // 手續費 USDT
+  points: string;               // 積分（= 手續費 × 0.2，自動計算）
   memberSince: string;
   treasuryParticipation: "Active" | "Pending";
   founderPass: FounderPassTier; // null = 無 Pass
@@ -34,9 +34,11 @@ export const FOUNDER_CONFIG: Record<string, { units: number; price: number }> = 
 // ★ 每週只需更新這裡 ★
 // VIP 等級門檻：Normal <300K / Silver 300K–1M / Gold 1M–5M / Diamond 5M+
 // founderPass: null = 無 Pass，"Lu" / "M" / "O" / "N" = 對應等級
-// tradingRank 不用填，系統自動計算
+// tradingRank / points 不用填，系統自動計算
+// points = commissions × 0.2
 // ════════════════════════════════════════════════════════════
-const rawMembers = [
+type RawMember = Omit<Member, "points" | "tradingRank">;
+const rawMembers: RawMember[] = [
 
 {
   uid: "222",
@@ -44,7 +46,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 222,
   tradingVolumeDisplay: "$222",
-  points: "0.022",
   commissions: 0.022,
   memberSince: "2026.02.22",
   treasuryParticipation: "Active" as const,
@@ -56,7 +57,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.05.29",
   treasuryParticipation: "Pending" as const,
@@ -68,7 +68,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.05.29",
   treasuryParticipation: "Pending" as const,
@@ -80,7 +79,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 2649.3131,
   tradingVolumeDisplay: "$2,649",
-  points: "0.45",
   commissions: 0.45298588,
   memberSince: "2026.05.28",
   treasuryParticipation: "Active" as const,
@@ -92,7 +90,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.05.27",
   treasuryParticipation: "Pending" as const,
@@ -104,7 +101,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 89370.4682,
   tradingVolumeDisplay: "$89,370",
-  points: "14.18",
   commissions: 14.17837852,
   memberSince: "2026.05.24",
   treasuryParticipation: "Active" as const,
@@ -116,7 +112,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.03.11",
   treasuryParticipation: "Pending" as const,
@@ -128,7 +123,6 @@ const rawMembers = [
   vip: "Gold" as const,
   tradingVolume: 1736335.474092,
   tradingVolumeDisplay: "$1,736,335",
-  points: "292.18",
   commissions: 292.18090435,
   memberSince: "2026.02.27",
   treasuryParticipation: "Active" as const,
@@ -140,7 +134,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 31.26471,
   tradingVolumeDisplay: "$31",
-  points: "0.01",
   commissions: 0.01031685,
   memberSince: "2026.02.27",
   treasuryParticipation: "Active" as const,
@@ -152,7 +145,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 8934.5719964,
   tradingVolumeDisplay: "$8,934",
-  points: "1.16",
   commissions: 1.1606191,
   memberSince: "2026.02.27",
   treasuryParticipation: "Active" as const,
@@ -164,7 +156,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0.02",
   commissions: 0.01903,
   memberSince: "2026.02.27",
   treasuryParticipation: "Active" as const,
@@ -176,7 +167,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.02.15",
   treasuryParticipation: "Pending" as const,
@@ -189,7 +179,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.02.14",
   treasuryParticipation: "Pending" as const,
@@ -201,7 +190,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.02.11",
   treasuryParticipation: "Pending" as const,
@@ -213,7 +201,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.02.11",
   treasuryParticipation: "Pending" as const,
@@ -225,7 +212,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.02.10",
   treasuryParticipation: "Pending" as const,
@@ -238,7 +224,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 0,
   tradingVolumeDisplay: "$0",
-  points: "0",
   commissions: 0,
   memberSince: "2026.02.06",
   treasuryParticipation: "Pending" as const,
@@ -250,7 +235,6 @@ const rawMembers = [
   vip: "Normal" as const,
   tradingVolume: 3000,
   tradingVolumeDisplay: "$3,000",
-  points: "1",
   commissions: 1,
   memberSince: "2026.04.07",
   treasuryParticipation: "Active" as const,
@@ -265,6 +249,7 @@ const sorted = [...rawMembers].sort((a, b) => b.tradingVolume - a.tradingVolume)
 
 export const members: Member[] = rawMembers.map((m) => ({
   ...m,
+  points: (m.commissions * 0.2).toFixed(4),
   tradingRank: sorted.findIndex((s) => s.uid === m.uid) + 1,
 }));
 

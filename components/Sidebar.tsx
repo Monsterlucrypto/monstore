@@ -18,7 +18,6 @@ const navItems = [
   { label: "VIP Membership",  icon: "◈",  href: "/vip"              },
   { label: "Founder Pass",    icon: "◆",  href: "/founder"          },
   { label: "Leaderboard",     icon: "🏆", href: "/leaderboard"      },
-  { label: "Rewards",         icon: "✦",  href: "/rewards"          },
   { label: "Marketplace",     icon: "◻",  href: "/marketplace"      },
 ];
 

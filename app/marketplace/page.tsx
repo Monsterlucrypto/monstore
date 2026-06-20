@@ -38,15 +38,15 @@ type FilterType = "全部" | "折價券" | "配件" | "Founder Pass";
 
 const products = [
   // ── 折價券 ──
-  { id: 1, name: "NT$250 折價券",      desc: "低消 NT$1,000 適用，每筆訂單限用一張",        price: 200,   tag: "折價券",      icon: "🎟️", locked: false },
-  { id: 2, name: "NT$500 折價券",      desc: "低消 NT$2,000 適用，每筆訂單限用一張",        price: 350,   tag: "折價券",      icon: "🎫", locked: false },
+  { id: 1, name: "NT$250 折價券",      desc: "低消 NT$1,000 適用，每筆訂單限用一張",        price: 40,    tag: "折價券",      icon: "🎟️", locked: false },
+  { id: 2, name: "NT$500 折價券",      desc: "低消 NT$2,000 適用，每筆訂單限用一張",        price: 70,    tag: "折價券",      icon: "🎫", locked: false },
   // ── 配件 ──
-  { id: 3, name: "30cm Type-C 充電線", desc: "Type-C to Type-C，30cm 短線，編織材質",       price: 200,   tag: "配件",        icon: "🔌", locked: false },
-  { id: 4, name: "20W 充電頭",         desc: "GaN 20W 快充充電頭，支援 PD 快充協議",         price: 500,   tag: "配件",        icon: "🔋", locked: false },
+  { id: 3, name: "30cm Type-C 充電線", desc: "Type-C to Type-C，30cm 短線，編織材質",       price: 40,    tag: "配件",        icon: "🔌", locked: false },
+  { id: 4, name: "20W 充電頭",         desc: "GaN 20W 快充充電頭，支援 PD 快充協議",         price: 100,   tag: "配件",        icon: "🔋", locked: false },
   // ── Founder Pass ──
-  { id: 5, name: "M Founder Pass",     desc: "Monstore 創始會員 M 等級，240 Reward Units，永久 Founder 權益", price: 60000, tag: "Founder Pass", icon: "◆", locked: false, founderTier: "M" },
-  { id: 6, name: "O Founder Pass",     desc: "Monstore 創始會員 O 等級，70 Reward Units，永久 Founder 權益", price: 20000, tag: "Founder Pass", icon: "◆", locked: false, founderTier: "O" },
-  { id: 7, name: "N Founder Pass",     desc: "Monstore 創始會員 N 等級，20 Reward Units，永久 Founder 權益", price: 6000,  tag: "Founder Pass", icon: "◆", locked: false, founderTier: "N" },
+  { id: 5, name: "M Founder Pass",     desc: "Monstore 創始會員 M 等級，240 Reward Units，永久 Founder 權益", price: 12000, tag: "Founder Pass", icon: "◆", locked: false, founderTier: "M" },
+  { id: 6, name: "O Founder Pass",     desc: "Monstore 創始會員 O 等級，70 Reward Units，永久 Founder 權益", price: 4000,  tag: "Founder Pass", icon: "◆", locked: false, founderTier: "O" },
+  { id: 7, name: "N Founder Pass",     desc: "Monstore 創始會員 N 等級，20 Reward Units，永久 Founder 權益", price: 1200,  tag: "Founder Pass", icon: "◆", locked: false, founderTier: "N" },
 ];
 
 const orders: { id: string; date: string; item: string; points: number; status: string }[] = [];
@@ -91,18 +91,10 @@ function PointsBanner({ member }: { member: Member | null }) {
         <div>
           <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>可用積分</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{pts.toFixed(2)}</span>
+            <span style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{pts.toFixed(4)}</span>
             <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>point</span>
           </div>
         </div>
-        <div style={{ width: "0.5px", height: 40, background: C.borderMid }} />
-        <div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>折合台幣</div>
-          <div style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: "#5ea96e" }}>NT${Math.round(pts).toLocaleString()}</div>
-        </div>
-      </div>
-      <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, textAlign: "right" }}>
-        <div>1 point = <span style={{ color: C.gold }}>NT$1</span></div>
       </div>
     </div>
   );
