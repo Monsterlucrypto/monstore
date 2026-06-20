@@ -42,7 +42,7 @@ const rawMembers: RawMember[] = [
 
 {
   uid: "222",
-  name: "測試用",
+  name: "Test222",
   vip: "Normal" as const,
   tradingVolume: 222,
   tradingVolumeDisplay: "$222",
@@ -229,17 +229,7 @@ const rawMembers: RawMember[] = [
   treasuryParticipation: "Pending" as const,
   founderPass: null as FounderPassTier,
 },
-{
-  uid: "31260502",
-  name: "MonsterLu",
-  vip: "Normal" as const,
-  tradingVolume: 3000,
-  tradingVolumeDisplay: "$3,000",
-  commissions: 1,
-  memberSince: "2026.04.07",
-  treasuryParticipation: "Active" as const,
-  founderPass: "Lu" as FounderPassTier,
-},
+
 ];
 
 // ════════════════════════════════════════════════════════════
