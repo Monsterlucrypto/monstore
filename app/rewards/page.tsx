@@ -83,10 +83,10 @@ function PointsSummary({ member }: { member: Member }) {
   const [hov, setHov] = useState<number | null>(null);
 
   const cards = [
-    { label: "目前積分餘額", value: s.totalPoints.toFixed(2),                unit: "USDT", sub: `≈ NT$${Math.round(s.totalPoints * PTS_TO_NTD).toLocaleString()}`,                subColor: "#5ea96e", icon: "✦"  },
-    { label: "本月累積積分", value: s.monthlyEarned.toFixed(2),              unit: "USDT", sub: `≈ NT$${Math.round(s.monthlyEarned * PTS_TO_NTD).toLocaleString()}`,               subColor: C.textMuted, icon: "📈" },
-    { label: "已兌換積分",   value: s.totalRedeemed.toFixed(2),              unit: "USDT", sub: `≈ NT$${Math.round(s.totalRedeemed * PTS_TO_NTD).toLocaleString()}`,               subColor: C.textMuted, icon: "◎"  },
-    { label: "待確認積分",   value: s.pendingPoints.toFixed(2),              unit: "USDT", sub: "結算中，24hr 內入帳",                                                              subColor: "#c9954c", icon: "⟐"  },
+    { label: "目前積分餘額", value: s.totalPoints.toFixed(2),                unit: "point", sub: `≈ NT$${Math.round(s.totalPoints * PTS_TO_NTD).toLocaleString()}`,                subColor: "#5ea96e", icon: "✦"  },
+    { label: "本月累積積分", value: s.monthlyEarned.toFixed(2),              unit: "point", sub: `≈ NT$${Math.round(s.monthlyEarned * PTS_TO_NTD).toLocaleString()}`,               subColor: C.textMuted, icon: "📈" },
+    { label: "已兌換積分",   value: s.totalRedeemed.toFixed(2),              unit: "point", sub: `≈ NT$${Math.round(s.totalRedeemed * PTS_TO_NTD).toLocaleString()}`,               subColor: C.textMuted, icon: "◎"  },
+    { label: "待確認積分",   value: s.pendingPoints.toFixed(2),              unit: "point", sub: "結算中，24hr 內入帳",                                                              subColor: "#c9954c", icon: "⟐"  },
   ];
 
   return (
@@ -121,12 +121,12 @@ function NTDConverter({ member }: { member: Member }) {
       <div>
         <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 8 }}>積分折合台幣</div>
         <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 16, lineHeight: 1.7 }}>
-          目前匯率：<span style={{ color: C.gold, fontFamily: F.mono }}>1 USDT = NT$1</span><br />可於商城兌換商品或折抵消費
+          目前匯率：<span style={{ color: C.gold, fontFamily: F.mono }}>1 point = NT$1</span><br />可於商城兌換商品或折抵消費
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, borderRadius: 8, padding: "8px 16px" }}>
             <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, marginBottom: 4, fontFamily: F.body }}>我的積分</div>
-            <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: C.goldLight }}>{s.totalPoints.toFixed(2)} USDT</div>
+            <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: C.goldLight }}>{s.totalPoints.toFixed(2)} point</div>
           </div>
           <span style={{ color: C.textMuted, fontSize: 18 }}>→</span>
           <div style={{ background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 8, padding: "8px 16px" }}>
@@ -140,7 +140,7 @@ function NTDConverter({ member }: { member: Member }) {
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>積分數量</span>
-            <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{pts.toLocaleString()} USDT</span>
+            <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{pts.toLocaleString()} point</span>
           </div>
           <input type="range" min={1} max={20000} step={1} value={pts} onChange={(e) => setPts(Number(e.target.value))} style={{ width: "100%", accentColor: C.gold }} />
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, fontFamily: F.mono, marginTop: 4 }}>
@@ -150,7 +150,7 @@ function NTDConverter({ member }: { member: Member }) {
         <div style={{ background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, borderRadius: 8, padding: 16, textAlign: "center" }}>
           <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 6, fontFamily: F.body }}>折合台幣</div>
           <div style={{ fontFamily: F.mono, fontSize: 28, fontWeight: 700, color: "#5ea96e" }}>NT${ntd}</div>
-          <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4, fontFamily: F.body }}>匯率 1 USDT = NT$1</div>
+          <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4, fontFamily: F.body }}>匯率 1 point = NT$1</div>
         </div>
       </div>
     </div>

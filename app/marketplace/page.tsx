@@ -92,7 +92,7 @@ function PointsBanner({ member }: { member: Member | null }) {
           <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>可用積分</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
             <span style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{pts.toFixed(2)}</span>
-            <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>USDT</span>
+            <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>point</span>
           </div>
         </div>
         <div style={{ width: "0.5px", height: 40, background: C.borderMid }} />
@@ -102,7 +102,7 @@ function PointsBanner({ member }: { member: Member | null }) {
         </div>
       </div>
       <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, textAlign: "right" }}>
-        <div>1 積分 = <span style={{ color: C.gold }}>NT$1</span></div>
+        <div>1 point = <span style={{ color: C.gold }}>NT$1</span></div>
       </div>
     </div>
   );
@@ -263,7 +263,7 @@ function ProductGrid({ member }: { member: Member | null }) {
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>兌換後餘額</span>
-                  <span style={{ fontSize: 13, fontFamily: F.mono, color: C.goldLight }}>{(userPoints - p.price).toFixed(2)} USDT</span>
+                  <span style={{ fontSize: 13, fontFamily: F.mono, color: C.goldLight }}>{(userPoints - p.price).toFixed(2)} point</span>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 12 }}>
