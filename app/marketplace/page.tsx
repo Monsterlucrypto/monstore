@@ -34,15 +34,18 @@ const F = {
 // 模擬資料
 // ════════════════════════════════════════════════════════════
 
-type FilterType = "全部" | "折價券" | "配件" | "Founder Pass";
+type FilterType = "全部" | "折價券" | "配件" | "Founder Pass" | "蝦皮";
 
 const products = [
+  // ── 蝦皮 ──
+  { id: 8, name: "配合的蝦皮商城",     desc: "會員私訊都可以用更優惠的價格購買哦~",          price: 0,     tag: "蝦皮",        icon: "🛒", locked: false, href: "https://s.shopee.tw/9zvWcmlEOB" },
   // ── 折價券 ──
   { id: 1, name: "NT$250 折價券",      desc: "低消 NT$1,000 適用，每筆訂單限用一張",        price: 40,    tag: "折價券",      icon: "🎟️", locked: false },
   { id: 2, name: "NT$500 折價券",      desc: "低消 NT$2,000 適用，每筆訂單限用一張",        price: 70,    tag: "折價券",      icon: "🎫", locked: false },
   // ── 配件 ──
   { id: 3, name: "30cm Type-C 充電線", desc: "Type-C to Type-C，30cm 短線，編織材質",       price: 40,    tag: "配件",        icon: "🔌", locked: false },
   { id: 4, name: "20W 充電頭",         desc: "GaN 20W 快充充電頭，支援 PD 快充協議",         price: 100,   tag: "配件",        icon: "🔋", locked: false },
+  { id: 9, name: "神秘小禮物",         desc: "敬請期待即將推出",                              price: 0,     tag: "配件",        icon: "🥃", locked: false, comingSoon: true },
   // ── Founder Pass ──
   { id: 5, name: "M Founder Pass",     desc: "Monstore 創始會員 M 等級，240 Reward Units，永久 Founder 權益", price: 12000, tag: "Founder Pass", icon: "◆", locked: false, founderTier: "M" },
   { id: 6, name: "O Founder Pass",     desc: "Monstore 創始會員 O 等級，70 Reward Units，永久 Founder 權益", price: 4000,  tag: "Founder Pass", icon: "◆", locked: false, founderTier: "O" },
@@ -111,7 +114,7 @@ function ProductGrid({ member }: { member: Member | null }) {
   // Founder Only 商品：有 Founder Pass 才解鎖
   const resolvedProducts = products.map((p) => ({ ...p }));
 
-  const filters: FilterType[] = ["全部", "折價券", "配件", "Founder Pass"];
+  const filters: FilterType[] = ["全部", "折價券", "配件", "Founder Pass", "蝦皮"];
 
   const filtered = resolvedProducts.filter((p) => {
     if (filter === "全部") return true;
@@ -210,26 +213,69 @@ function ProductGrid({ member }: { member: Member | null }) {
               <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 12, lineHeight: 1.5, fontFamily: F.body }}>{p.desc}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: p.locked ? C.textMuted : C.goldLight }}>{p.price.toLocaleString()} pts</div>
+                  {"href" in p
+                    ? <div style={{ fontFamily: F.body, fontSize: 12, color: C.textMuted }}>免積分</div>
+                    : "comingSoon" in p
+                    ? <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.textMuted }}>? pts</div>
+                    : <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: p.locked ? C.textMuted : C.goldLight }}>{p.price.toLocaleString()} pts</div>
+                  }
                 </div>
-                <button
-                  disabled={p.locked || userPoints < p.price}
-                  onClick={() => !p.locked && setRedeemed(p.id)}
-                  style={{
-                    fontSize: 11,
-                    color: p.locked ? C.textMuted : userPoints < p.price ? C.textMuted : C.gold,
-                    background: "rgba(201,168,76,0.08)",
-                    border: `0.5px solid ${C.borderMid}`,
-                    padding: "6px 14px",
-                    borderRadius: 6,
-                    cursor: p.locked || userPoints < p.price ? "not-allowed" : "pointer",
-                    opacity: p.locked || userPoints < p.price ? 0.4 : 1,
-                    fontFamily: F.body,
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {p.locked ? "已鎖定" : userPoints < p.price ? "積分不足" : "立即兌換"}
-                </button>
+                {"href" in p ? (
+                  <a
+                    href={(p as typeof p & { href: string }).href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontSize: 11,
+                      color: C.gold,
+                      background: "rgba(201,168,76,0.08)",
+                      border: `0.5px solid ${C.borderMid}`,
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      fontFamily: F.body,
+                      textDecoration: "none",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    立即前往
+                  </a>
+                ) : "comingSoon" in p ? (
+                  <button
+                    disabled
+                    style={{
+                      fontSize: 11,
+                      color: C.textMuted,
+                      background: "rgba(201,168,76,0.08)",
+                      border: `0.5px solid ${C.borderMid}`,
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      cursor: "not-allowed",
+                      opacity: 0.4,
+                      fontFamily: F.body,
+                    }}
+                  >
+                    不能兌換
+                  </button>
+                ) : (
+                  <button
+                    disabled={p.locked || userPoints < p.price}
+                    onClick={() => !p.locked && setRedeemed(p.id)}
+                    style={{
+                      fontSize: 11,
+                      color: p.locked ? C.textMuted : userPoints < p.price ? C.textMuted : C.gold,
+                      background: "rgba(201,168,76,0.08)",
+                      border: `0.5px solid ${C.borderMid}`,
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      cursor: p.locked || userPoints < p.price ? "not-allowed" : "pointer",
+                      opacity: p.locked || userPoints < p.price ? 0.4 : 1,
+                      fontFamily: F.body,
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {p.locked ? "已鎖定" : userPoints < p.price ? "積分不足" : "立即兌換"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
