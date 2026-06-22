@@ -1,4 +1,6 @@
 "use client";
+import { useState, useEffect } from "react";
+import { members } from "@/data/members";
 
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
@@ -30,6 +32,18 @@ interface SidebarProps {
 
 export default function Sidebar({ activePath, collapsed, onToggle, isMobile = false }: SidebarProps) {
   const w = isMobile ? 260 : collapsed ? 64 : 240;
+
+  const [uid, setUid] = useState("");
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const storedUid = localStorage.getItem("monstore_uid") ?? "";
+    setUid(storedUid);
+    const member = members.find((m) => m.uid === storedUid);
+    setName(member?.name ?? storedUid);
+  }, []);
+
+  const initials = name ? name.slice(0, 2).toUpperCase() : "??";
 
   return (
     <aside
@@ -135,10 +149,10 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
       {(!collapsed || isMobile) && (
         <div style={{ padding: "14px 8px 0", borderTop: `0.5px solid ${C.borderSubtle}`, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
-            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display, flexShrink: 0 }}>CL</div>
+            <div style={{ width: 30, height: 30, borderRadius: 6, background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display, flexShrink: 0 }}>{initials}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12.5, fontWeight: 500, color: C.textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Chinglu</div>
-              <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.mono }}>0x7f4a...3d8c</div>
+              <div style={{ fontSize: 12.5, fontWeight: 500, color: C.textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name || "—"}</div>
+              <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.mono }}>{uid || "—"}</div>
             </div>
           </div>
         </div>
@@ -147,7 +161,7 @@ export default function Sidebar({ activePath, collapsed, onToggle, isMobile = fa
       {/* 折疊時只顯示頭像 */}
       {collapsed && !isMobile && (
         <div style={{ padding: "14px 0 0", borderTop: `0.5px solid ${C.borderSubtle}`, display: "flex", justifyContent: "center", flexShrink: 0 }}>
-          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display }}>CL</div>
+          <div style={{ width: 30, height: 30, borderRadius: 6, background: "linear-gradient(135deg, #3a2f15, #7a6130)", border: "1.5px solid #7a6130", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: C.goldLight, fontFamily: F.display }}>{initials}</div>
         </div>
       )}
     </aside>

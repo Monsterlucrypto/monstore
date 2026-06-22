@@ -69,10 +69,10 @@ export default function MemberPage() {
 
         {/* Nav */}
         <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: "rgba(10,10,11,0.92)", backdropFilter: "blur(20px)", borderBottom: `0.5px solid ${C.borderSubtle}`, height: 64, display: "flex", alignItems: "center", padding: "0 32px", gap: 12 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
+          <div style={{ width: 43, height: 43, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
             <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </div>
-          <a href="/" style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.textPrimary, letterSpacing: 1, textDecoration: "none" }}>
+          <a href="/" style={{ fontFamily: F.display, fontSize: 30, fontWeight: 500, color: C.textPrimary, letterSpacing: 1, textDecoration: "none" }}>
             Mon<span style={{ color: C.gold }}>store</span>
           </a>
           <div style={{ marginLeft: "auto" }}>

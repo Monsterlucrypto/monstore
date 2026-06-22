@@ -15,6 +15,7 @@ const TIERS = [
     color: "#cd7f32", colorDim: "rgba(205,127,50,0.15)", colorBorder: "rgba(205,127,50,0.3)",
     signals: false,
     perks: [
+      "每月抽獎資格 × 1",
       "每月 50 NTD 電商折價券（無低消）",
       "95折優惠券 × 1（低消 500）",
     ],
@@ -25,7 +26,7 @@ const TIERS = [
     color: "#a8a9ad", colorDim: "rgba(168,169,173,0.15)", colorBorder: "rgba(168,169,173,0.3)",
     signals: true,
     perks: [
-      "每月抽獎資格 × 1",
+      "每月抽獎資格 × 2",
       "每月 100 NTD 電商折價券（無低消）× 2",
       "9折優惠券 × 2（低消 500）",
       "私人交易訊號",
@@ -43,6 +44,7 @@ const TIERS = [
       "85折優惠券 × 2（低消 500）",
       "私人交易訊號",
       "VIP 群組",
+      "專人客服",
     ],
   },
   {
@@ -228,10 +230,10 @@ function BenefitsTable({ currentVip }: { currentVip: string }) {
     { label: "每月電商折價券",            values: ["50 NTD × 1", "100 NTD × 2", "100 NTD × 2", "100 NTD × 5"] },
     { label: "每月優惠券",                values: ["95折 × 1", "9折 × 2", "85折 × 2", "—"] },
     { label: "優惠券低消",                values: ["$500", "$500", "$500", "—"] },
-    { label: "每月抽獎資格",              values: ["✗", "× 1", "× 3", "× 10"] },
+    { label: "每月抽獎資格",              values: ["× 1", "× 2", "× 3", "× 10"] },
     { label: "私人交易訊號",              values: ["✗", "✓", "✓", "✓"] },
     { label: "VIP 群組",                  values: ["✗", "✓", "✓", "✓"] },
-    { label: "專人客服",                  values: ["✗", "✗", "✗", "✓"] },
+    { label: "專人客服",                  values: ["✗", "✗", "✓", "✓"] },
   ];
   const currentIdx = TIERS.findIndex((t) => t.id === currentVip);
 

@@ -1,4 +1,6 @@
 "use client";
+import { useState, useEffect } from "react";
+import { members } from "@/data/members";
 
 const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
@@ -18,6 +20,18 @@ interface HeaderProps {
 }
 
 export default function Header({ title, onMenuClick }: HeaderProps) {
+  const [uid, setUid] = useState("");
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const storedUid = localStorage.getItem("monstore_uid") ?? "";
+    setUid(storedUid);
+    const member = members.find((m) => m.uid === storedUid);
+    setName(member?.name ?? storedUid);
+  }, []);
+
+  const initials = name ? name.slice(0, 2).toUpperCase() : "??";
+
   return (
     <header
       style={{
@@ -105,13 +119,13 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
           flexShrink: 0,
         }}>
           <div style={{
-            width: 28, height: 28, borderRadius: "50%",
+            width: 28, height: 28, borderRadius: 6,
             background: "linear-gradient(135deg, #3a2f15, #7a6130)",
             border: "1.5px solid #7a6130",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 11, color: C.goldLight, fontFamily: F.display,
-          }}>CL</div>
-          <span className="wallet-addr" style={{ fontFamily: F.mono, fontSize: 11, color: C.textSecondary }}>0x7f4a...3d8c</span>
+          }}>{initials}</div>
+          <span className="wallet-addr" style={{ fontFamily: F.mono, fontSize: 11, color: C.textSecondary }}>{uid || "—"}</span>
         </div>
       </div>
     </header>

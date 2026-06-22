@@ -27,6 +27,7 @@ const vipTiers = [
     name: "Normal",
     range: "50K – 300K",
     perks: [
+      "每月抽獎資格 × 1",
       "每月 50 NTD 電商折價券（無低消）",
       "95折優惠券 × 1（低消 500）",
     ],
@@ -36,7 +37,7 @@ const vipTiers = [
     name: "Silver",
     range: "300K – 1M",
     perks: [
-      "每月抽獎資格 × 1",
+      "每月抽獎資格 × 2",
       "每月 100 NTD 電商折價券（無低消）× 2",
       "9折優惠券 × 2（低消 500）",
       "VIP 群組",
@@ -109,10 +110,10 @@ function Navbar() {
       height: 64, display: "flex", alignItems: "center", padding: "0 32px",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
-        <div style={{ width: 34, height: 34, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
+        <div style={{ width: 43, height: 43, borderRadius: 8, overflow: "hidden", background: "#000", border: `0.5px solid ${C.borderMid}`, flexShrink: 0 }}>
           <img src="/logo.png" alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
-        <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.textPrimary, letterSpacing: 1 }}>
+        <div style={{ fontFamily: F.display, fontSize: 30, fontWeight: 500, color: C.textPrimary, letterSpacing: 1 }}>
           Mon<span style={{ color: C.gold }}>store</span>
         </div>
       </div>
