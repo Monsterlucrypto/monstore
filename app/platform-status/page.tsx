@@ -20,25 +20,33 @@ const F = {
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
 
+// ── 上月（五月）真實數據 ──────────────────────────────────────────────────────
+const lastMonthFeeProfit  = 270.11142141; // 五月 Fee Profit USDT 合計
+const lastMonthEcommerce  = 0;            // 電商平台分潤（目前 0）
+const lastMonthRevenue    = lastMonthFeeProfit + lastMonthEcommerce;
+const lastMonthActiveUsers = 7;           // 五月有交易紀錄的會員數
+
 const overview = [
-  { label: "Monthly Revenue",        sub: "本月平台總收入", value: "NT$29,760", change: "+18.4%", changeLabel: "vs last month", icon: "◈", positive: true },
-  { label: "Total Orders",           sub: "本月訂單總數",   value: "42 Orders",  change: "+12.0%", changeLabel: "vs last month", icon: "⟐", positive: true },
-  { label: "Referral Commissions",   sub: "累計手續費佣金",  value: `$${members.reduce((s,m)=>s+m.commissions,0).toFixed(2)} USDT`, change: `${members.filter(m=>m.commissions>0).length} 位會員有佣金`, changeLabel: "", icon: "◎", positive: true },
-  { label: "Treasury Balance",       sub: "財庫目前餘額",   value: "NT$10,000",  change: "NT$2,500", changeLabel: "this month",  icon: "◆", positive: true },
+  { label: "Last Month Revenue",   sub: "上月平台總收入（手續費＋電商）", value: `$${lastMonthRevenue.toFixed(2)} USDT`, change: `手續費 $${lastMonthFeeProfit.toFixed(2)} ＋ 電商 $${lastMonthEcommerce}`, changeLabel: "May 2026", icon: "◈", positive: true },
+  { label: "Last Month Active",    sub: "上月活躍用戶數",                  value: `${lastMonthActiveUsers} Members`,       change: "上月有交易紀錄",                                                         changeLabel: "May 2026", icon: "⟐", positive: true },
+  { label: "Referral Commissions", sub: "累計手續費佣金",                  value: `$${members.reduce((s,m)=>s+m.commissions,0).toFixed(2)} USDT`, change: `${members.filter(m=>m.commissions>0).length} 位會員有佣金`, changeLabel: "", icon: "◎", positive: true },
+  { label: "Treasury Balance",     sub: "財庫目前餘額",                    value: "NT$10,000",                             change: "NT$2,500",                                                              changeLabel: "this month", icon: "◆", positive: true },
 ];
 
+// 上月收入分佈（目前 100% 手續費佣金，電商 & 其他為 0）
 const revenueBreakdown = [
-  { label: "Trading Referral Revenue", sub: "交易推薦收入", value: 18640, pct: 62.6, color: "#E8C96A" },
-  { label: "Marketplace Revenue",      sub: "商城銷售收入", value: 8256,  pct: 27.7, color: "#C9A84C" },
-  { label: "Other Revenue",            sub: "其他來源收入", value: 2864,  pct: 9.6,  color: "#7a6130" },
+  { label: "Trading Referral Revenue", sub: "交易推薦收入", value: lastMonthFeeProfit, pct: 100, color: "#E8C96A" },
+  { label: "Marketplace Revenue",      sub: "商城銷售收入", value: lastMonthEcommerce, pct: 0,   color: "#C9A84C" },
+  { label: "Other Revenue",            sub: "其他來源收入", value: 0,                  pct: 0,   color: "#7a6130" },
 ];
 const totalRevenue = revenueBreakdown.reduce((s, r) => s + r.value, 0);
 
+// 上月 Reward Pool：月收入 × 20%
 const rewardPool = {
-  amount: "NT$5,952",
-  change: "+14.2%",
+  amount: `$${(lastMonthRevenue * 0.2).toFixed(2)} USDT`,
+  change: "",
   allocation: 20,
-  revenue: 29760,
+  revenue: lastMonthRevenue,
 };
 
 const community = [
@@ -53,17 +61,42 @@ const treasury = {
   runway: 5.5,
 };
 
+// 月交易量對比
+const lastMonthTotalVolume  = 520885.778;   // 五月 TradingAmount 合計 USDT
+const thisMonthTotalVolume  = members.reduce((s, m) => s + m.tradingVolume, 0);
+const volumeDiff            = thisMonthTotalVolume - lastMonthTotalVolume;
+const volumeChangePct       = (volumeDiff / lastMonthTotalVolume * 100);
+const totalCommissions      = 741.5;        // 累積佣金（所有時期）USDT
+
 const growthMetrics = [
-  { label: "Total Trading Volume",        sub: "累計交易總量",       value: "NT$186,400", change: "+21.3%", positive: true },
-  { label: "Total Commissions Generated", sub: "累計佣金總額",       value: "NT$7,832",   change: "+23.0%", positive: true },
-  { label: "Avg Volume Per Member",       sub: "每位會員平均交易量", value: "NT$751",     change: "+6.1%",  positive: true },
+  {
+    label: "This Month vs Last Month",
+    sub:   `本月 $${thisMonthTotalVolume.toLocaleString("en", { maximumFractionDigits: 0 })} vs 上月 $${lastMonthTotalVolume.toLocaleString("en", { maximumFractionDigits: 0 })} USDT`,
+    value: `${volumeChangePct >= 0 ? "+" : ""}${volumeChangePct.toFixed(1)}%`,
+    change: `${volumeDiff >= 0 ? "+" : ""}$${Math.abs(volumeDiff).toLocaleString("en", { maximumFractionDigits: 0 })} USDT`,
+    positive: volumeChangePct >= 0,
+  },
+  {
+    label: "Total Commissions Generated",
+    sub:   "累積佣金總額",
+    value: `$${totalCommissions.toLocaleString("en", { minimumFractionDigits: 1 })} USDT`,
+    change: `${members.filter(m => m.commissions > 0).length} 位會員有佣金`,
+    positive: true,
+  },
+  {
+    label: "Avg Volume Per Active Member",
+    sub:   "上月每位活躍會員平均交易量",
+    value: `$${(lastMonthTotalVolume / lastMonthActiveUsers).toLocaleString("en", { maximumFractionDigits: 0 })} USDT`,
+    change: `${lastMonthActiveUsers} 位活躍會員`,
+    positive: true,
+  },
 ];
 
 const founderStatus = {
-  allocatedUnits: 1860,
+  allocatedUnits: 0,
   totalUnits: 10000,
-  holders: 5,
-  progress: 18.6,
+  holders: 0,
+  progress: 10,
 };
 
 
@@ -115,8 +148,9 @@ function PlatformOverview() {
 function RevenueBreakdown() {
   const [hov, setHov] = useState<number | null>(null);
 
-  // Simple donut via conic-gradient
-  const conicStops = revenueBreakdown.reduce<{ stops: string[]; offset: number }>(
+  // Simple donut via conic-gradient（過濾 0% 項目）
+  const activeBreakdown = revenueBreakdown.filter(r => r.pct > 0);
+  const conicStops = activeBreakdown.reduce<{ stops: string[]; offset: number }>(
     (acc, r) => {
       const start = acc.offset;
       const end = start + r.pct;
@@ -176,15 +210,14 @@ function RevenueBreakdown() {
 }
 
 function RewardPoolStatus() {
-  const poolAmt = Math.round(rewardPool.revenue * rewardPool.allocation / 100);
+  const poolAmt = (rewardPool.revenue * rewardPool.allocation / 100).toFixed(2);
   return (
     <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -60, right: -60, width: 240, height: 240, background: "radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Monthly Reward Pool</div>
+      <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Last Month Reward Pool</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
         <span style={{ fontFamily: F.mono, fontSize: 36, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{rewardPool.amount}</span>
-        <span style={{ fontSize: 12, fontWeight: 600, color: C.green, fontFamily: F.mono }}>{rewardPool.change}</span>
-        <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>vs last month</span>
+        <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>May 2026</span>
       </div>
       <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 28 }}>本月 Reward Pool 已提撥金額</div>
 
@@ -193,7 +226,7 @@ function RewardPoolStatus() {
         <div style={{ background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, borderRadius: 10, padding: "12px 18px", textAlign: "center" }}>
           <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Revenue</div>
           <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, marginBottom: 4 }}>平台月收入</div>
-          <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.textPrimary }}>NT${rewardPool.revenue.toLocaleString()}</div>
+          <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.textPrimary }}>${rewardPool.revenue.toFixed(2)} USDT</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0 12px" }}>
           <div style={{ fontSize: 18, color: C.gold }}>→</div>
@@ -210,7 +243,7 @@ function RewardPoolStatus() {
         <div style={{ background: "rgba(232,201,106,0.1)", border: `0.5px solid rgba(232,201,106,0.4)`, borderRadius: 10, padding: "12px 18px", textAlign: "center" }}>
           <div style={{ fontSize: 10, color: C.goldLight, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Reward Pool</div>
           <div style={{ fontSize: 10, color: C.goldLight, fontFamily: F.body, marginBottom: 4, opacity: 0.7 }}>本月獎勵池</div>
-          <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.goldLight }}>NT${poolAmt.toLocaleString()}</div>
+          <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.goldLight }}>${poolAmt} USDT</div>
         </div>
       </div>
       <div style={{ marginTop: 16, fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
@@ -232,13 +265,12 @@ function CommunityGrowth() {
   const totalMembers   = members.length;
   const lastMonthTotal = totalMembers - joinedThisMonth;
   const growthPct      = lastMonthTotal > 0 ? ((joinedThisMonth / lastMonthTotal) * 100).toFixed(1) : null;
-  const founderHolders = members.filter(m => m.founderPass !== null).length;
   const activeMembers  = members.filter(m => m.tradingVolume > 0).length;
 
   const stats = [
-    { label: "Current Members", sub: "目前總會員數",       value: totalMembers,   color: C.gold,    newThisMonth: joinedThisMonth, growthPct },
-    { label: "Founder Holders", sub: "創始會員持有人數",   value: founderHolders, color: "#E8C96A", newThisMonth: null as null,    growthPct: null as null },
-    { label: "Active Members",  sub: "活躍中的會員", value: activeMembers,  color: C.green,   newThisMonth: null as null,    growthPct: null as null },
+    { label: "Current Members", sub: "目前總會員數",     value: totalMembers,           color: C.gold,    newThisMonth: joinedThisMonth, growthPct },
+    { label: "Founder Holders", sub: "創始會員持有人數", value: founderStatus.holders,  color: "#E8C96A", newThisMonth: null as null,    growthPct: null as null },
+    { label: "Active Members",  sub: "本月活躍中的會員", value: activeMembers,          color: C.green,   newThisMonth: null as null,    growthPct: null as null },
   ];
 
   return (

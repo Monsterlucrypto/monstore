@@ -9,15 +9,16 @@ export type FounderPassTier = "Lu" | "M" | "O" | "N" | null;
 export type Member = {
   uid: string;
   name: string;
-  vip: "Diamond" | "Gold" | "Silver" | "Normal";
-  tradingVolume: number;        // 交易量（數字，方便排序）
-  tradingVolumeDisplay: string; // 顯示用字串
-  commissions: number;          // 手續費 USDT
-  points: string;               // 積分（= 手續費 × 0.2，自動計算）
+  vip: "Diamond" | "Gold" | "Silver" | "Normal"; // 自動計算，不用手動填
+  tradingVolume: number;         // 本月交易量（leaderboard 用）
+  tradingVolumeLastMonth: number;// 上月交易量（VIP 對比用）
+  tradingVolumeDisplay: string;  // 顯示用字串（本月）
+  commissions: number;           // 本月手續費 USDT
+  points: string;                // 積分（= 手續費 × 0.2，自動計算）
   memberSince: string;
   treasuryParticipation: "Active" | "Pending";
-  founderPass: FounderPassTier; // null = 無 Pass
-  tradingRank: number;          // 自動計算，不用手動填
+  founderPass: FounderPassTier;  // null = 無 Pass
+  tradingRank: number;           // 自動計算，不用手動填
 };
 
 // ════════════════════════════════════════════════════════════
@@ -31,20 +32,32 @@ export const FOUNDER_CONFIG: Record<string, { units: number; price: number }> = 
 };
 
 // ════════════════════════════════════════════════════════════
-// ★ 每週只需更新這裡 ★
-// VIP 等級門檻：Normal <300K / Silver 300K–1M / Gold 1M–5M / Diamond 5M+
-// founderPass: null = 無 Pass，"Lu" / "M" / "O" / "N" = 對應等級
-// tradingRank / points 不用填，系統自動計算
-// points = commissions × 0.2
+// VIP 自動計算：取本月與上月較大值來決定等級
+// Normal <300K / Silver 300K–1M / Gold 1M–5M / Diamond 5M+
 // ════════════════════════════════════════════════════════════
-type RawMember = Omit<Member, "points" | "tradingRank">;
+function calcVip(thisMonth: number, lastMonth: number): Member["vip"] {
+  const vol = Math.max(thisMonth, lastMonth);
+  if (vol >= 5_000_000) return "Diamond";
+  if (vol >= 1_000_000) return "Gold";
+  if (vol >= 300_000)   return "Silver";
+  return "Normal";
+}
+
+// ════════════════════════════════════════════════════════════
+// ★ 每週只需更新這裡 ★
+// tradingVolume        = 本月交易量
+// tradingVolumeLastMonth = 上月交易量
+// vip / tradingRank / points 不用填，系統自動計算
+// founderPass: null = 無 Pass，"Lu" / "M" / "O" / "N" = 對應等級
+// ════════════════════════════════════════════════════════════
+type RawMember = Omit<Member, "vip" | "points" | "tradingRank">;
 const rawMembers: RawMember[] = [
 
 {
   uid: "222",
   name: "Test222",
-  vip: "Normal" as const,
   tradingVolume: 222,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$222",
   commissions: 0.022,
   memberSince: "2026.02.22",
@@ -54,8 +67,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "566012493",
   name: "—",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.05.29",
@@ -65,8 +78,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "566012108",
   name: "—",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.05.29",
@@ -76,8 +89,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "565720494",
   name: "林庭",
-  vip: "Normal" as const,
   tradingVolume: 2649.3131,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$2,649",
   commissions: 0.45298588,
   memberSince: "2026.05.28",
@@ -87,8 +100,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "565630312",
   name: "—",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.05.27",
@@ -98,10 +111,10 @@ const rawMembers: RawMember[] = [
 {
   uid: "565008268",
   name: "老豆",
-  vip: "Normal" as const,
-  tradingVolume: 89370.4682,
-  tradingVolumeDisplay: "$89,370",
-  commissions: 14.17837852,
+  tradingVolume: 98196.0743,
+  tradingVolumeLastMonth: 23449.8150243,
+  tradingVolumeDisplay: "$98,196",
+  commissions: 15.7039295,
   memberSince: "2026.05.24",
   treasuryParticipation: "Active" as const,
   founderPass: null as FounderPassTier,
@@ -109,8 +122,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "551559896",
   name: "張宜",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.03.11",
@@ -120,10 +133,10 @@ const rawMembers: RawMember[] = [
 {
   uid: "549110911",
   name: "利寶寶",
-  vip: "Gold" as const,
-  tradingVolume: 1736335.474092,
-  tradingVolumeDisplay: "$1,736,335",
-  commissions: 292.18090435,
+  tradingVolume: 2005629.814185,
+  tradingVolumeLastMonth: 413519.815248,
+  tradingVolumeDisplay: "$2,005,629",
+  commissions: 316.83660322,
   memberSince: "2026.02.27",
   treasuryParticipation: "Active" as const,
   founderPass: null as FounderPassTier,
@@ -131,8 +144,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "549046149",
   name: "海倫",
-  vip: "Normal" as const,
   tradingVolume: 31.26471,
+  tradingVolumeLastMonth: 5500.42387,
   tradingVolumeDisplay: "$31",
   commissions: 0.01031685,
   memberSince: "2026.02.27",
@@ -142,10 +155,10 @@ const rawMembers: RawMember[] = [
 {
   uid: "549044824",
   name: "Banglin",
-  vip: "Normal" as const,
-  tradingVolume: 8934.5719964,
-  tradingVolumeDisplay: "$8,934",
-  commissions: 1.1606191,
+  tradingVolume: 10880.4833164,
+  tradingVolumeLastMonth: 62094.2586932,
+  tradingVolumeDisplay: "$10,880",
+  commissions: 1.79118865,
   memberSince: "2026.02.27",
   treasuryParticipation: "Active" as const,
   founderPass: null as FounderPassTier,
@@ -153,10 +166,10 @@ const rawMembers: RawMember[] = [
 {
   uid: "549044820",
   name: "Shanghungx",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 5463.72419,
   tradingVolumeDisplay: "$0",
-  commissions: 0.01903,
+  commissions: 0.020935,
   memberSince: "2026.02.27",
   treasuryParticipation: "Active" as const,
   founderPass: null as FounderPassTier,
@@ -164,8 +177,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "546872407",
   name: "Alice",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.02.15",
@@ -173,11 +186,10 @@ const rawMembers: RawMember[] = [
   founderPass: null as FounderPassTier,
 },
 {
-  // CSV 新增，無 Remarks 名稱
   uid: "546783969",
   name: "—",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.02.14",
@@ -187,8 +199,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "546187833",
   name: "Ann",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 5946.41026,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.02.11",
@@ -198,8 +210,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "546120888",
   name: "修",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.02.11",
@@ -209,8 +221,8 @@ const rawMembers: RawMember[] = [
 {
   uid: "545954666",
   name: "星辰",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 4911.33134,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.02.10",
@@ -218,11 +230,10 @@ const rawMembers: RawMember[] = [
   founderPass: null as FounderPassTier,
 },
 {
-  // CSV 新增，無 Remarks 名稱
   uid: "545118630",
   name: "—",
-  vip: "Normal" as const,
   tradingVolume: 0,
+  tradingVolumeLastMonth: 0,
   tradingVolumeDisplay: "$0",
   commissions: 0,
   memberSince: "2026.02.06",
@@ -233,23 +244,24 @@ const rawMembers: RawMember[] = [
 ];
 
 // ════════════════════════════════════════════════════════════
-// 自動計算 tradingRank（交易量由大到小排名，同量同名）
+// 自動計算 vip / points / tradingRank
 // ════════════════════════════════════════════════════════════
 const sorted = [...rawMembers].sort((a, b) => b.tradingVolume - a.tradingVolume);
 
 export const members: Member[] = rawMembers.map((m) => ({
   ...m,
+  vip: calcVip(m.tradingVolume, m.tradingVolumeLastMonth),
   points: (m.commissions * 0.2).toFixed(4),
   tradingRank: sorted.findIndex((s) => s.uid === m.uid) + 1,
 }));
 
 // ════════════════════════════════════════════════════════════
-// 排行榜（前 10）
+// 排行榜（前 10，依本月交易量排序）
 // ════════════════════════════════════════════════════════════
 export const leaderboard = [...members]
   .sort((a, b) => b.tradingVolume - a.tradingVolume)
   .slice(0, 10)
   .map((m, i) => ({ ...m, rank: i + 1 }));
 
-// 總交易量
+// 總交易量（本月）
 export const totalVolume = members.reduce((s, m) => s + m.tradingVolume, 0);

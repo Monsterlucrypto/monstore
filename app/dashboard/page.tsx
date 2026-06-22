@@ -167,7 +167,7 @@ function StatCards({ member }: { member: Member }) {
   const stats = [
     { label: "Trading Volume", value: member.tradingVolumeDisplay,                    change: "累計交易量",                                   up: member.tradingVolume > 0, icon: "📈" },
     { label: "Trading Rank",   value: `#${member.tradingRank}`,                       change: "全會員排名",                                     up: true,                     icon: "⬡"  },
-    { label: "Points",          value: member.points,                                  change: "手續費 × 0.2",                                 up: parseFloat(member.points) > 0, icon: "✦" },
+    { label: "Points",          value: member.points,                                  change: "",                                             up: parseFloat(member.points) > 0, icon: "✦" },
     { label: "Founder Pass",   value: fp ?? "—",                                      change: cfg ? `${cfg.units.toLocaleString()} Units` : "無 Pass", up: !!fp,          icon: "💎" },
   ];
 

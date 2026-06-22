@@ -15,9 +15,9 @@ const F = {
 const navItems = [
   { label: "Dashboard",       icon: "⬡",  href: "/dashboard"        },
   { label: "Platform Status", icon: "◎",  href: "/platform-status"  },
+  { label: "Leaderboard",     icon: "🏆", href: "/leaderboard"      },
   { label: "VIP Membership",  icon: "◈",  href: "/vip"              },
   { label: "Founder Pass",    icon: "◆",  href: "/founder"          },
-  { label: "Leaderboard",     icon: "🏆", href: "/leaderboard"      },
   { label: "Marketplace",     icon: "◻",  href: "/marketplace"      },
 ];
 
