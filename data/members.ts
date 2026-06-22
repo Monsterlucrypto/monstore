@@ -259,6 +259,7 @@ export const members: Member[] = rawMembers.map((m) => ({
 // 排行榜（前 10，依本月交易量排序）
 // ════════════════════════════════════════════════════════════
 export const leaderboard = [...members]
+  .filter((m) => m.tradingVolume > 0)
   .sort((a, b) => b.tradingVolume - a.tradingVolume)
   .slice(0, 10)
   .map((m, i) => ({ ...m, rank: i + 1 }));
