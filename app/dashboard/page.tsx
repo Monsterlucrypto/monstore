@@ -34,7 +34,7 @@ const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
   bgPrimary: "#0a0a0b", bgCard: "#141418", bgCardHover: "#1a1a1f",
   borderSubtle: "rgba(201,168,76,0.12)", borderMid: "rgba(201,168,76,0.25)", borderStrong: "rgba(201,168,76,0.45)",
-  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#4a4740",
+  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#8a8578",
 };
 
 const F = {
@@ -45,7 +45,7 @@ const F = {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
+    <div style={{ fontSize: 12, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
       {children}
     </div>
   );
@@ -65,9 +65,9 @@ function MemberCard({ member }: { member: Member }) {
           <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.goldLight, letterSpacing: 2 }}>Monstore</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {fp && (
-              <span style={{ background: "rgba(201,168,76,0.15)", border: `0.5px solid ${C.borderStrong}`, color: C.gold, fontSize: 9, letterSpacing: 1.5, padding: "4px 10px", borderRadius: 20, textTransform: "uppercase", fontWeight: 500 }}>◈ Founder</span>
+              <span style={{ background: "rgba(201,168,76,0.15)", border: `0.5px solid ${C.borderStrong}`, color: C.gold, fontSize: 11, letterSpacing: 1.5, padding: "4px 10px", borderRadius: 20, textTransform: "uppercase", fontWeight: 500 }}>◈ Founder</span>
             )}
-            <span style={{ fontFamily: F.display, fontSize: 13, fontWeight: 600, color: tierColor, letterSpacing: 2 }}>{member.vip.toUpperCase()}</span>
+            <span style={{ fontFamily: F.display, fontSize: 16, fontWeight: 600, color: tierColor, letterSpacing: 2 }}>{member.vip.toUpperCase()}</span>
           </div>
         </div>
 
@@ -86,8 +86,8 @@ function MemberCard({ member }: { member: Member }) {
           { label: "Member Since", value: member.memberSince },
         ].map((s) => (
           <div key={s.label}>
-            <div style={{ fontSize: 9, letterSpacing: 2, color: C.textMuted, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
-            <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{s.value}</div>
+            <div style={{ fontSize: 11, letterSpacing: 2, color: C.textSecondary, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
+            <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.goldLight }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -109,7 +109,7 @@ function VIPProgress({ member }: { member: Member }) {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🏆</div>
           <div>
-            <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>目前等級</div>
+            <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>目前等級</div>
             <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: tierColor, letterSpacing: 1 }}>{member.vip} Membership</div>
           </div>
         </div>
@@ -124,18 +124,18 @@ function VIPProgress({ member }: { member: Member }) {
       {/* Progress bar */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-          <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>
+          <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body }}>
             {isMax
               ? <>已達最高 <strong style={{ color: tierColor }}>Diamond</strong> 等級 ✓</>
               : <>距離下一等級 <strong style={{ color: TIER_COLORS[TIER_ORDER[tierIndex + 1]] }}>{targetLabel}</strong></>
             }
           </div>
-          <span style={{ fontFamily: F.mono, fontSize: 12, color: C.gold }}>{progressPct}%</span>
+          <span style={{ fontFamily: F.mono, fontSize: 14, color: C.gold }}>{progressPct}%</span>
         </div>
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, height: 6, overflow: "hidden" }}>
           <div style={{ height: "100%", background: `linear-gradient(90deg, ${C.goldDim}, ${tierColor})`, borderRadius: 4, width: `${progressPct}%`, transition: "width 1s ease" }} />
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.textMuted, fontFamily: F.mono, marginTop: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: C.textMuted, fontFamily: F.mono, marginTop: 8 }}>
           <span>目前 {currentLabel}</span>
           {!isMax && <span>目標 {targetLabel}</span>}
         </div>
@@ -149,7 +149,7 @@ function VIPProgress({ member }: { member: Member }) {
           { label: "VIP Tier",     value: member.vip,              color: tierColor   },
         ].map((s) => (
           <div key={s.label}>
-            <div style={{ fontSize: 9, letterSpacing: 2, color: C.textMuted, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
+            <div style={{ fontSize: 11, letterSpacing: 2, color: C.textSecondary, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
             <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: s.color }}>{s.value}</div>
           </div>
         ))}
@@ -177,9 +177,9 @@ function StatCards({ member }: { member: Member }) {
         <div key={s.label} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} style={{ background: hovered === i ? C.bgCardHover : C.bgCard, border: `0.5px solid ${hovered === i ? C.borderMid : C.borderSubtle}`, borderRadius: 12, padding: 20, transition: "all 0.25s ease", transform: hovered === i ? "translateY(-2px)" : "none", cursor: "default", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)", opacity: hovered === i ? 1 : 0, transition: "opacity 0.25s" }} />
           <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderSubtle}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 14 }}>{s.icon}</div>
-          <div style={{ fontSize: 11, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontFamily: F.body }}>{s.label}</div>
+          <div style={{ fontSize: 13, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontFamily: F.body }}>{s.label}</div>
           <div style={{ fontFamily: F.mono, fontSize: 22, fontWeight: 700, color: C.textPrimary, lineHeight: 1, marginBottom: 6 }}>{s.value}</div>
-          <div style={{ fontSize: 11, color: s.up ? "#5ea96e" : C.textMuted }}>{s.up ? "▲" : "◎"} {s.change}</div>
+          <div style={{ fontSize: 13, color: s.up ? "#5ea96e" : C.textMuted }}>{s.up ? "▲" : "◎"} {s.change}</div>
         </div>
       ))}
     </div>
@@ -228,24 +228,24 @@ function BenefitsPanel({ member }: { member: Member }) {
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 24 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
         <div style={{ fontFamily: F.display, fontSize: 17, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>優惠券</div>
-        <span style={{ fontSize: 10, color: tierColor, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body, letterSpacing: 1 }}>{member.vip} 方案</span>
+        <span style={{ fontSize: 12, color: tierColor, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body, letterSpacing: 1 }}>{member.vip} 方案</span>
       </div>
-      <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginBottom: 18 }}>本月可兌換數量（依 VIP 等級）</div>
+      <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginBottom: 18 }}>本月可兌換數量（依 VIP 等級）</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {coupons.map((c) => (
           <div key={c.name} style={{ background: c.available ? "rgba(201,168,76,0.04)" : "rgba(255,255,255,0.02)", border: `0.5px solid ${c.available ? C.borderMid : C.borderSubtle}`, borderRadius: 10, padding: "14px 16px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: c.available ? C.textPrimary : C.textMuted, fontFamily: F.body }}>{c.name}</div>
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>{c.desc} · {c.pts} pts</div>
+                <div style={{ fontSize: 16, fontWeight: 500, color: c.available ? C.textPrimary : C.textMuted, fontFamily: F.body }}>{c.name}</div>
+                <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>{c.desc} · {c.pts} pts</div>
               </div>
               {c.available ? (
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontFamily: F.mono, fontSize: 22, fontWeight: 700, color: remain250 > 0 || c.name.includes("500") && remain500 > 0 ? C.goldLight : C.textMuted, lineHeight: 1 }}>{c.remain}</div>
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>/ {c.quota} 張剩餘</div>
+                  <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>/ {c.quota} 張剩餘</div>
                 </div>
               ) : (
-                <span style={{ fontSize: 10, color: C.textMuted, background: "rgba(255,255,255,0.03)", border: `0.5px solid ${C.borderSubtle}`, padding: "3px 10px", borderRadius: 4, fontFamily: F.body }}>需升級 Silver+</span>
+                <span style={{ fontSize: 12, color: C.textMuted, background: "rgba(255,255,255,0.03)", border: `0.5px solid ${C.borderSubtle}`, padding: "3px 10px", borderRadius: 4, fontFamily: F.body }}>需升級 Silver+</span>
               )}
             </div>
             {c.available && (
@@ -256,7 +256,7 @@ function BenefitsPanel({ member }: { member: Member }) {
           </div>
         ))}
       </div>
-      <a href="/marketplace" style={{ display: "block", marginTop: 14, fontSize: 11, color: C.gold, fontFamily: F.body, textDecoration: "none", textAlign: "right" }}>前往商城兌換 →</a>
+      <a href="/marketplace" style={{ display: "block", marginTop: 14, fontSize: 13, color: C.gold, fontFamily: F.body, textDecoration: "none", textAlign: "right" }}>前往商城兌換 →</a>
     </div>
   );
 }
@@ -277,7 +277,7 @@ function Marketplace() {
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5 }}>會員專屬商城</div>
-        <a href="/marketplace" style={{ fontSize: 12, color: C.gold, cursor: "pointer", textDecoration: "none" }}>瀏覽全部商品 →</a>
+        <a href="/marketplace" style={{ fontSize: 14, color: C.gold, cursor: "pointer", textDecoration: "none" }}>瀏覽全部商品 →</a>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
         {products.map((p, i) => (
@@ -301,20 +301,20 @@ function Marketplace() {
                     <text x="48" y="14" textAnchor="middle" fontFamily="'Cormorant Garamond',Georgia,serif" fontSize="9" fontWeight="600" fill="rgba(55,35,5,0.8)" letterSpacing="3">FOUNDER</text>
                     <text x="48" y="30" textAnchor="middle" fontFamily="'DM Sans',system-ui,sans-serif" fontSize="7" fill="rgba(55,35,5,0.6)" letterSpacing="2">MEMBERSHIP</text>
                   </svg>
-                  <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 700, color: "#E8C96A", letterSpacing: 2 }}>{p.founderTier} ACCESS</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: "#E8C96A", letterSpacing: 2 }}>{p.founderTier} ACCESS</span>
                 </>
               ) : (
                 <span style={{ fontSize: 44 }}>{p.icon}</span>
               )}
-              <div style={{ position: "absolute", top: 8, left: 8, background: p.isFounderPass ? "rgba(232,201,106,0.2)" : "rgba(201,168,76,0.12)", border: `0.5px solid ${p.isFounderPass ? C.borderStrong : C.borderMid}`, color: p.isFounderPass ? C.goldLight : C.gold, fontSize: 9, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>{p.tag}</div>
+              <div style={{ position: "absolute", top: 8, left: 8, background: p.isFounderPass ? "rgba(232,201,106,0.2)" : "rgba(201,168,76,0.12)", border: `0.5px solid ${p.isFounderPass ? C.borderStrong : C.borderMid}`, color: p.isFounderPass ? C.goldLight : C.gold, fontSize: 11, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>{p.tag}</div>
             </div>
             {/* Info */}
             <div style={{ padding: 14 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, marginBottom: 4, fontFamily: F.body }}>{p.name}</div>
-              <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 10, fontFamily: F.body }}>{p.desc}</div>
+              <div style={{ fontSize: 16, fontWeight: 500, color: C.textPrimary, marginBottom: 4, fontFamily: F.body }}>{p.name}</div>
+              <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 10, fontFamily: F.body }}>{p.desc}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{p.price}</div>
-                <button style={{ fontSize: 11, color: C.gold, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, padding: "5px 12px", borderRadius: 6, cursor: "pointer", fontFamily: F.body }}>
+                <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.goldLight }}>{p.price}</div>
+                <button style={{ fontSize: 13, color: C.gold, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, padding: "5px 12px", borderRadius: 6, cursor: "pointer", fontFamily: F.body }}>
                   立即兌換
                 </button>
               </div>
@@ -343,7 +343,7 @@ function FounderPass({ member }: { member: Member }) {
         </svg>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textMuted, letterSpacing: 1, marginBottom: 6 }}>No Founder Pass</div>
-          <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginBottom: 20 }}>此會員尚未持有任何 Founder Pass</div>
+          <div style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body, marginBottom: 20 }}>此會員尚未持有任何 Founder Pass</div>
           <a href="/founder" style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "10px 24px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5, textDecoration: "none", display: "inline-block" }}>了解 Founder Membership →</a>
         </div>
       </div>
@@ -380,15 +380,15 @@ function FounderPass({ member }: { member: Member }) {
             <text x="57" y="44" textAnchor="middle" fontFamily="'DM Sans',system-ui,sans-serif" fontSize="7" fontWeight="500" fill="rgba(55,35,5,0.6)" letterSpacing="2">MEMBERSHIP</text>
           </svg>
           <div>
-            <div style={{ fontFamily: F.display, fontSize: 13, color: C.gold, letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>Founder Membership</div>
+            <div style={{ fontFamily: F.display, fontSize: 16, color: C.gold, letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>Founder Membership</div>
             <div style={{ fontFamily: F.display, fontSize: 26, fontWeight: 300, color: C.textPrimary, letterSpacing: 1, marginBottom: 6 }}>Pass · {fp}</div>
-            <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 0.5, fontFamily: F.body }}>Reward Weight · Monthly Reward Pool · Ecosystem Growth</div>
+            <div style={{ fontSize: 14, color: C.textMuted, letterSpacing: 0.5, fontFamily: F.body }}>Reward Weight · Monthly Reward Pool · Ecosystem Growth</div>
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontFamily: F.display, fontSize: 36, fontWeight: 300, color: C.gold, lineHeight: 1 }}>{cfg!.units.toLocaleString()}</div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Reward Units</div>
-          <div style={{ fontFamily: F.mono, fontSize: 13, color: C.goldLight, marginTop: 6 }}>${cfg!.price.toLocaleString()}</div>
+          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Reward Units</div>
+          <div style={{ fontFamily: F.mono, fontSize: 16, color: C.goldLight, marginTop: 6 }}>${cfg!.price.toLocaleString()}</div>
         </div>
       </div>
 
@@ -396,8 +396,8 @@ function FounderPass({ member }: { member: Member }) {
         {dynamicBenefits.map((b) => (
           <div key={b.name} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: 16 }}>
             <span style={{ fontSize: 20, marginBottom: 10, color: C.gold, display: "block" }}>{b.icon}</span>
-            <div style={{ fontSize: 12.5, fontWeight: 500, color: C.textPrimary, marginBottom: 4, fontFamily: F.body }}>{b.name}</div>
-            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5, fontFamily: F.body }}>{b.desc}</div>
+            <div style={{ fontSize: 15, fontWeight: 500, color: C.textPrimary, marginBottom: 4, fontFamily: F.body }}>{b.name}</div>
+            <div style={{ fontSize: 13, color: C.textMuted, lineHeight: 1.5, fontFamily: F.body }}>{b.desc}</div>
           </div>
         ))}
       </div>
@@ -428,14 +428,14 @@ export default function DashboardPage() {
 
         {/* 未帶 UID 提示 */}
         {!member && !notFound && (
-          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, fontFamily: F.body, fontSize: 13, color: C.textMuted }}>
+          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, fontFamily: F.body, fontSize: 16, color: C.textMuted }}>
             ← 請先前往 <a href="/member" style={{ color: C.gold, textDecoration: "none" }}>Member Access</a> 頁面輸入 UID 查詢會員資料
           </div>
         )}
 
         {/* 找不到 */}
         {notFound && (
-          <div style={{ padding: "16px 20px", background: "rgba(201,96,96,0.06)", border: "0.5px solid rgba(201,96,96,0.28)", borderRadius: 10, fontFamily: F.mono, fontSize: 13, color: "#c96060" }}>
+          <div style={{ padding: "16px 20px", background: "rgba(201,96,96,0.06)", border: "0.5px solid rgba(201,96,96,0.28)", borderRadius: 10, fontFamily: F.mono, fontSize: 16, color: "#c96060" }}>
             ✕ Member not found — 查無此 UID 資料
           </div>
         )}

@@ -13,7 +13,7 @@ const C = {
   borderStrong: "rgba(201,168,76,0.45)",
   textPrimary: "#f0ece0",
   textSecondary: "#8a8578",
-  textMuted: "#4a4740",
+  textMuted: "#8a8578",
 };
 
 const F = {
@@ -224,7 +224,7 @@ export default function LandingPage() {
                 Trade More.<br />
                 <span style={{ color: C.goldLight }}>Unlock More.</span>
               </h1>
-              <p style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 36, maxWidth: 460 }}>
+              <p style={{ fontSize: 24, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 36, maxWidth: 460 }}>
                 讓交易量、消費與推薦貢獻，轉化為會員積分、VIP 等級與專屬權益。
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -249,7 +249,7 @@ export default function LandingPage() {
         <h2 style={{ fontFamily: F.display, fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 16, maxWidth: 600 }}>
           Web3 會員經濟平台
         </h2>
-        <p style={{ fontSize: 15, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 48, maxWidth: 600 }}>
+        <p style={{ fontSize: 22, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 48, maxWidth: 600 }}>
           Monstore 將交易返佣與會員制度結合，讓會員的交易量累積成可見的 VIP 等級與專屬電商福利。平台不是交易所，不保管用戶資產，也不要求 API Key。
         </p>
         <div className="feature-grid">
@@ -261,7 +261,7 @@ export default function LandingPage() {
             >
               <div style={{ fontSize: 28, marginBottom: 16 }}>{f.icon}</div>
               <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, marginBottom: 10, letterSpacing: 0.5 }}>{f.title}</div>
-              <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.7 }}>{f.desc}</div>
+              <div style={{ fontSize: 17, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.7 }}>{f.desc}</div>
             </div>
           ))}
         </div>
@@ -279,7 +279,7 @@ export default function LandingPage() {
               <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 14, padding: 24 }}>
                 <div style={{ fontFamily: F.mono, fontSize: 12, color: C.gold, marginBottom: 14, letterSpacing: 2 }}>{s.num}</div>
                 <div style={{ fontSize: 15, fontWeight: 500, color: C.textPrimary, marginBottom: 8, fontFamily: F.body }}>{s.title}</div>
-                <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.7, fontFamily: F.body }}>{s.desc}</div>
+                <div style={{ fontSize: 16, color: C.textMuted, lineHeight: 1.7, fontFamily: F.body }}>{s.desc}</div>
               </div>
               {i < steps.length - 1 && (
                 <div style={{ position: "absolute", top: "50%", right: -10, fontSize: 16, color: C.borderMid, transform: "translateY(-50%)" }}>→</div>
@@ -295,7 +295,7 @@ export default function LandingPage() {
         <h2 style={{ fontFamily: F.display, fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 12 }}>
           四個會員等級
         </h2>
-        <p style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, marginBottom: 48, maxWidth: 500 }}>
+        <p style={{ fontSize: 21, color: C.textSecondary, fontFamily: F.body, marginBottom: 48, maxWidth: 500 }}>
           依據累積交易量晉升等級，享有電商折價券、優惠券與抽獎等專屬會員福利。
         </p>
         <div className="vip-grid">
@@ -310,13 +310,13 @@ export default function LandingPage() {
               )}
               <div style={{ fontFamily: F.display, fontSize: 24, fontWeight: 500, color: tier.color, letterSpacing: 1, marginBottom: 4 }}>{tier.name}</div>
               <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: tier.color, marginBottom: 4 }}>{tier.range}</div>
-              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body, marginBottom: 20 }}>累積交易量</div>
+              <div style={{ fontSize: 13, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body, marginBottom: 20 }}>累積交易量</div>
               <div style={{ height: "0.5px", background: tier.colorBorder, marginBottom: 16 }} />
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {tier.perks.map((p) => (
                   <div key={p} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                     <span style={{ fontSize: 12, color: tier.color, flexShrink: 0, marginTop: 1 }}>✓</span>
-                    <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{p}</span>
+                    <span style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{p}</span>
                   </div>
                 ))}
               </div>
@@ -331,7 +331,7 @@ export default function LandingPage() {
         <h2 style={{ fontFamily: F.display, fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 12 }}>
           雙池模型
         </h2>
-        <p style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, marginBottom: 48, maxWidth: 520 }}>
+        <p style={{ fontSize: 21, color: C.textSecondary, fontFamily: F.body, marginBottom: 48, maxWidth: 520 }}>
           Monstore 採用透明的雙池架構，平衡平台長期發展與會員月度回饋。
         </p>
         <div className="pool-grid">
@@ -340,7 +340,7 @@ export default function LandingPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 500, color: pool.color, letterSpacing: 0.5, marginBottom: 4 }}>{pool.label}</div>
-                  <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7, maxWidth: 300 }}>{pool.desc}</div>
+                  <div style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7, maxWidth: 300 }}>{pool.desc}</div>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 16 }}>
                   <div style={{ fontFamily: F.mono, fontSize: 40, fontWeight: 700, color: pool.color, lineHeight: 1 }}>{pool.pct}%</div>
@@ -354,14 +354,14 @@ export default function LandingPage() {
                 {pool.detail.map((d) => (
                   <div key={d} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span style={{ fontSize: 12, color: pool.color, flexShrink: 0 }}>◎</span>
-                    <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>{d}</span>
+                    <span style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body }}>{d}</span>
                   </div>
                 ))}
               </div>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 20, background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: "14px 20px", fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+        <div style={{ marginTop: 20, background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: "14px 20px", fontSize: 16, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
           ✦ Reward Units 代表你在 Monthly Reward Pool 中的參與權重，非股權、非保證收益產品。月度回饋來自真實平台收益，無保底金額。
         </div>
       </SectionWrapper>
@@ -374,21 +374,21 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: F.display, fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 16 }}>
               Limited Founder<br /><span style={{ color: C.goldLight }}>Membership</span>
             </h2>
-            <p style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 24 }}>
+            <p style={{ fontSize: 21, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 24 }}>
               Founder 不是股權，不是股票，不是保證收益產品。Founder 是早期生態參與身份，擁有最高 Reward Units、永久 VIP、Founder Badge 與未來平台優先權益。
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
               {["1,290 Reward Units", "Permanent VIP Status", "Founder Badge", "Ecosystem Priority", "Monthly Reward Pool 最高權重"].map((item) => (
                 <div key={item} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 14, color: C.gold }}>✦</span>
-                  <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body }}>{item}</span>
+                  <span style={{ fontSize: 17, color: C.textSecondary, fontFamily: F.body }}>{item}</span>
                 </div>
               ))}
             </div>
             <button style={{ background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, padding: "12px 28px", borderRadius: 10, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F.body }}>
               Founder Access — $5,000
             </button>
-            <div style={{ marginTop: 12, fontSize: 11, color: C.textMuted, fontFamily: F.body }}>限量 20 席 · 售完即止</div>
+            <div style={{ marginTop: 12, fontSize: 14, color: C.textMuted, fontFamily: F.body }}>限量 20 席 · 售完即止</div>
           </div>
 
           <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 60%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
@@ -405,13 +405,13 @@ export default function LandingPage() {
                 { label: "VIP 等級", value: "Permanent" },
               ].map((s) => (
                 <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>{s.label}</span>
-                  <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>{s.value}</span>
+                  <span style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body }}>{s.label}</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 17, fontWeight: 700, color: C.goldLight }}>{s.value}</span>
                 </div>
               ))}
             </div>
             <div style={{ marginTop: 20, background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, borderRadius: 8, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>剩餘名額</span>
+              <span style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>剩餘名額</span>
               <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.gold }}>17 / 20</span>
             </div>
           </div>
@@ -425,7 +425,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: F.display, fontSize: "clamp(28px, 5vw, 52px)", fontWeight: 300, color: C.textPrimary, letterSpacing: 1, lineHeight: 1.2, marginBottom: 16 }}>
               Become an Early<br /><span style={{ color: C.goldLight }}>Monstore Member</span>
             </h2>
-            <p style={{ fontSize: 15, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 40 }}>
+            <p style={{ fontSize: 22, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 40 }}>
               加入早期會員，參與 Monstore 交易會員經濟的第一階段。
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>

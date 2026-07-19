@@ -10,7 +10,7 @@ const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
   bgPrimary: "#0a0a0b",
   borderSubtle: "rgba(201,168,76,0.12)", borderMid: "rgba(201,168,76,0.25)",
-  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#4a4740",
+  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#8a8578",
   error: "#c96060",
 };
 

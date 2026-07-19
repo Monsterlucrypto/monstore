@@ -8,7 +8,7 @@ const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
   bgPrimary: "#0a0a0b", bgCard: "#141418", bgCardHover: "#1a1a1f",
   borderSubtle: "rgba(201,168,76,0.12)", borderMid: "rgba(201,168,76,0.25)", borderStrong: "rgba(201,168,76,0.45)",
-  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#4a4740",
+  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#8a8578",
   green: "#5ea96e", greenDim: "rgba(94,169,110,0.08)", greenBorder: "rgba(94,169,110,0.25)",
 };
 
@@ -111,7 +111,7 @@ const founderStatus = {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
+    <div style={{ fontSize: 12, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
       {children}
     </div>
   );
@@ -121,7 +121,7 @@ function LiveBadge() {
   return (
     <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.greenDim, border: `0.5px solid ${C.greenBorder}`, borderRadius: 20, padding: "5px 14px" }}>
       <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.green, display: "inline-block", boxShadow: `0 0 6px ${C.green}` }} />
-      <span style={{ fontSize: 10, color: C.green, fontFamily: F.body, letterSpacing: 2, textTransform: "uppercase" }}>Live · All Systems Operational</span>
+      <span style={{ fontSize: 12, color: C.green, fontFamily: F.body, letterSpacing: 2, textTransform: "uppercase" }}>Live · All Systems Operational</span>
     </div>
   );
 }
@@ -136,14 +136,14 @@ function PlatformOverview() {
           style={{ background: hov === i ? C.bgCardHover : C.bgCard, border: `0.5px solid ${hov === i ? C.borderMid : C.borderSubtle}`, borderRadius: 14, padding: 22, transition: "all 0.2s ease", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)", opacity: hov === i ? 1 : 0, transition: "opacity 0.2s" }} />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-            <span style={{ fontSize: 11, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>{o.label}</span>
+            <span style={{ fontSize: 13, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>{o.label}</span>
             <span style={{ fontSize: 18, color: C.gold }}>{o.icon}</span>
           </div>
-          <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body, marginBottom: 14 }}>{o.sub}</div>
+          <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, marginBottom: 14 }}>{o.sub}</div>
           <div style={{ fontFamily: F.mono, fontSize: 24, fontWeight: 700, color: C.textPrimary, marginBottom: 8, lineHeight: 1 }}>{o.value}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: o.positive ? C.green : "#c95e5e", fontFamily: F.mono }}>{o.change}</span>
-            <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{o.changeLabel}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: o.positive ? C.green : "#c95e5e", fontFamily: F.mono }}>{o.change}</span>
+            <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>{o.changeLabel}</span>
           </div>
         </div>
       ))}
@@ -170,7 +170,7 @@ function RevenueBreakdown() {
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
       <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 6 }}>Revenue Breakdown</div>
-      <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 24 }}>上月收入來源分佈</div>
+      <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, marginBottom: 24 }}>上月收入來源分佈</div>
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 40, alignItems: "center" }} className="grid-2">
         {/* Donut */}
         <div style={{ position: "relative", width: 160, height: 160, flexShrink: 0 }}>
@@ -181,8 +181,8 @@ function RevenueBreakdown() {
             WebkitMask: "radial-gradient(circle at center, transparent 54px, black 55px)",
           }} />
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.goldLight }}>NT${totalRevenue.toLocaleString()}</div>
-            <div style={{ fontSize: 9, color: C.textMuted, fontFamily: F.body, letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>Total</div>
+            <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.goldLight }}>NT${totalRevenue.toLocaleString()}</div>
+            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>Total</div>
           </div>
         </div>
         {/* Bars */}
@@ -195,13 +195,13 @@ function RevenueBreakdown() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: r.color, flexShrink: 0 }} />
                   <div>
-                    <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>{r.label}</div>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{r.sub}</div>
+                    <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body }}>{r.label}</div>
+                    <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>{r.sub}</div>
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                  <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textPrimary }}>NT${r.value.toLocaleString()}</span>
-                  <span style={{ fontFamily: F.mono, fontSize: 11, color: r.color, minWidth: 36, textAlign: "right" }}>{r.pct}%</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textPrimary }}>NT${r.value.toLocaleString()}</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 13, color: r.color, minWidth: 36, textAlign: "right" }}>{r.pct}%</span>
                 </div>
               </div>
               <div style={{ height: 4, background: "rgba(255,255,255,0.04)", borderRadius: 2, overflow: "hidden" }}>
@@ -220,39 +220,39 @@ function RewardPoolStatus() {
   return (
     <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -60, right: -60, width: 240, height: 240, background: "radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Last Month Reward Pool</div>
+      <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Last Month Reward Pool</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
         <span style={{ fontFamily: F.mono, fontSize: 36, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{rewardPool.amount}</span>
-        <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>May 2026</span>
+        <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>May 2026</span>
       </div>
-      <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 28 }}>本月 Reward Pool 已提撥金額</div>
+      <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, marginBottom: 28 }}>本月 Reward Pool 已提撥金額</div>
 
       {/* Flow diagram */}
       <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
         <div style={{ background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, borderRadius: 10, padding: "12px 18px", textAlign: "center" }}>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Revenue</div>
-          <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, marginBottom: 4 }}>平台月收入</div>
+          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Revenue</div>
+          <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 4 }}>平台月收入</div>
           <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.textPrimary }}>NT${rewardPool.revenue.toLocaleString("en")}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0 12px" }}>
           <div style={{ fontSize: 18, color: C.gold }}>→</div>
-          <div style={{ fontSize: 9, color: C.gold, fontFamily: F.mono, letterSpacing: 1 }}>{rewardPool.allocation}%</div>
+          <div style={{ fontSize: 11, color: C.gold, fontFamily: F.mono, letterSpacing: 1 }}>{rewardPool.allocation}%</div>
         </div>
         <div style={{ background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, borderRadius: 10, padding: "12px 18px", textAlign: "center" }}>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Allocation</div>
-          <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, marginBottom: 4 }}>提撥比例</div>
+          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Allocation</div>
+          <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 4 }}>提撥比例</div>
           <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.gold }}>{rewardPool.allocation}%</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0 12px" }}>
           <div style={{ fontSize: 18, color: C.gold }}>→</div>
         </div>
         <div style={{ background: "rgba(232,201,106,0.1)", border: `0.5px solid rgba(232,201,106,0.4)`, borderRadius: 10, padding: "12px 18px", textAlign: "center" }}>
-          <div style={{ fontSize: 10, color: C.goldLight, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Reward Pool</div>
-          <div style={{ fontSize: 10, color: C.goldLight, fontFamily: F.body, marginBottom: 4, opacity: 0.7 }}>本月獎勵池</div>
+          <div style={{ fontSize: 12, color: C.goldLight, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 2, fontFamily: F.body }}>Reward Pool</div>
+          <div style={{ fontSize: 12, color: C.goldLight, fontFamily: F.body, marginBottom: 4, opacity: 0.7 }}>本月獎勵池</div>
           <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.goldLight }}>NT${Number(poolAmt).toLocaleString("en")}</div>
         </div>
       </div>
-      <div style={{ marginTop: 16, fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
+      <div style={{ marginTop: 16, fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
         ✦ 平台每月淨收益的 {rewardPool.allocation}% 提撥至 Monthly Reward Pool，按 Founder Units 比例分配
       </div>
     </div>
@@ -285,15 +285,15 @@ function CommunityGrowth() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
         {stats.map((c) => (
           <div key={c.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 12, padding: 20 }}>
-            <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{c.label}</div>
-            <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body, marginBottom: 12 }}>{c.sub}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{c.label}</div>
+            <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, marginBottom: 12 }}>{c.sub}</div>
             <div style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: c.color, lineHeight: 1, marginBottom: c.newThisMonth !== null ? 10 : 0 }}>{c.value.toLocaleString()}</div>
             {c.newThisMonth !== null && (
               <>
                 <div style={{ height: "0.5px", background: C.borderSubtle, marginBottom: 10 }} />
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>+{c.newThisMonth} 本月新增</span>
-                  {c.growthPct && <span style={{ fontSize: 11, fontWeight: 600, color: C.green, fontFamily: F.mono }}>+{c.growthPct}%</span>}
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>+{c.newThisMonth} 本月新增</span>
+                  {c.growthPct && <span style={{ fontSize: 13, fontWeight: 600, color: C.green, fontFamily: F.mono }}>+{c.growthPct}%</span>}
                 </div>
               </>
             )}
@@ -319,14 +319,14 @@ function TreasuryHealth() {
           { label: "Runway",            sub: "預計可維運月數", value: `${treasury.runway} Months`,               color: runwayColor  },
         ].map((s) => (
           <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: 18 }}>
-            <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: F.body, marginBottom: 8 }}>{s.sub}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
+            <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, marginBottom: 8 }}>{s.sub}</div>
             <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: s.color }}>{s.value}</div>
           </div>
         ))}
       </div>
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
           <span>Runway Progress</span>
           <span style={{ color: runwayColor }}>{treasury.runway} / 12 Months</span>
         </div>
@@ -346,12 +346,12 @@ function GrowthMetrics() {
         {growthMetrics.map((g, i) => (
           <div key={g.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 0", borderBottom: i < growthMetrics.length - 1 ? `0.5px solid ${C.borderSubtle}` : "none" }}>
             <div>
-              <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body }}>{g.label}</div>
-              <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>{g.sub}</div>
+              <div style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body }}>{g.label}</div>
+              <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>{g.sub}</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.textPrimary }}>{g.value}</span>
-              <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 600, color: g.positive ? C.green : "#c95e5e", minWidth: 56, textAlign: "right" }}>{g.change}</span>
+              <span style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 600, color: g.positive ? C.green : "#c95e5e", minWidth: 56, textAlign: "right" }}>{g.change}</span>
             </div>
           </div>
         ))}
@@ -366,7 +366,7 @@ function GenesisFounderStatus() {
     <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 60%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 28, position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -40, right: -40, width: 220, height: 220, background: "radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 6 }}>Genesis Founder Status</div>
-      <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 24 }}>Phase One · Genesis Release 開放進度</div>
+      <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, marginBottom: 24 }}>Phase One · Genesis Release 開放進度</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }} className="grid-3">
         {[
           { label: "Allocated Units",    sub: "已分配 Reward Units", value: `${founderStatus.allocatedUnits.toLocaleString()} Units`, color: C.goldLight },
@@ -374,14 +374,14 @@ function GenesisFounderStatus() {
           { label: "Release Progress",   sub: "第一階段開放進度",    value: `${founderStatus.progress}%`,                              color: C.gold },
         ].map((s) => (
           <div key={s.label} style={{ background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: 18 }}>
-            <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: F.body, marginBottom: 8 }}>{s.sub}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>{s.label}</div>
+            <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, marginBottom: 8 }}>{s.sub}</div>
             <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: s.color }}>{s.value}</div>
           </div>
         ))}
       </div>
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, fontFamily: F.mono, marginBottom: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: C.textMuted, fontFamily: F.mono, marginBottom: 8 }}>
           <span>0 Units</span>
           <span style={{ color: C.gold }}>Genesis Release · {pct}% Allocated</span>
           <span>10,000 Units</span>
@@ -389,7 +389,7 @@ function GenesisFounderStatus() {
         <div style={{ height: 8, background: "rgba(255,255,255,0.04)", borderRadius: 4, overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg, ${C.goldDim}, ${C.gold}, ${C.goldLight})`, borderRadius: 4 }} />
         </div>
-        <div style={{ marginTop: 10, fontSize: 11, color: C.textMuted, fontFamily: F.body }}>
+        <div style={{ marginTop: 10, fontSize: 13, color: C.textMuted, fontFamily: F.body }}>
           ✦ 已分配 {founderStatus.allocatedUnits.toLocaleString()} / {founderStatus.totalUnits.toLocaleString()} Units · 剩餘 {(founderStatus.totalUnits - founderStatus.allocatedUnits).toLocaleString()} Units 尚未開放
         </div>
       </div>
@@ -409,7 +409,7 @@ export default function PlatformStatusPage() {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
           <div>
             <div style={{ fontFamily: F.display, fontSize: 32, fontWeight: 300, color: C.textPrimary, letterSpacing: 1, marginBottom: 6 }}>Platform Status</div>
-            <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>Monstore · 營運狀態與成長數據儀表板</div>
+            <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>Monstore · 營運狀態與成長數據儀表板</div>
           </div>
           <LiveBadge />
         </div>

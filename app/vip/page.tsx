@@ -83,7 +83,7 @@ const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
   bgPrimary: "#0a0a0b", bgCard: "#141418", bgCardHover: "#1a1a1f",
   borderSubtle: "rgba(201,168,76,0.12)", borderMid: "rgba(201,168,76,0.25)", borderStrong: "rgba(201,168,76,0.45)",
-  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#4a4740",
+  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#8a8578",
 };
 const F = {
   display: "'Cormorant Garamond', Georgia, serif",
@@ -93,7 +93,7 @@ const F = {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
+    <div style={{ fontSize: 12, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
       {children}
     </div>
   );
@@ -101,7 +101,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function TierBadge({ tier }: { tier: typeof TIERS[0] }) {
   return (
-    <span style={{ fontSize: 10, letterSpacing: 1.5, padding: "3px 10px", borderRadius: 20, border: `0.5px solid ${tier.colorBorder}`, background: tier.colorDim, color: tier.color, fontFamily: F.body, fontWeight: 500, textTransform: "uppercase" }}>
+    <span style={{ fontSize: 12, letterSpacing: 1.5, padding: "3px 10px", borderRadius: 20, border: `0.5px solid ${tier.colorBorder}`, background: tier.colorDim, color: tier.color, fontFamily: F.body, fontWeight: 500, textTransform: "uppercase" }}>
       {tier.icon} {tier.name}
     </span>
   );
@@ -119,7 +119,7 @@ function CurrentStatusCard({ member }: { member: Member }) {
 
       {/* Left: current tier */}
       <div>
-        <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>目前等級</div>
+        <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>目前等級</div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <div style={{ fontFamily: F.display, fontSize: 42, fontWeight: 300, color: tier.color, letterSpacing: 2, lineHeight: 1 }}>{tier.name}</div>
           <TierBadge tier={tier} />
@@ -130,7 +130,7 @@ function CurrentStatusCard({ member }: { member: Member }) {
             { label: "Rank",        value: `#${member.tradingRank}` },
           ].map((s) => (
             <div key={s.label}>
-              <div style={{ fontSize: 9, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 3, fontFamily: F.body }}>{s.label}</div>
+              <div style={{ fontSize: 11, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 3, fontFamily: F.body }}>{s.label}</div>
               <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.goldLight }}>{s.value}</div>
             </div>
           ))}
@@ -142,30 +142,30 @@ function CurrentStatusCard({ member }: { member: Member }) {
         {nextTier ? (
           <>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>
+              <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body }}>
                 距離 <span style={{ color: nextTier.color, fontFamily: F.mono }}>{nextTier.name}</span> 還差
               </div>
-              <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.gold }}>{prog.remaining}</span>
+              <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.gold }}>{prog.remaining}</span>
             </div>
             <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, height: 8, overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${prog.pct}%`, background: `linear-gradient(90deg, ${C.goldDim}, ${C.gold}, ${tier.color})`, borderRadius: 4, transition: "width 1s ease" }} />
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.textMuted, fontFamily: F.mono }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: C.textMuted, fontFamily: F.mono }}>
               <span>目前 {prog.current}</span><span>{prog.pct}%</span><span>目標 {prog.target}</span>
             </div>
-            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
               達到 <span style={{ color: nextTier.color }}>{nextTier.name}</span> 等級可獲得：
               {nextTier.signals && !tier.signals && " 私人交易訊號、"}
               {" 更多月度抽獎與折價券權益"}
             </div>
-            <a href="/founder" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, color: C.gold, fontFamily: F.body, textDecoration: "none" }}>
+            <a href="/founder" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: C.gold, fontFamily: F.body, textDecoration: "none" }}>
               ◆ 了解 Founder Membership →
             </a>
           </>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ fontFamily: F.display, fontSize: 18, color: tier.color, letterSpacing: 1 }}>已達最高等級 ✓</div>
-            <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
               你已達到 Diamond 最高等級，享有所有專屬權益。
             </div>
             <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 4, height: 8, overflow: "hidden" }}>
@@ -194,26 +194,26 @@ function TierCards({ currentVip }: { currentVip: string }) {
             style={{ background: isCurrent ? "rgba(201,168,76,0.06)" : isHov ? C.bgCardHover : C.bgCard, border: `0.5px solid ${isCurrent ? C.borderStrong : isHov ? C.borderMid : C.borderSubtle}`, borderRadius: 14, padding: 24, position: "relative", overflow: "hidden", transition: "all 0.25s ease", transform: isHov ? "translateY(-2px)" : "none" }}
           >
             {isCurrent && (
-              <div style={{ position: "absolute", top: 12, right: 12, fontSize: 9, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "2px 8px", borderRadius: 4, letterSpacing: 1, fontFamily: F.body }}>目前</div>
+              <div style={{ position: "absolute", top: 12, right: 12, fontSize: 11, color: C.gold, background: "rgba(201,168,76,0.1)", border: `0.5px solid ${C.borderMid}`, padding: "2px 8px", borderRadius: 4, letterSpacing: 1, fontFamily: F.body }}>目前</div>
             )}
             <div style={{ marginBottom: 10 }}>
               <span style={{ fontSize: 28, color: tier.color }}>{tier.icon}</span>
             </div>
             <div style={{ fontFamily: F.display, fontSize: 30, fontWeight: 300, color: tier.color, letterSpacing: 2, marginBottom: 2 }}>{tier.name}</div>
-            <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>{tier.label}</div>
-            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginBottom: 16, lineHeight: 1.5 }}>{tier.requirement}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>{tier.label}</div>
+            <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginBottom: 16, lineHeight: 1.5 }}>{tier.requirement}</div>
             <div style={{ height: "0.5px", background: tier.colorBorder, marginBottom: 16 }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {tier.perks.map((perk) => (
                 <div key={perk} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                  <span style={{ fontSize: 12, color: tier.color, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{perk}</span>
+                  <span style={{ fontSize: 14, color: tier.color, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{perk}</span>
                 </div>
               ))}
             </div>
             {tier.id === "Diamond" && (
               <div style={{ marginTop: 14, padding: "8px 12px", background: "rgba(176,224,255,0.05)", border: `0.5px solid ${tier.colorBorder}`, borderRadius: 6 }}>
-                <div style={{ fontSize: 10, color: tier.color, fontFamily: F.body, lineHeight: 1.5 }}>可透過 Founder Membership 永久達成，無需月交易量門檻</div>
+                <div style={{ fontSize: 12, color: tier.color, fontFamily: F.body, lineHeight: 1.5 }}>可透過 Founder Membership 永久達成，無需月交易量門檻</div>
               </div>
             )}
           </div>
@@ -242,12 +242,12 @@ function BenefitsTable({ currentVip }: { currentVip: string }) {
       <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: F.body }}>
         <thead>
           <tr style={{ borderBottom: `0.5px solid ${C.borderSubtle}` }}>
-            <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 11, color: C.textMuted, fontWeight: 400, letterSpacing: 1.5, textTransform: "uppercase", width: "28%" }}>權益項目</th>
+            <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, color: C.textMuted, fontWeight: 400, letterSpacing: 1.5, textTransform: "uppercase", width: "28%" }}>權益項目</th>
             {TIERS.map((t, i) => (
               <th key={t.id} style={{ padding: "16px 20px", textAlign: "center", fontSize: 18, color: t.color, fontWeight: 300, fontFamily: F.display, letterSpacing: 2, background: i === currentIdx ? "rgba(201,168,76,0.04)" : "transparent" }}>
                 {t.name}
                 {i === currentIdx && (
-                  <div style={{ fontSize: 9, color: C.gold, fontFamily: F.body, letterSpacing: 1, marginTop: 4, textTransform: "uppercase" }}>目前</div>
+                  <div style={{ fontSize: 11, color: C.gold, fontFamily: F.body, letterSpacing: 1, marginTop: 4, textTransform: "uppercase" }}>目前</div>
                 )}
               </th>
             ))}
@@ -256,7 +256,7 @@ function BenefitsTable({ currentVip }: { currentVip: string }) {
         <tbody>
           {rows.map((row, ri) => (
             <tr key={row.label} style={{ borderBottom: ri < rows.length - 1 ? `0.5px solid ${C.borderSubtle}` : "none" }}>
-              <td style={{ padding: "14px 20px", fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>{row.label}</td>
+              <td style={{ padding: "14px 20px", fontSize: 14, color: C.textSecondary, fontFamily: F.body }}>{row.label}</td>
               {row.values.map((val, vi) => {
                 const isCurrent = vi === currentIdx;
                 const isCheck   = val === "✓";
@@ -297,7 +297,7 @@ function UpgradeHistory({ member }: { member: Member }) {
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>升級歷史</div>
-        <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.mono }}>共 {reversed.length} 筆紀錄</span>
+        <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.mono }}>共 {reversed.length} 筆紀錄</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
         {reversed.map((h, i) => {
@@ -305,21 +305,21 @@ function UpgradeHistory({ member }: { member: Member }) {
           return (
             <div key={i} style={{ display: "flex", gap: 20, position: "relative" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
-                <div style={{ width: 32, height: 32, borderRadius: "50%", background: toTier ? toTier.colorDim : "rgba(255,255,255,0.04)", border: `0.5px solid ${toTier ? toTier.colorBorder : C.borderSubtle}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: toTier ? toTier.color : C.textMuted, flexShrink: 0 }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: toTier ? toTier.colorDim : "rgba(255,255,255,0.04)", border: `0.5px solid ${toTier ? toTier.colorBorder : C.borderSubtle}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: toTier ? toTier.color : C.textMuted, flexShrink: 0 }}>
                   {toTier ? toTier.icon : "◎"}
                 </div>
                 {i < reversed.length - 1 && <div style={{ width: 1, flex: 1, minHeight: 32, background: C.borderSubtle, margin: "4px 0" }} />}
               </div>
               <div style={{ flex: 1, paddingBottom: i < reversed.length - 1 ? 24 : 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                  <span style={{ fontFamily: F.mono, fontSize: 11, color: C.textMuted }}>{h.date}</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 13, color: C.textMuted }}>{h.date}</span>
                   {h.from !== "—" && (
-                    <><span style={{ fontSize: 11, color: C.textMuted }}>{h.from}</span><span style={{ fontSize: 11, color: C.textMuted }}>→</span></>
+                    <><span style={{ fontSize: 13, color: C.textMuted }}>{h.from}</span><span style={{ fontSize: 13, color: C.textMuted }}>→</span></>
                   )}
                   {toTier && <TierBadge tier={toTier} />}
                 </div>
-                <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, marginBottom: 4 }}>{h.note}</div>
-                {h.volume !== "—" && <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.mono }}>達成交易量：{h.volume}</div>}
+                <div style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body, marginBottom: 4 }}>{h.note}</div>
+                {h.volume !== "—" && <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.mono }}>達成交易量：{h.volume}</div>}
               </div>
             </div>
           );
@@ -348,14 +348,14 @@ export default function VIPMembershipPage() {
 
         {/* 未帶 UID */}
         {!member && !notFound && (
-          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, fontFamily: F.body, fontSize: 13, color: C.textMuted }}>
+          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, fontFamily: F.body, fontSize: 16, color: C.textMuted }}>
             ← 請先前往 <a href="/member" style={{ color: C.gold, textDecoration: "none" }}>Member Access</a> 頁面輸入 UID 查詢會員資料
           </div>
         )}
 
         {/* 找不到 */}
         {notFound && (
-          <div style={{ padding: "16px 20px", background: "rgba(201,96,96,0.06)", border: "0.5px solid rgba(201,96,96,0.28)", borderRadius: 10, fontFamily: F.mono, fontSize: 13, color: "#c96060" }}>
+          <div style={{ padding: "16px 20px", background: "rgba(201,96,96,0.06)", border: "0.5px solid rgba(201,96,96,0.28)", borderRadius: 10, fontFamily: F.mono, fontSize: 16, color: "#c96060" }}>
             ✕ Member not found — 查無此 UID 資料
           </div>
         )}

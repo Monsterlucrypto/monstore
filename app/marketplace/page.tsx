@@ -21,7 +21,7 @@ const C = {
   borderStrong: "rgba(201,168,76,0.45)",
   textPrimary: "#f0ece0",
   textSecondary: "#8a8578",
-  textMuted: "#4a4740",
+  textMuted: "#8a8578",
 };
 
 const F = {
@@ -60,7 +60,7 @@ const orders: { id: string; date: string; item: string; points: number; status: 
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
+    <div style={{ fontSize: 12, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
       {children}
     </div>
   );
@@ -74,7 +74,7 @@ function StatusBadge({ status }: { status: string }) {
   };
   const s = map[status] ?? map["審核中"];
   return (
-    <span style={{ fontSize: 11, color: s.color, background: s.bg, border: `0.5px solid ${s.border}`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body }}>
+    <span style={{ fontSize: 13, color: s.color, background: s.bg, border: `0.5px solid ${s.border}`, padding: "3px 10px", borderRadius: 20, fontFamily: F.body }}>
       {status}
     </span>
   );
@@ -92,10 +92,10 @@ function PointsBanner({ member }: { member: Member | null }) {
       <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         <div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>可用積分</div>
+          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>可用積分</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
             <span style={{ fontFamily: F.mono, fontSize: 32, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{pts.toFixed(4)}</span>
-            <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>point</span>
+            <span style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body }}>point</span>
           </div>
         </div>
       </div>
@@ -132,7 +132,7 @@ function ProductGrid({ member }: { member: Member | null }) {
             style={{
               padding: "7px 18px",
               borderRadius: 20,
-              fontSize: 12,
+              fontSize: 14,
               fontFamily: F.body,
               cursor: "pointer",
               border: `0.5px solid ${filter === f ? C.borderStrong : C.borderSubtle}`,
@@ -144,7 +144,7 @@ function ProductGrid({ member }: { member: Member | null }) {
             {f}
           </button>
         ))}
-        <span style={{ marginLeft: "auto", fontSize: 12, color: C.textMuted, fontFamily: F.body, alignSelf: "center" }}>
+        <span style={{ marginLeft: "auto", fontSize: 14, color: C.textMuted, fontFamily: F.body, alignSelf: "center" }}>
           {filtered.length} 件商品
         </span>
       </div>
@@ -189,13 +189,13 @@ function ProductGrid({ member }: { member: Member | null }) {
                     <text x="55" y="17" textAnchor="middle" fontFamily="'Cormorant Garamond',Georgia,serif" fontSize="10" fontWeight="600" fill="rgba(55,35,5,0.8)" letterSpacing="3">FOUNDER</text>
                     <text x="55" y="36" textAnchor="middle" fontFamily="'DM Sans',system-ui,sans-serif" fontSize="8" fontWeight="500" fill="rgba(55,35,5,0.6)" letterSpacing="2">MEMBERSHIP</text>
                   </svg>
-                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 13, fontWeight: 700, color: "#E8C96A", letterSpacing: 3 }}>{p.founderTier} ACCESS</span>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 16, fontWeight: 700, color: "#E8C96A", letterSpacing: 3 }}>{p.founderTier} ACCESS</span>
                 </div>
               ) : (
                 <span style={{ opacity: p.locked ? 0.4 : 1 }}>{p.icon}</span>
               )}
               {/* 標籤 */}
-              <div style={{ position: "absolute", top: 10, left: 10, background: p.tag === "Founder Pass" ? "rgba(232,201,106,0.2)" : "rgba(201,168,76,0.12)", border: `0.5px solid ${p.tag === "Founder Pass" ? C.borderStrong : C.borderMid}`, color: p.tag === "Founder Pass" ? C.goldLight : C.gold, fontSize: 9, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>
+              <div style={{ position: "absolute", top: 10, left: 10, background: p.tag === "Founder Pass" ? "rgba(232,201,106,0.2)" : "rgba(201,168,76,0.12)", border: `0.5px solid ${p.tag === "Founder Pass" ? C.borderStrong : C.borderMid}`, color: p.tag === "Founder Pass" ? C.goldLight : C.gold, fontSize: 11, letterSpacing: 1.5, padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>
                 {p.tag}
               </div>
 
@@ -210,11 +210,11 @@ function ProductGrid({ member }: { member: Member | null }) {
             {/* 商品資訊 */}
             <div style={{ padding: 16 }}>
               <div style={{ fontSize: 14, fontWeight: 500, color: p.locked ? C.textMuted : C.textPrimary, marginBottom: 4, fontFamily: F.body }}>{p.name}</div>
-              <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 12, lineHeight: 1.5, fontFamily: F.body }}>{p.desc}</div>
+              <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 12, lineHeight: 1.5, fontFamily: F.body }}>{p.desc}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   {"href" in p
-                    ? <div style={{ fontFamily: F.body, fontSize: 12, color: C.textMuted }}>免積分</div>
+                    ? <div style={{ fontFamily: F.body, fontSize: 14, color: C.textMuted }}>免積分</div>
                     : "comingSoon" in p
                     ? <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.textMuted }}>? pts</div>
                     : <div style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: p.locked ? C.textMuted : C.goldLight }}>{p.price.toLocaleString()} pts</div>
@@ -226,7 +226,7 @@ function ProductGrid({ member }: { member: Member | null }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
-                      fontSize: 11,
+                      fontSize: 13,
                       color: C.gold,
                       background: "rgba(201,168,76,0.08)",
                       border: `0.5px solid ${C.borderMid}`,
@@ -243,7 +243,7 @@ function ProductGrid({ member }: { member: Member | null }) {
                   <button
                     disabled
                     style={{
-                      fontSize: 11,
+                      fontSize: 13,
                       color: C.textMuted,
                       background: "rgba(201,168,76,0.08)",
                       border: `0.5px solid ${C.borderMid}`,
@@ -261,7 +261,7 @@ function ProductGrid({ member }: { member: Member | null }) {
                     disabled={p.locked || userPoints < p.price}
                     onClick={() => !p.locked && setRedeemed(p.id)}
                     style={{
-                      fontSize: 11,
+                      fontSize: 13,
                       color: p.locked ? C.textMuted : userPoints < p.price ? C.textMuted : C.gold,
                       background: "rgba(201,168,76,0.08)",
                       border: `0.5px solid ${C.borderMid}`,
@@ -289,24 +289,24 @@ function ProductGrid({ member }: { member: Member | null }) {
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
             <div style={{ background: "#141418", border: `0.5px solid ${C.borderMid}`, borderRadius: 16, padding: 32, width: 400, position: "relative" }}>
               <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 400, color: C.textPrimary, marginBottom: 8 }}>確認兌換</div>
-              <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginBottom: 24 }}>請確認以下兌換資訊</div>
+              <div style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body, marginBottom: 24 }}>請確認以下兌換資訊</div>
               <div style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, padding: 16, marginBottom: 24 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>商品</span>
-                  <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F.body }}>{p.name}</span>
+                  <span style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>商品</span>
+                  <span style={{ fontSize: 16, color: C.textPrimary, fontFamily: F.body }}>{p.name}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>消耗積分</span>
-                  <span style={{ fontSize: 13, fontFamily: F.mono, fontWeight: 700, color: C.gold }}>-{p.price.toLocaleString()} pts</span>
+                  <span style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>消耗積分</span>
+                  <span style={{ fontSize: 16, fontFamily: F.mono, fontWeight: 700, color: C.gold }}>-{p.price.toLocaleString()} pts</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>兌換後餘額</span>
-                  <span style={{ fontSize: 13, fontFamily: F.mono, color: C.goldLight }}>{(userPoints - p.price).toFixed(2)} point</span>
+                  <span style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>兌換後餘額</span>
+                  <span style={{ fontSize: 16, fontFamily: F.mono, color: C.goldLight }}>{(userPoints - p.price).toFixed(2)} point</span>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 12 }}>
-                <button onClick={() => setRedeemed(null)} style={{ flex: 1, padding: "11px 0", borderRadius: 8, background: "transparent", border: `0.5px solid ${C.borderMid}`, color: C.textSecondary, fontSize: 13, cursor: "pointer", fontFamily: F.body }}>取消</button>
-                <button onClick={() => setRedeemed(null)} style={{ flex: 1, padding: "11px 0", borderRadius: 8, background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F.body }}>確認兌換</button>
+                <button onClick={() => setRedeemed(null)} style={{ flex: 1, padding: "11px 0", borderRadius: 8, background: "transparent", border: `0.5px solid ${C.borderMid}`, color: C.textSecondary, fontSize: 16, cursor: "pointer", fontFamily: F.body }}>取消</button>
+                <button onClick={() => setRedeemed(null)} style={{ flex: 1, padding: "11px 0", borderRadius: 8, background: `linear-gradient(135deg, ${C.goldDim}, #5a4520)`, border: `0.5px solid ${C.gold}`, color: C.goldLight, fontSize: 16, fontWeight: 500, cursor: "pointer", fontFamily: F.body }}>確認兌換</button>
               </div>
             </div>
           </div>
@@ -322,27 +322,27 @@ function MyOrders() {
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div style={{ fontFamily: F.display, fontSize: 20, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>我的訂單</div>
-        <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.mono }}>共 {orders.length} 筆</span>
+        <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.mono }}>共 {orders.length} 筆</span>
       </div>
       {orders.length === 0 && (
-        <div style={{ padding: "32px 0", textAlign: "center", fontSize: 13, color: C.textMuted, fontFamily: F.body }}>尚無兌換紀錄</div>
+        <div style={{ padding: "32px 0", textAlign: "center", fontSize: 16, color: C.textMuted, fontFamily: F.body }}>尚無兌換紀錄</div>
       )}
 
       {/* 表頭 */}
       <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 2fr 1fr 1fr", gap: 16, padding: "0 0 12px", borderBottom: `0.5px solid ${C.borderSubtle}`, marginBottom: 4 }}>
         {["訂單編號", "日期", "商品", "消耗積分", "狀態"].map((h) => (
-          <div key={h} style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>{h}</div>
+          <div key={h} style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", fontFamily: F.body }}>{h}</div>
         ))}
       </div>
 
       {orders.map((o, i) => (
         <div key={o.id} style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 2fr 1fr 1fr", gap: 16, padding: "16px 0", borderBottom: i < orders.length - 1 ? `0.5px solid ${C.borderSubtle}` : "none", alignItems: "center" }}>
-          <span style={{ fontFamily: F.mono, fontSize: 11, color: C.textMuted }}>{o.id}</span>
-          <span style={{ fontFamily: F.mono, fontSize: 11, color: C.textMuted }}>{o.date}</span>
-          <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F.body }}>{o.item}</span>
+          <span style={{ fontFamily: F.mono, fontSize: 13, color: C.textMuted }}>{o.id}</span>
+          <span style={{ fontFamily: F.mono, fontSize: 13, color: C.textMuted }}>{o.date}</span>
+          <span style={{ fontSize: 16, color: C.textPrimary, fontFamily: F.body }}>{o.item}</span>
           <div>
-            <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.gold }}>-{o.points.toLocaleString()}</span>
-            <span style={{ fontSize: 10, color: C.textMuted, marginLeft: 4, fontFamily: F.body }}>pts</span>
+            <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.gold }}>-{o.points.toLocaleString()}</span>
+            <span style={{ fontSize: 12, color: C.textMuted, marginLeft: 4, fontFamily: F.body }}>pts</span>
           </div>
           <StatusBadge status={o.status} />
         </div>
@@ -368,7 +368,7 @@ export default function MarketplacePage() {
     <Layout activePath="/marketplace" title="會員商城">
       <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 32, maxWidth: 1200 }}>
         {!member && (
-          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: "0.5px solid rgba(201,168,76,0.12)", borderRadius: 10, fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 13, color: "#4a4740" }}>
+          <div style={{ padding: "16px 20px", background: "rgba(201,168,76,0.04)", border: "0.5px solid rgba(201,168,76,0.12)", borderRadius: 10, fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 16, color: "#4a4740" }}>
             ← 請先前往 <a href="/member" style={{ color: "#C9A84C", textDecoration: "none" }}>Member Access</a> 頁面輸入 UID 查詢會員資料
           </div>
         )}

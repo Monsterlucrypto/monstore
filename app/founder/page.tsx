@@ -10,7 +10,7 @@ const C = {
   gold: "#C9A84C", goldLight: "#E8C96A", goldDim: "#7a6130",
   bgPrimary: "#0a0a0b", bgCard: "#141418", bgCardHover: "#1a1a1f",
   borderSubtle: "rgba(201,168,76,0.12)", borderMid: "rgba(201,168,76,0.25)", borderStrong: "rgba(201,168,76,0.45)",
-  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#4a4740",
+  textPrimary: "#f0ece0", textSecondary: "#8a8578", textMuted: "#8a8578",
 };
 
 const F = {
@@ -168,7 +168,7 @@ function GoldenTicket({ size = 80, passId }: { size?: number; passId?: string })
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
+    <div style={{ fontSize: 12, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>
       {children}
     </div>
   );
@@ -178,7 +178,7 @@ function HeroBanner({ member }: { member: Member | null }) {
   return (
     <div style={{ background: "linear-gradient(135deg, #1a1508 0%, #0e0e12 50%, #0a0a0b 100%)", border: `0.5px solid ${C.borderMid}`, borderRadius: 20, padding: "48px 40px", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -80, left: "30%", transform: "translateX(-50%)", width: 400, height: 400, background: "radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 20, right: 20, fontSize: 10, color: C.textMuted, letterSpacing: 2, fontFamily: F.body, textTransform: "uppercase" }}>Phase One</div>
+      <div style={{ position: "absolute", top: 20, right: 20, fontSize: 12, color: C.textMuted, letterSpacing: 2, fontFamily: F.body, textTransform: "uppercase" }}>Phase One</div>
 
       {/* 左右並排 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
@@ -188,28 +188,28 @@ function HeroBanner({ member }: { member: Member | null }) {
           <div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}>
             <GoldenTicket size={72} />
           </div>
-          <div style={{ fontFamily: F.display, fontSize: 13, fontWeight: 400, color: C.gold, letterSpacing: 4, marginBottom: 12, textTransform: "uppercase" }}>Founder Membership</div>
+          <div style={{ fontFamily: F.display, fontSize: 16, fontWeight: 400, color: C.gold, letterSpacing: 4, marginBottom: 12, textTransform: "uppercase" }}>Founder Membership</div>
           <div style={{ fontFamily: F.display, fontSize: 46, fontWeight: 300, color: C.textPrimary, letterSpacing: 2, marginBottom: 8 }}>
             Lu · M · O · N
           </div>
-          <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginBottom: 32, letterSpacing: 0.5 }}>
+          <div style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body, marginBottom: 32, letterSpacing: 0.5 }}>
             Reward Weight · Monthly Reward Pool · Ecosystem Growth
           </div>
 
           <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 24, background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderMid}`, borderRadius: 12, padding: "20px 32px", marginBottom: 32 }}>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.textSecondary, lineHeight: 1 }}>10,000</div>
-              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Total Future Supply</div>
+              <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Total Future Supply</div>
             </div>
             <div style={{ width: "0.5px", height: 50, background: C.borderMid }} />
             <div style={{ textAlign: "center" }}>
               <div style={{ fontFamily: F.display, fontSize: 44, fontWeight: 300, color: C.textSecondary, lineHeight: 1 }}>10%</div>
-              <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Phase One Release</div>
+              <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Phase One Release</div>
             </div>
           </div>
 
           <div style={{ maxWidth: 400, margin: "0 auto 32px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.textMuted, fontFamily: F.mono, marginBottom: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: C.textMuted, fontFamily: F.mono, marginBottom: 8 }}>
               <span>0 Units</span>
               <span style={{ color: C.gold }}>Genesis Release 開放中</span>
               <span>10,000 Units</span>
@@ -273,20 +273,20 @@ function RewardPoolBubbles() {
   return (
     <div style={{ background: "linear-gradient(135deg, #0f0d07 0%, #0a0a0b 100%)", border: `0.5px solid rgba(201,168,76,0.2)`, borderRadius: 16, padding: 24, height: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <div style={{ fontSize: 10, letterSpacing: 3, color: "#4a4740", textTransform: "uppercase", marginBottom: 8, fontFamily: "'DM Sans', system-ui, sans-serif" }}>Reward Pool Allocation</div>
+        <div style={{ fontSize: 12, letterSpacing: 3, color: "#4a4740", textTransform: "uppercase", marginBottom: 8, fontFamily: "'DM Sans', system-ui, sans-serif" }}>Reward Pool Allocation</div>
         <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
               <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 20, fontWeight: 700, color: "#E8C96A" }}>{totalUnits.toLocaleString()}</span>
-              <span style={{ fontSize: 10, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>Units · {poolMembers.length} Members</span>
+              <span style={{ fontSize: 12, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>Units · {poolMembers.length} Members</span>
             </div>
           </div>
           <div style={{ width: "0.5px", height: 28, background: "rgba(201,168,76,0.2)", flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 9, color: "#4a4740", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>本月分潤池</div>
+            <div style={{ fontSize: 11, color: "#4a4740", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 2 }}>本月分潤池</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
               <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 20, fontWeight: 700, color: "#5ea96e" }}>NT${totalAirdrop.toLocaleString()}</span>
-              <span style={{ fontSize: 10, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>已分配回饋</span>
+              <span style={{ fontSize: 12, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>已分配回饋</span>
             </div>
           </div>
         </div>
@@ -396,13 +396,13 @@ function RewardPoolBubbles() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: 12, color: "#f0ece0", fontFamily: "'DM Sans', system-ui, sans-serif" }}>{m.nickname}</span>
-                  <span style={{ fontSize: 10, color: m.color, background: m.colorDim, border: `0.5px solid ${m.color}40`, padding: "1px 6px", borderRadius: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{m.tier}</span>
+                  <span style={{ fontSize: 14, color: "#f0ece0", fontFamily: "'DM Sans', system-ui, sans-serif" }}>{m.nickname}</span>
+                  <span style={{ fontSize: 12, color: m.color, background: m.colorDim, border: `0.5px solid ${m.color}40`, padding: "1px 6px", borderRadius: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{m.tier}</span>
                 </div>
                 <div style={{ display: "flex", gap: 12 }}>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: "#8a8578" }}>{m.units.toLocaleString()} u</span>
-<span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: "#5ea96e" }}>{m.lastAirdrop}</span>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: m.color, minWidth: 40, textAlign: "right" }}>{pct}%</span>
+                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, color: "#8a8578" }}>{m.units.toLocaleString()} u</span>
+<span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, color: "#5ea96e" }}>{m.lastAirdrop}</span>
+                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, color: m.color, minWidth: 40, textAlign: "right" }}>{pct}%</span>
                 </div>
               </div>
               <div style={{ height: 3, background: "rgba(255,255,255,0.04)", borderRadius: 2, overflow: "hidden" }}>
@@ -435,12 +435,12 @@ function MyFounderStatus({ member }: { member: Member }) {
           <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 500, color: "#5ea96e", letterSpacing: 0.5 }}>
             Founder Membership 持有狀態
           </div>
-          <div style={{ fontSize: 13, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 4 }}>
+          <div style={{ fontSize: 16, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 4 }}>
             累計 {totalUnits.toLocaleString()} Reward Units · 所有 Founder 權益已啟用
           </div>
         </div>
         <div style={{ marginLeft: "auto", background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", borderRadius: 10, padding: "10px 20px", textAlign: "center" }}>
-          <div style={{ fontSize: 9, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 4 }}>Total Passes</div>
+          <div style={{ fontSize: 11, color: "#5ea96e", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', system-ui, sans-serif", marginBottom: 4 }}>Total Passes</div>
           <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 18, fontWeight: 700, color: "#5ea96e" }}>{tierEntries.reduce((s,[,q])=>s+q,0)}</div>
         </div>
       </div>
@@ -450,8 +450,8 @@ function MyFounderStatus({ member }: { member: Member }) {
         {tierEntries.map(([tier, qty]) => (
           <div key={tier} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(232,201,106,0.08)", border: "0.5px solid rgba(232,201,106,0.3)", borderRadius: 8, padding: "8px 16px" }}>
             <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, fontWeight: 700, color: "#E8C96A" }}>{tier}</span>
-            <span style={{ fontSize: 12, color: "#8a8578", fontFamily: "'DM Sans', system-ui, sans-serif" }}>×{qty}</span>
-            <span style={{ fontSize: 11, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+            <span style={{ fontSize: 14, color: "#8a8578", fontFamily: "'DM Sans', system-ui, sans-serif" }}>×{qty}</span>
+            <span style={{ fontSize: 13, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
               ({((FOUNDER_CONFIG[tier]?.units ?? 0) * qty).toLocaleString()} Units)
             </span>
           </div>
@@ -466,7 +466,7 @@ function MyFounderStatus({ member }: { member: Member }) {
           { label: "Reward Units", value: `${totalUnits.toLocaleString()} Units` },
         ].map((s) => (
           <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(201,168,76,0.15)", borderRadius: 12, padding: "22px 24px" }}>
-            <div style={{ fontSize: 10, color: "#4a4740", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "#4a4740", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, fontFamily: "'DM Sans', system-ui, sans-serif" }}>{s.label}</div>
             <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 22, fontWeight: 700, color: "#f0ece0", lineHeight: 1 }}>{s.value}</div>
           </div>
         ))}
@@ -489,41 +489,41 @@ function MembershipUnits() {
           >
             <div>
               <div style={{ fontFamily: F.display, fontSize: 32, fontWeight: 300, color: t.color, letterSpacing: 2, lineHeight: 1, marginBottom: 6 }}>{t.name}</div>
-              <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, letterSpacing: 1, textTransform: "uppercase" }}>{t.label}</div>
+              <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, letterSpacing: 1, textTransform: "uppercase" }}>{t.label}</div>
             </div>
             <div style={{ height: "0.5px", background: t.colorBorder }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>Reward Units</span>
+                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>Reward Units</span>
                 <span style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: t.color }}>{t.units.toLocaleString()}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>參考價格</span>
-                <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textSecondary }}>${t.price.toLocaleString()} USDT</span>
+                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>參考價格</span>
+                <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textSecondary }}>${t.price.toLocaleString()} USDT</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>總名額</span>
-                <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textPrimary }}>{t.slots}</span>
+                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>總名額</span>
+                <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textPrimary }}>{t.slots}</span>
               </div>
               <div style={{ height: "0.5px", background: C.borderSubtle }} />
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, color: "#5ea96e", fontFamily: F.body }}>販售中</span>
-                <span style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 700, color: "#5ea96e" }}>{t.onSale}</span>
+                <span style={{ fontSize: 13, color: "#5ea96e", fontFamily: F.body }}>販售中</span>
+                <span style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: "#5ea96e" }}>{t.onSale}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>鎖定中</span>
-                <span style={{ fontFamily: F.mono, fontSize: 12, color: C.textMuted }}>{t.locked}</span>
+                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>鎖定中</span>
+                <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textMuted }}>{t.locked}</span>
               </div>
             </div>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
                 <span>販售中比例</span><span style={{ color: t.color }}>10%</span>
               </div>
               <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 3, height: 4, overflow: "hidden" }}>
                 <div style={{ height: "100%", width: "10%", background: `linear-gradient(90deg, ${t.color}80, ${t.color})`, borderRadius: 3 }} />
               </div>
             </div>
-            <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, background: `linear-gradient(135deg, ${t.color}25, ${t.color}10)`, border: `0.5px solid ${t.colorBorder}`, color: t.color, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
+            <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, background: `linear-gradient(135deg, ${t.color}25, ${t.color}10)`, border: `0.5px solid ${t.colorBorder}`, color: t.color, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
               申請加入
             </button>
           </div>
@@ -539,9 +539,9 @@ function GenesisRelease() {
       <div style={{ position: "absolute", top: -60, right: -60, width: 260, height: 260, background: "radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, position: "relative", zIndex: 1 }}>
         <div style={{ flex: 1, marginRight: 24 }}>
-          <div style={{ fontSize: 10, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Phase One</div>
+          <div style={{ fontSize: 12, letterSpacing: 3, color: C.textMuted, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Phase One</div>
           <div style={{ fontFamily: F.display, fontSize: 26, fontWeight: 300, color: C.textPrimary, letterSpacing: 1, marginBottom: 10 }}>Genesis Release</div>
-          <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
             Founder Membership 不會一次全部開放。第一階段僅釋出總量的 10%，確保早期成員具備稀缺性與完整的 Ecosystem 參與價值。
           </div>
         </div>
@@ -553,13 +553,13 @@ function GenesisRelease() {
           { label: "未開放 Units", value: "不參與分配", sub: "僅已啟用 Units 計入回饋" },
         ].map((s) => (
           <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10, padding: 18 }}>
-            <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>{s.label}</div>
             <div style={{ fontFamily: F.mono, fontSize: 15, fontWeight: 700, color: C.goldLight, marginBottom: 4 }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{s.sub}</div>
+            <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>{s.sub}</div>
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 20, padding: "14px 18px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7, position: "relative", zIndex: 1 }}>
+      <div style={{ marginTop: 20, padding: "14px 18px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, fontSize: 14, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7, position: "relative", zIndex: 1 }}>
         ✦ 只有已售出 / 已啟用的 Units 才能參與每月 Monthly Reward Pool 分配。未開放的 Units 不計入分配基數。
       </div>
     </div>
@@ -574,22 +574,22 @@ function TreasurySection() {
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>◈</div>
           <div>
             <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.goldLight, letterSpacing: 0.5 }}>Monstore Treasury</div>
-            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>平台長期金庫</div>
+            <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>平台長期金庫</div>
           </div>
         </div>
-        <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 18 }}>
+        <div style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 18 }}>
           Treasury 是 Monstore 平台的長期金庫，用於支撐平台穩定運作與生態持續成長。Treasury 不直接分配給會員，而是作為平台發展的戰略儲備。
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {["平台營運與基礎建設", "生態成長與合作佈局", "預備金與風險緩衝", "回購機制預備資金", "活動、行銷與會員權益"].map((item) => (
             <div key={item} style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.goldDim, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>{item}</span>
+              <span style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>{item}</span>
             </div>
           ))}
         </div>
         <div style={{ marginTop: 18, padding: "10px 14px", background: "rgba(201,168,76,0.04)", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
-          <div style={{ fontSize: 10, color: C.textMuted, fontFamily: F.body, letterSpacing: 0.3, lineHeight: 1.6 }}>
+          <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, letterSpacing: 0.3, lineHeight: 1.6 }}>
             Reward Weight represents participation in the Monthly Reward Pool, not ownership of the Treasury.
           </div>
         </div>
@@ -600,10 +600,10 @@ function TreasurySection() {
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>✦</div>
           <div>
             <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.goldLight, letterSpacing: 0.5 }}>Monthly Reward Pool</div>
-            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>每月會員回饋池</div>
+            <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>每月會員回饋池</div>
           </div>
         </div>
-        <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 18 }}>
+        <div style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 18 }}>
           Monthly Reward Pool 是每月可分配給 Founder Membership 持有者的回饋池，來源為平台後續<strong style={{ color: C.textPrimary }}>真實營運收益</strong>（返佣收入、電商毛利等）。
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -613,8 +613,8 @@ function TreasurySection() {
             { label: "不包含", value: "會員購買金額", highlight: true },
           ].map((row) => (
             <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "rgba(201,168,76,0.04)", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
-              <span style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>{row.label}</span>
-              <span style={{ fontSize: 12, color: row.highlight ? "#c96060" : C.textPrimary, fontFamily: F.body, fontWeight: 500 }}>{row.value}</span>
+              <span style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>{row.label}</span>
+              <span style={{ fontSize: 14, color: row.highlight ? "#c96060" : C.textPrimary, fontFamily: F.body, fontWeight: 500 }}>{row.value}</span>
             </div>
           ))}
         </div>
@@ -632,7 +632,7 @@ function RevenueAllocation() {
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 32 }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 6 }}>Revenue Allocation</div>
-        <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>
           以下比例適用於平台後續真實營運收益（返佣收入、電商毛利等）。<strong style={{ color: C.textSecondary }}>不包含</strong> Founder Membership / Reward Weight 購買收入。
         </div>
       </div>
@@ -647,14 +647,14 @@ function RevenueAllocation() {
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
               <span style={{ fontFamily: F.mono, fontSize: 22, fontWeight: 700, color: s.color }}>{s.pct}%</span>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary, marginBottom: 2, fontFamily: F.body }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 10, fontFamily: F.body }}>{s.labelZh}</div>
-            <div style={{ fontSize: 11, color: C.textSecondary, lineHeight: 1.7, fontFamily: F.body }}>{s.desc}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: C.textPrimary, marginBottom: 2, fontFamily: F.body }}>{s.label}</div>
+            <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 10, fontFamily: F.body }}>{s.labelZh}</div>
+            <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.7, fontFamily: F.body }}>{s.desc}</div>
           </div>
         ))}
       </div>
       <div style={{ marginTop: 20, padding: "12px 18px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8 }}>
-        <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+        <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
           ✦ 會員購買 Membership / Reward Weight 的收入屬於<strong style={{ color: C.textSecondary }}>平台發展資金</strong>，可用於營運、開發、品牌與社群建設，不列入當月 Monthly Reward Pool 分配。
         </div>
       </div>
@@ -674,31 +674,31 @@ function RewardDistributionExample() {
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
           <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 6 }}>Reward Distribution Example</div>
-          <div style={{ fontSize: 12, color: C.textMuted, fontFamily: F.body }}>以下為假設情境，用於說明分配邏輯</div>
+          <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body }}>以下為假設情境，用於說明分配邏輯</div>
         </div>
         <div style={{ background: "rgba(201,168,76,0.08)", border: `0.5px solid ${C.borderMid}`, borderRadius: 8, padding: "6px 14px", textAlign: "center", flexShrink: 0 }}>
-          <div style={{ fontSize: 9, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", fontFamily: F.body }}>假設情境</div>
-          <div style={{ fontFamily: F.mono, fontSize: 12, color: C.gold, marginTop: 2 }}>Example Only</div>
+          <div style={{ fontSize: 11, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", fontFamily: F.body }}>假設情境</div>
+          <div style={{ fontFamily: F.mono, fontSize: 14, color: C.gold, marginTop: 2 }}>Example Only</div>
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 0, marginBottom: 28 }}>
         <div style={{ paddingRight: 28 }}>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>本月平台真實營運收益</div>
+          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>本月平台真實營運收益</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "rgba(255,255,255,0.02)", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
-              <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body }}>總營運收益</span>
+              <span style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body }}>總營運收益</span>
               <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.textPrimary }}>NT${totalRevenue.toLocaleString()}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "rgba(201,168,76,0.06)", borderRadius: 8, border: `0.5px solid ${C.borderMid}` }}>
-              <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body }}>Monthly Reward Pool <span style={{ color: C.gold }}>(20%)</span></span>
+              <span style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body }}>Monthly Reward Pool <span style={{ color: C.gold }}>(20%)</span></span>
               <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.goldLight }}>NT${pool.toLocaleString()}</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {[{ l: "Platform Operations (80%)", v: "NT$24,000" }].map((r) => (
                 <div key={r.l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 16px", background: "rgba(255,255,255,0.01)", borderRadius: 6 }}>
-                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{r.l}</span>
-                  <span style={{ fontFamily: F.mono, fontSize: 11, color: C.textMuted }}>{r.v}</span>
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>{r.l}</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 13, color: C.textMuted }}>{r.v}</span>
                 </div>
               ))}
             </div>
@@ -708,7 +708,7 @@ function RewardDistributionExample() {
         <div style={{ width: "0.5px", background: C.borderSubtle }} />
 
         <div style={{ paddingLeft: 28 }}>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>Reward Units 分配</div>
+          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16, fontFamily: F.body }}>Reward Units 分配</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 12 }}>
             {[
               { who: "Member A", units: aUnits, reward: aReward, pct: "66.7%" },
@@ -716,12 +716,12 @@ function RewardDistributionExample() {
             ].map((m) => (
               <div key={m.who} style={{ padding: "14px 16px", background: "rgba(255,255,255,0.02)", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F.body, fontWeight: 500 }}>{m.who}</span>
+                  <span style={{ fontSize: 16, color: C.textPrimary, fontFamily: F.body, fontWeight: 500 }}>{m.who}</span>
                   <span style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: C.goldLight }}>NT${m.reward.toLocaleString()}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>{m.units.toLocaleString()} Units</span>
-                  <span style={{ fontSize: 11, color: C.gold, fontFamily: F.mono }}>{m.pct} of Pool</span>
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>{m.units.toLocaleString()} Units</span>
+                  <span style={{ fontSize: 13, color: C.gold, fontFamily: F.mono }}>{m.pct} of Pool</span>
                 </div>
                 <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 3, height: 3, overflow: "hidden" }}>
                   <div style={{ height: "100%", width: m.pct, background: C.gold, borderRadius: 3 }} />
@@ -731,14 +731,14 @@ function RewardDistributionExample() {
           </div>
           <div style={{ padding: "10px 14px", background: "rgba(201,168,76,0.04)", borderRadius: 8, border: `0.5px solid ${C.borderSubtle}` }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body }}>已售出 Units 總計</span>
-              <span style={{ fontFamily: F.mono, fontSize: 11, color: C.textSecondary }}>{totalUnits.toLocaleString()} Units</span>
+              <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>已售出 Units 總計</span>
+              <span style={{ fontFamily: F.mono, fontSize: 13, color: C.textSecondary }}>{totalUnits.toLocaleString()} Units</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div style={{ padding: "12px 18px", background: "rgba(201,168,76,0.03)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, fontSize: 12, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+      <div style={{ padding: "12px 18px", background: "rgba(201,168,76,0.03)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, fontSize: 14, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
         ✦ 此為示意計算，不代表實際收益承諾。Monthly Reward Pool 僅分配 Pool 部分，不分配 Treasury。未開放 Units 不計入分配基數。
       </div>
     </div>
@@ -752,18 +752,18 @@ function TreasurySeed() {
         <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(94,169,110,0.08)", border: "0.5px solid rgba(94,169,110,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>◎</div>
         <div>
           <div style={{ fontFamily: F.display, fontSize: 18, fontWeight: 500, color: C.textPrimary, letterSpacing: 0.5 }}>Initial Treasury Seed</div>
-          <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>平台基礎資金說明</div>
+          <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, marginTop: 2 }}>平台基礎資金說明</div>
         </div>
       </div>
-      <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 18 }}>
+      <div style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8, marginBottom: 18 }}>
         Monstore 平台的初始啟動資金，由 Founder 團隊及早期支持者贊助投入，作為 Treasury Seed 使用。此部分屬於<strong style={{ color: C.textPrimary }}>平台基礎發展資金</strong>，不對應任何 Reward Weight，亦不計入 Monthly Reward Pool 分配。
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(94,169,110,0.04)", border: "0.5px solid rgba(94,169,110,0.2)", borderRadius: 10 }}>
         <div>
-          <div style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>Initial Treasury Seed</div>
+          <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4, fontFamily: F.body }}>Initial Treasury Seed</div>
           <div style={{ fontFamily: F.mono, fontSize: 18, fontWeight: 700, color: "#5ea96e" }}>10,000 USDT</div>
         </div>
-        <div style={{ marginLeft: "auto", fontSize: 11, color: C.textMuted, fontFamily: F.body, textAlign: "right", lineHeight: 1.6 }}>
+        <div style={{ marginLeft: "auto", fontSize: 13, color: C.textMuted, fontFamily: F.body, textAlign: "right", lineHeight: 1.6 }}>
           不對應 Reward Weight<br />不計入回饋分配
         </div>
       </div>
@@ -778,33 +778,33 @@ function BuybackRight() {
         <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(201,168,76,0.06)", border: `0.5px solid ${C.borderMid}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>◆</div>
         <div>
           <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 6 }}>Buyback Right</div>
-          <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 16, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
             Monstore 保留未來依照平台發展狀況，對 Founder Membership / Reward Weight 進行回購的權利。回購並非義務，亦不代表 Weight 的清算價值等同 Treasury 的直接比例所有權。
           </div>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
         <div>
-          <div style={{ fontSize: 11, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12, fontFamily: F.body }}>回購評估依據</div>
+          <div style={{ fontSize: 13, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12, fontFamily: F.body }}>回購評估依據</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {["平台成長與盈利能力", "Monstore Treasury 狀態", "活躍會員數與交易量", "每月真實營運收益", "Founder Access 稀缺性"].map((item) => (
               <div key={item} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.gold, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body }}>{item}</span>
+                <span style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body }}>{item}</span>
               </div>
             ))}
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 11, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12, fontFamily: F.body }}>重要說明</div>
+          <div style={{ fontSize: 13, color: C.textMuted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12, fontFamily: F.body }}>重要說明</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={{ padding: "12px 14px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8 }}>
-              <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>
                 Reward Weight 代表參與 Monthly Reward Pool 的權重，<strong style={{ color: C.textPrimary }}>不等於</strong> Monstore Treasury 的直接所有權比例。
               </div>
             </div>
             <div style={{ padding: "12px 14px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8 }}>
-              <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>
                 回購時機與條件由平台綜合評估後決定，不具有強制執行義務。
               </div>
             </div>
@@ -812,7 +812,7 @@ function BuybackRight() {
         </div>
       </div>
       <div style={{ padding: "12px 18px", background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8 }}>
-        <div style={{ fontFamily: F.mono, fontSize: 11, color: C.textMuted, lineHeight: 1.7 }}>
+        <div style={{ fontFamily: F.mono, fontSize: 13, color: C.textMuted, lineHeight: 1.7 }}>
           Reward Weight represents participation in the Monthly Reward Pool, not ownership of the Treasury. Any future buyback valuation is based on ecosystem health, not a fixed Treasury percentage.
         </div>
       </div>
@@ -835,12 +835,12 @@ function BenefitCards() {
         >
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
             <span style={{ fontSize: 26, color: C.gold }}>{b.icon}</span>
-            <span style={{ fontSize: 12, color: C.textMuted, transition: "transform 0.2s", display: "inline-block", transform: expanded === i ? "rotate(180deg)" : "none" }}>▾</span>
+            <span style={{ fontSize: 14, color: C.textMuted, transition: "transform 0.2s", display: "inline-block", transform: expanded === i ? "rotate(180deg)" : "none" }}>▾</span>
           </div>
           <div style={{ fontSize: 15, fontWeight: 500, color: C.textPrimary, marginBottom: 6, fontFamily: F.body }}>{b.name}</div>
-          <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.6, fontFamily: F.body }}>{b.desc}</div>
+          <div style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6, fontFamily: F.body }}>{b.desc}</div>
           {expanded === i && (
-            <div style={{ marginTop: 14, paddingTop: 14, borderTop: `0.5px solid ${C.borderSubtle}`, fontSize: 12, color: C.textSecondary, lineHeight: 1.7, fontFamily: F.body }}>
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: `0.5px solid ${C.borderSubtle}`, fontSize: 14, color: C.textSecondary, lineHeight: 1.7, fontFamily: F.body }}>
               {b.detail}
             </div>
           )}
@@ -865,12 +865,12 @@ function ImportantNotes() {
         ].map((n, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
             <span style={{ fontSize: 14, color: C.gold, flexShrink: 0, marginTop: 1 }}>{n.icon}</span>
-            <span style={{ fontSize: 13, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{n.text}</span>
+            <span style={{ fontSize: 16, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.6 }}>{n.text}</span>
           </div>
         ))}
       </div>
       <div style={{ marginTop: 18, padding: "10px 14px", background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8 }}>
-        <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+        <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
           此為平台生態權益計劃，非公司股權、股票、證券或任何受監管金融商品。Monstore 不承諾任何固定或保證的回報。
         </div>
       </div>
@@ -888,10 +888,10 @@ function FAQ() {
           <div key={i} style={{ borderBottom: i < faqs.length - 1 ? `0.5px solid ${C.borderSubtle}` : "none" }}>
             <div onClick={() => setOpen(open === i ? null : i)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 0", cursor: "pointer" }}>
               <span style={{ fontSize: 14, color: C.textPrimary, fontFamily: F.body, fontWeight: 500 }}>{f.q}</span>
-              <span style={{ fontSize: 12, color: C.textMuted, transition: "transform 0.2s", display: "inline-block", transform: open === i ? "rotate(180deg)" : "none", flexShrink: 0, marginLeft: 16 }}>▾</span>
+              <span style={{ fontSize: 14, color: C.textMuted, transition: "transform 0.2s", display: "inline-block", transform: open === i ? "rotate(180deg)" : "none", flexShrink: 0, marginLeft: 16 }}>▾</span>
             </div>
             {open === i && (
-              <div style={{ paddingBottom: 18, fontSize: 13, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.7 }}>{f.a}</div>
+              <div style={{ paddingBottom: 18, fontSize: 16, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.7 }}>{f.a}</div>
             )}
           </div>
         ))}
