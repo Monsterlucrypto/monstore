@@ -24,28 +24,54 @@ const USDT_TO_NT = 31.6; // 1 USDT = 31.6 NT$
 const toNT = (usdt: number) => Math.round(usdt * USDT_TO_NT);
 const fmtNT = (usdt: number) => `NT$${toNT(usdt).toLocaleString("en")}`;
 
-// ── 上月（五月）真實數據 ──────────────────────────────────────────────────────
-const lastMonthFeeProfit  = 270.11142141; // 五月 Fee Profit USDT 合計
-const lastMonthEcommerce  = 0;            // 電商平台分潤（目前 0）
-const lastMonthRevenue    = lastMonthFeeProfit + lastMonthEcommerce;
-const lastMonthActiveUsers = 7;           // 五月有交易紀錄的會員數
+// ── 月度數據 ──────────────────────────────────────────────────────────────────
+// income = 交易所返佣給平台的 Commissions（平台實際收入，≈毛額 Fee Profit 的 33%）
+// 數據來源：Bybit Commission CSV（2026-02 ~ 2026-07，全部 Settled）
+// ecommerce（電商分潤）目前為 0
+// 七月（本月）交易量・收入・活躍數由 members 即時計算
+const thisMonthVolume  = members.reduce((s, m) => s + m.tradingVolume, 0);
+const thisMonthIncome  = members.reduce((s, m) => s + m.commissions, 0); // members.commissions = Commissions 欄
+const thisMonthActive  = members.filter((m) => m.tradingVolume > 0).length;
+const ecommerceRevenue = 0; // 電商分潤（目前無）
 
-const lastMonthCommissions  = 89.21830147; // 五月 Commissions USDT 合計
-const thisMonthCommissions  = members.reduce((s, m) => s + m.commissions, 0);
-const totalCommissionsUsdt  = lastMonthCommissions + thisMonthCommissions;
+type MonthStat = { label: string; volume: number; income: number; active: number };
+// 歷史月份（Bybit CSV，已結算）；七月為即時
+const HISTORY: Record<"feb" | "mar" | "apr" | "may" | "june", MonthStat> = {
+  feb:  { label: "Feb 2026",  volume: 254265.66,   income: 44.2186,  active: 8 },
+  mar:  { label: "Mar 2026",  volume: 1261099.13,  income: 213.8035, active: 8 },
+  apr:  { label: "Apr 2026",  volume: 319422.72,   income: 60.0278,  active: 8 },
+  may:  { label: "May 2026",  volume: 517591.53,   income: 88.8655,  active: 7 },
+  june: { label: "June 2026", volume: 2454589.22,  income: 411.6383, active: 4 },
+};
+const july: MonthStat = { label: "July 2026", volume: thisMonthVolume, income: thisMonthIncome, active: thisMonthActive };
+
+const lastM = HISTORY.june; // 上月 = 六月
+const thisM = july;         // 本月 = 七月
+
+const lastMonthIncome      = lastM.income;
+const lastMonthRevenue     = lastMonthIncome + ecommerceRevenue;
+const lastMonthActiveUsers = lastM.active;
+const lastMonthTotalVolume = lastM.volume;
+const thisMonthTotalVolume = thisM.volume;
+
+// 累積平台收入 = 二月~六月（CSV 已結算）＋ 七月（即時）
+const preJulyIncome = HISTORY.feb.income + HISTORY.mar.income + HISTORY.apr.income + HISTORY.may.income + HISTORY.june.income;
+const totalIncome   = preJulyIncome + thisMonthIncome; // ≈ 948U
 
 const overview = [
-  { label: "Last Month Revenue",   sub: "上月平台總收入（手續費＋電商）", value: fmtNT(lastMonthRevenue), change: `手續費 ${fmtNT(lastMonthFeeProfit)} ＋ 電商 NT$0`, changeLabel: "May 2026", icon: "◈", positive: true },
-  { label: "Last Month Active",    sub: "上月活躍用戶數",                  value: `${lastMonthActiveUsers} Members`, change: "上月有交易紀錄", changeLabel: "May 2026", icon: "⟐", positive: true },
-  { label: "Referral Commissions", sub: "累計手續費佣金",                  value: fmtNT(totalCommissionsUsdt), change: `${members.filter(m=>m.commissions>0).length} 位會員有佣金`, changeLabel: "", icon: "◎", positive: true },
-  { label: "Treasury Balance",     sub: "財庫目前餘額",                    value: "NT$10,000", change: "NT$2,500", changeLabel: "this month", icon: "◆", positive: true },
+  { label: "Last Month Revenue",   sub: "上月平台總收入（手續費佣金＋電商）", value: fmtNT(lastMonthRevenue), change: `佣金 ${fmtNT(lastMonthIncome)} ＋ 電商 ${fmtNT(ecommerceRevenue)}`, changeLabel: lastM.label, icon: "◈", positive: true },
+  { label: "Last Month Active",    sub: "上月活躍用戶數",                    value: `${lastMonthActiveUsers} Members`, change: "上月有交易紀錄", changeLabel: lastM.label, icon: "⟐", positive: true },
+  { label: "Total Platform Income",sub: "累積平台收入（2–7月）",             value: fmtNT(totalIncome), change: `${members.filter(m=>m.commissions>0).length} 位會員貢獻手續費`, changeLabel: "", icon: "◎", positive: true },
+  { label: "Treasury Balance",     sub: "財庫目前餘額",                      value: "NT$0", change: "NT$0", changeLabel: "this month", icon: "◆", positive: true },
 ];
 
-// 上月收入分佈（目前 100% 手續費佣金，電商 & 其他為 0）
+// 上月收入分佈（依收入來源動態計算比例；全為 0 時顯示「資料待補」）
+const totalRevenueNT = toNT(lastMonthIncome) + toNT(ecommerceRevenue);
+const pctOf = (v: number) => (totalRevenueNT > 0 ? Math.round((v / totalRevenueNT) * 100) : 0);
 const revenueBreakdown = [
-  { label: "Trading Referral Revenue", sub: "交易推薦收入", value: toNT(lastMonthFeeProfit), pct: 100, color: "#E8C96A" },
-  { label: "Marketplace Revenue",      sub: "商城銷售收入", value: toNT(lastMonthEcommerce), pct: 0,   color: "#C9A84C" },
-  { label: "Other Revenue",            sub: "其他來源收入", value: 0,                         pct: 0,   color: "#7a6130" },
+  { label: "Trading Referral Revenue", sub: "交易推薦收入", value: toNT(lastMonthIncome),   pct: pctOf(toNT(lastMonthIncome)),   color: "#E8C96A" },
+  { label: "Marketplace Revenue",      sub: "商城銷售收入", value: toNT(ecommerceRevenue), pct: pctOf(toNT(ecommerceRevenue)), color: "#C9A84C" },
+  { label: "Other Revenue",            sub: "其他來源收入", value: 0,                       pct: 0,                              color: "#7a6130" },
 ];
 const totalRevenue = revenueBreakdown.reduce((s, r) => s + r.value, 0);
 
@@ -64,14 +90,12 @@ const community = [
 ];
 
 const treasury = {
-  balance: 10000,
-  expenses: 1800,
-  runway: 5.5,
+  balance: 0,
+  expenses: 0,
+  runway: 0,
 };
 
-// 月交易量對比
-const lastMonthTotalVolume  = 520885.778;   // 五月 TradingAmount 合計 USDT
-const thisMonthTotalVolume  = members.reduce((s, m) => s + m.tradingVolume, 0);
+// 月交易量對比（本月七月 vs 上月六月）
 const volumeDiff            = thisMonthTotalVolume - lastMonthTotalVolume;
 const volumeChangePct       = (volumeDiff / lastMonthTotalVolume * 100);
 const growthMetrics = [
@@ -83,10 +107,10 @@ const growthMetrics = [
     positive: volumeChangePct >= 0,
   },
   {
-    label: "Total Commissions Generated",
-    sub:   "累積佣金總額",
-    value: fmtNT(totalCommissionsUsdt),
-    change: `${members.filter(m => m.commissions > 0).length} 位會員有佣金`,
+    label: "Total Platform Income",
+    sub:   "累積平台收入（2–7月）",
+    value: fmtNT(totalIncome),
+    change: `${members.filter(m => m.commissions > 0).length} 位會員貢獻手續費`,
     positive: true,
   },
   {
@@ -166,6 +190,10 @@ function RevenueBreakdown() {
     },
     { stops: [], offset: 0 }
   );
+  const hasRevenue = conicStops.stops.length > 0;
+  const ringBg = hasRevenue
+    ? `conic-gradient(${conicStops.stops.join(", ")})`
+    : "conic-gradient(rgba(201,168,76,0.12) 0% 100%)"; // 資料待補：柔和空環
 
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 28 }}>
@@ -176,13 +204,13 @@ function RevenueBreakdown() {
         <div style={{ position: "relative", width: 160, height: 160, flexShrink: 0 }}>
           <div style={{
             width: 160, height: 160, borderRadius: "50%",
-            background: `conic-gradient(${conicStops.stops.join(", ")})`,
+            background: ringBg,
             mask: "radial-gradient(circle at center, transparent 54px, black 55px)",
             WebkitMask: "radial-gradient(circle at center, transparent 54px, black 55px)",
           }} />
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: C.goldLight }}>NT${totalRevenue.toLocaleString()}</div>
-            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>Total</div>
+            <div style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 700, color: hasRevenue ? C.goldLight : C.textMuted }}>NT${totalRevenue.toLocaleString()}</div>
+            <div style={{ fontSize: 11, color: C.textMuted, fontFamily: F.body, letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>{hasRevenue ? "Total" : "資料待補"}</div>
           </div>
         </div>
         {/* Bars */}
@@ -223,7 +251,7 @@ function RewardPoolStatus() {
       <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8, fontFamily: F.body }}>Last Month Reward Pool</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
         <span style={{ fontFamily: F.mono, fontSize: 36, fontWeight: 700, color: C.goldLight, lineHeight: 1 }}>{rewardPool.amount}</span>
-        <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>May 2026</span>
+        <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>{lastM.label}</span>
       </div>
       <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, marginBottom: 28 }}>本月 Reward Pool 已提撥金額</div>
 
