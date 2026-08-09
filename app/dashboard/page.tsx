@@ -168,7 +168,7 @@ function StatCards({ member }: { member: Member }) {
     { label: "Trading Volume", value: member.tradingVolumeDisplay,                    change: "累計交易量",                                   up: member.tradingVolume > 0, icon: "📈" },
     { label: "Trading Rank",   value: `#${member.tradingRank}`,                       change: "全會員排名",                                     up: true,                     icon: "⬡"  },
     { label: "Points",          value: member.points,                                  change: "",                                             up: parseFloat(member.points) > 0, icon: "✦" },
-    { label: "Founder Pass",   value: fp ?? "—",                                      change: cfg ? `${cfg.units.toLocaleString()} Units` : "無 Pass", up: !!fp,          icon: "💎" },
+    { label: "Founder Pass",   value: fp ?? "—",                                      change: cfg ? `${cfg.rewardUnits.toLocaleString()} Units` : "無 Pass", up: !!fp,          icon: "💎" },
   ];
 
   return (
@@ -354,7 +354,7 @@ function FounderPass({ member }: { member: Member }) {
   const dynamicBenefits = [
     { icon: "◈", name: "永久 VIP",                              desc: "無論月交易量，永遠鎖定 Founder 等級" },
     { icon: "⟐", name: "專屬存取權",                            desc: "私人訊號頻道、優先搶購、Alpha 群組" },
-    { icon: "◎", name: `${cfg!.units.toLocaleString()} Reward Units`, desc: "參與 Monthly Reward Pool 月回饋分配" },
+    { icon: "◎", name: `${cfg!.rewardUnits.toLocaleString()} Reward Units`, desc: "參與 Monthly Reward Pool 月回饋分配" },
   ];
 
   return (
@@ -386,7 +386,7 @@ function FounderPass({ member }: { member: Member }) {
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ fontFamily: F.display, fontSize: 36, fontWeight: 300, color: C.gold, lineHeight: 1 }}>{cfg!.units.toLocaleString()}</div>
+          <div style={{ fontFamily: F.display, fontSize: 36, fontWeight: 300, color: C.gold, lineHeight: 1 }}>{cfg!.rewardUnits.toLocaleString()}</div>
           <div style={{ fontSize: 12, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", marginTop: 4, fontFamily: F.body }}>Reward Units</div>
           <div style={{ fontFamily: F.mono, fontSize: 16, color: C.goldLight, marginTop: 6 }}>${cfg!.price.toLocaleString()}</div>
         </div>

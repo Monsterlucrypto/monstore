@@ -1,0 +1,296 @@
+//@version=6
+// ════════════════════════════════════════════════════════════════════
+// 組合策略 v1 —— 三燈計分 × 趨勢跟隨風控
+//
+// 分層設計:每一層只做一件事,不互相覆蓋
+//
+//   第 1 層【方向】EMA 快慢線 + 斜率  → 只在趨勢方向交易 (門檻,必須通過)
+//   第 2 層【時機】兩個互補觸發器      → 至少一個開火才進場
+//         A. 突破 N 根新高/新低   = 追趨勢啟動 (動能)
+//         B. 放量吞沒             = 買強平洗盤後的回檔 (反轉)
+//   第 3 層【共振】POC 站穩/壓制      → 加分項,不能單獨構成進場理由
+//   第 4 層【風控】ATR 標準化倉位      → 每筆固定風險 1R,無止盈,吊燈移動停損
+//
+// 為什麼這樣分層:
+//   · 突破與吞沒在不同時間點開火(啟動 vs 回檔),互補而非重複
+//   · POC 與 EMA 高度相關,獨立資訊量低,所以降級為加分而非門檻
+//   · 不設止盈 → 保留右尾;獲利來自少數大贏單,這是正期望值的來源
+//   · ATR 標準化 → 每筆虧損都是 1R,期望值才可估計;副作用是槓桿自動壓低,
+//                  手續費幾乎不構成拖累
+//
+// 建議週期:4H 或 1D    建議測試:全部歷史,且跨多個標的
+// ════════════════════════════════════════════════════════════════════
+strategy("組合策略 v1", overlay = true,
+     initial_capital    = 10000,
+     max_bars_back      = 500,
+     default_qty_type   = strategy.fixed,
+     commission_type    = strategy.commission.percent,
+     commission_value   = 0.055,
+     slippage           = 2,
+     margin_long        = 20,
+     margin_short       = 20,
+     pyramiding         = 10,
+     calc_on_every_tick = false)
+
+// ═══════════════ ① 方向:趨勢 regime ═══════════════
+g1 = "① 方向 (門檻)"
+maType   = input.string("EMA", "均線類型", options = ["EMA", "SMA"], group = g1)
+fastLen  = input.int(50,  "快線", minval = 5,  group = g1)
+slowLen  = input.int(200, "慢線", minval = 20, group = g1)
+useSlope = input.bool(true, "慢線需同向傾斜", group = g1)
+slopeLen = input.int(20, "斜率回看根數", minval = 1, group = g1)
+allowLong  = input.bool(true, "做多", group = g1)
+allowShort = input.bool(true, "做空 (關掉會在熊市穩定虧損)", group = g1)
+
+// ═══════════════ ② 時機:兩個觸發器 ═══════════════
+g2 = "② 時機 (至少一個開火)"
+useBreakout = input.bool(true, "觸發 A — 突破 N 根極值", group = g2)
+brkLen      = input.int(20, "　突破週期", minval = 3, group = g2)
+useEngulf   = input.bool(true, "觸發 B — 放量吞沒", group = g2)
+volMAlen    = input.int(20,  "　均量週期", group = g2)
+volMult     = input.float(1.3, "　誘空/誘多棒放量倍數", minval = 1.0, step = 0.1, group = g2)
+volMultCfm  = input.float(1.1, "　吞沒棒放量倍數", minval = 1.0, step = 0.1, group = g2)
+wickMult    = input.float(2.0, "　長影線 = 實體幾倍", minval = 1.0, step = 0.5, group = g2)
+solidPct    = input.float(0.7, "　實心K實體佔比", minval = 0.5, maxval = 1.0, step = 0.05, group = g2)
+engulfWin   = input.int(3, "　吞沒視窗 (誘空棒後幾根內)", minval = 1, maxval = 5, group = g2)
+signalValid = input.int(5, "　訊號有效 K 棒數", minval = 1, group = g2)
+
+// ═══════════════ ③ 共振:POC ═══════════════
+g3 = "③ 共振 (加分項)"
+usePOC   = input.bool(true, "啟用 POC 計分", group = g3)
+lookback = input.int(200, "回溯 K 棒數", minval = 50, maxval = 500, group = g3)
+rowsN    = input.int(24,  "價格分層數", minval = 10, maxval = 50, group = g3)
+vpEvery  = input.int(5,   "重算間隔 (調大可解決逾時)", minval = 1, maxval = 50, group = g3)
+minScore = input.int(1, "最低燈數才進場", minval = 1, maxval = 3, group = g3)
+
+// ═══════════════ ④ 風控 ═══════════════
+g4 = "④ 風控 (ATR)"
+atrLen   = input.int(14,   "ATR 長度", minval = 2, group = g4)
+slMult   = input.float(2.5, "初始停損 ATR 倍數", minval = 0.5, step = 0.1, group = g4)
+trMult   = input.float(3.5, "移動停損 ATR 倍數", minval = 0.5, step = 0.1, group = g4)
+riskPct  = input.float(1.0, "每筆風險 % 權益 (1R)", minval = 0.1, maxval = 5, step = 0.1, group = g4)
+maxLev   = input.float(3.0, "槓桿上限", minval = 0.1, maxval = 5, step = 0.1, group = g4)
+useConv  = input.bool(false, "依燈數調整風險 (1燈×0.7 / 2燈×1.0 / 3燈×1.5)", group = g4)
+maxUnits = input.int(1, "金字塔:最多幾單位 (1=關)", minval = 1, maxval = 5, group = g4)
+addStep  = input.float(1.0, "金字塔:每幾個 ATR 加一次", minval = 0.2, step = 0.1, group = g4)
+exitOnRev = input.bool(false, "反向吞沒即出場 (會切斷右尾,預設關)", group = g4)
+
+// ═══════════════ 基礎計算 (ta.* 一律全域,不可放進 if) ═══════════════
+fastE = ta.ema(close, fastLen)
+fastS = ta.sma(close, fastLen)
+slowE = ta.ema(close, slowLen)
+slowS = ta.sma(close, slowLen)
+fast  = maType == "EMA" ? fastE : fastS
+slow  = maType == "EMA" ? slowE : slowS
+atr   = ta.atr(atrLen)
+volMA = ta.sma(volume, volMAlen)
+
+hiRange = ta.highest(high, lookback)
+loRange = ta.lowest(low,  lookback)
+hh = ta.highest(high, brkLen)[1]
+ll = ta.lowest(low,  brkLen)[1]
+
+bullRegime = fast > slow and close > slow and (not useSlope or slow > slow[slopeLen])
+bearRegime = fast < slow and close < slow and (not useSlope or slow < slow[slopeLen])
+
+body  = math.abs(close - open)
+rng   = high - low
+uWick = high - math.max(open, close)
+lWick = math.min(open, close) - low
+
+// ═══════════════ Volume Profile → POC ═══════════════
+var vols = array.new_float(rowsN, 0.0)
+var float poc = na
+
+if bar_index % vpEvery == 0 or na(poc)
+    st = (hiRange - loRange) / rowsN
+    if not na(st) and st > 0
+        array.fill(vols, 0.0)
+        for i = 0 to lookback - 1
+            bv = volume[i]
+            if not na(bv) and bv > 0
+                i0 = math.max(0, math.min(rowsN - 1, int(math.floor((low[i]  - loRange) / st))))
+                i1 = math.max(0, math.min(rowsN - 1, int(math.floor((high[i] - loRange) / st))))
+                share = bv / (i1 - i0 + 1)
+                for j = i0 to i1
+                    array.set(vols, j, array.get(vols, j) + share)
+        pocIdx = 0
+        maxVol = array.get(vols, 0)
+        for k = 1 to rowsN - 1
+            if array.get(vols, k) > maxVol
+                maxVol := array.get(vols, k)
+                pocIdx := k
+        poc := loRange + (pocIdx + 0.5) * st
+
+// ═══════════════ 觸發 B:放量吞沒 (多空鏡像) ═══════════════
+heavy   = volume > volMA * volMult      // 誘空/誘多棒
+heavyC  = volume > volMA * volMultCfm   // 吞沒棒
+bearBar = close < open
+bullBar = close > open
+
+// 多方:放量陰棒(長上影或實心) → engulfWin 根內放量陽棒收復其開盤價
+setupL = heavy and bearBar and (uWick >= body * wickMult or (rng > 0 and body >= rng * solidPct))
+bool fireL = false
+if bullBar and heavyC
+    for n = 1 to engulfWin
+        if setupL[n] and close > open[n]
+            fireL := true
+
+// 空方:完全鏡像
+setupS = heavy and bullBar and (lWick >= body * wickMult or (rng > 0 and body >= rng * solidPct))
+bool fireS = false
+if bearBar and heavyC
+    for n = 1 to engulfWin
+        if setupS[n] and close < open[n]
+            fireS := true
+
+engulfL = useEngulf and nz(ta.barssince(fireL), 99999) <= signalValid - 1
+engulfS = useEngulf and nz(ta.barssince(fireS), 99999) <= signalValid - 1
+
+// ═══════════════ 觸發 A:突破 ═══════════════
+brkL = useBreakout and close > hh
+brkS = useBreakout and close < ll
+
+// ═══════════════ ③ 共振 + 計分 ═══════════════
+pocL = usePOC and not na(poc) and close > poc
+pocS = usePOC and not na(poc) and close < poc
+
+scoreL = (brkL ? 1 : 0) + (engulfL ? 1 : 0) + (pocL ? 1 : 0)
+scoreS = (brkS ? 1 : 0) + (engulfS ? 1 : 0) + (pocS ? 1 : 0)
+
+// 觸發器必須至少一個開火 —— POC 單獨亮燈不構成進場理由
+trigL = brkL or engulfL
+trigS = brkS or engulfS
+
+longOK  = allowLong  and bullRegime and trigL and scoreL >= minScore
+shortOK = allowShort and bearRegime and trigS and scoreS >= minScore
+
+// ═══════════════ ④ 倉位:ATR 標準化 ═══════════════
+// qty = (權益 × 風險%) ÷ 停損距離  →  打到停損恰好虧 1R,與波動無關
+scoreNow = longOK ? scoreL : shortOK ? scoreS : 0
+convMult = not useConv ? 1.0 : scoreNow >= 3 ? 1.5 : scoreNow == 2 ? 1.0 : 0.7
+stopDist = atr * slMult
+qtyRisk  = stopDist > 0 ? (strategy.equity * riskPct * convMult / 100) / stopDist : 0.0
+qtyCap   = close > 0 ? strategy.equity * maxLev / close : 0.0
+qty      = math.min(qtyRisk, qtyCap)
+levNow   = close > 0 and strategy.equity > 0 ? qty * close / strategy.equity : 0.0
+
+// ═══════════════ 進場 ═══════════════
+if strategy.position_size == 0 and qty > 0 and not na(atr)
+    if longOK
+        strategy.entry("L", strategy.long,  qty = qty, comment = "多 " + str.tostring(scoreL) + "燈")
+    else if shortOK
+        strategy.entry("S", strategy.short, qty = qty, comment = "空 " + str.tostring(scoreS) + "燈")
+
+// ═══════════════ 出場:只有停損,沒有止盈 ═══════════════
+var float peakH   = na
+var float troughL = na
+var float stopLvl = na
+var int   units   = 0
+var float lastAdd = na
+
+justOpen = strategy.position_size != 0 and nz(strategy.position_size[1]) == 0
+
+if strategy.position_size == 0
+    peakH   := na
+    troughL := na
+    stopLvl := na
+    units   := 0
+    lastAdd := na
+else
+    avg    = strategy.position_avg_price
+    isLong = strategy.position_size > 0
+    if justOpen
+        units   := 1
+        lastAdd := avg
+
+    if isLong
+        peakH := na(peakH) ? high : math.max(peakH, high)
+        if justOpen
+            stopLvl := avg - atr * slMult
+        trail = peakH - atr * trMult
+        stopLvl := math.max(nz(stopLvl, trail), trail)      // 只上不下
+        if units < maxUnits and not na(lastAdd) and close >= lastAdd + atr * addStep and qty > 0
+            strategy.entry("L", strategy.long, qty = qty, comment = "加碼" + str.tostring(units + 1))
+            units   := units + 1
+            lastAdd := close
+        strategy.exit("Lx", from_entry = "L", stop = stopLvl, comment = "停損")
+        if exitOnRev and fireS
+            strategy.close("L", comment = "反向吞沒")
+    else
+        troughL := na(troughL) ? low : math.min(troughL, low)
+        if justOpen
+            stopLvl := avg + atr * slMult
+        trail = troughL + atr * trMult
+        stopLvl := math.min(nz(stopLvl, trail), trail)      // 只下不上
+        if units < maxUnits and not na(lastAdd) and close <= lastAdd - atr * addStep and qty > 0
+            strategy.entry("S", strategy.short, qty = qty, comment = "加碼" + str.tostring(units + 1))
+            units   := units + 1
+            lastAdd := close
+        strategy.exit("Sx", from_entry = "S", stop = stopLvl, comment = "停損")
+        if exitOnRev and fireL
+            strategy.close("S", comment = "反向吞沒")
+
+// ═══════════════ 績效表:直接顯示有沒有優勢 ═══════════════
+ct = strategy.closedtrades
+wt = strategy.wintrades
+lt = strategy.losstrades
+winRate = ct > 0 ? wt / ct * 100.0 : na
+avgW    = wt > 0 ? strategy.grossprofit / wt : na
+avgL    = lt > 0 ? strategy.grossloss  / lt : na
+payoff  = (not na(avgL) and avgL > 0 and not na(avgW)) ? avgW / avgL : na
+needed  = (not na(winRate) and winRate > 0) ? (100.0 - winRate) / winRate : na
+pf      = strategy.grossloss > 0 ? strategy.grossprofit / strategy.grossloss : na
+edgeOK  = not na(payoff) and not na(needed) and payoff > needed
+
+f2(x) => na(x) ? "—" : str.tostring(x, "#.##")
+
+var table tb = table.new(position.bottom_right, 2, 9, border_width = 1, border_color = color.new(color.gray, 60))
+headBg = color.new(#1e222d, 0)
+goodBg = color.new(color.green, 20)
+badBg  = color.new(color.red, 20)
+neutBg = color.new(color.gray, 45)
+
+if barstate.islast
+    table.cell(tb, 0, 0, "組合策略 v1", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 0, ct < 100 ? "樣本不足 " + str.tostring(ct) : "n=" + str.tostring(ct), text_color = color.white, bgcolor = ct < 100 ? badBg : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 1, "方向", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 1, bullRegime ? "多頭" : bearRegime ? "空頭" : "無趨勢", text_color = color.white, bgcolor = bullRegime ? goodBg : bearRegime ? badBg : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 2, "A 突破", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 2, brkL ? "多" : brkS ? "空" : "—", text_color = color.white, bgcolor = brkL or brkS ? goodBg : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 3, "B 放量吞沒", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 3, engulfL ? "多" : engulfS ? "空" : "—", text_color = color.white, bgcolor = engulfL or engulfS ? goodBg : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 4, "C POC", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 4, not usePOC ? "已停用" : pocL ? "站穩" : pocS ? "壓制" : "—", text_color = color.white, bgcolor = pocL or pocS ? goodBg : neutBg, text_size = size.small)
+
+    actTxt = longOK ? "做多 " + str.tostring(scoreL) + "燈 " + f2(levNow) + "x" : shortOK ? "做空 " + str.tostring(scoreS) + "燈 " + f2(levNow) + "x" : strategy.position_size != 0 ? "持倉中" : "觀望"
+    table.cell(tb, 0, 5, "行動", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 5, actTxt, text_color = color.white, bgcolor = longOK or shortOK ? goodBg : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 6, "勝率", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 6, na(winRate) ? "—" : f2(winRate) + "%", text_color = color.white, bgcolor = neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 7, "賠率 / 需要", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 7, f2(payoff) + " / " + f2(needed), text_color = color.white, bgcolor = edgeOK ? goodBg : badBg, text_size = size.small)
+
+    table.cell(tb, 0, 8, "PF / 淨利", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 8, f2(pf) + " / " + f2(strategy.netprofit / strategy.initial_capital * 100) + "%", text_color = color.white, bgcolor = not na(pf) and pf > 1 ? goodBg : badBg, text_size = size.small)
+
+// ═══════════════ 繪圖 ═══════════════
+pF = plot(fast, "快線", color = color.new(color.orange, 0), linewidth = 2)
+pS = plot(slow, "慢線", color = color.new(color.blue, 0),   linewidth = 2)
+fill(pF, pS, color = bullRegime ? color.new(color.green, 88) : bearRegime ? color.new(color.red, 88) : color.new(color.gray, 94))
+
+plot(usePOC ? poc : na, "POC", color = color.new(color.red, 0), linewidth = 2, style = plot.style_linebr)
+plot(useBreakout ? hh : na, "突破上緣", color = color.new(color.teal, 50), style = plot.style_stepline)
+plot(useBreakout ? ll : na, "突破下緣", color = color.new(color.maroon, 50), style = plot.style_stepline)
+plot(strategy.position_size != 0 ? stopLvl : na, "停損位", color = color.new(color.red, 0), linewidth = 2, style = plot.style_linebr)
+
+plotshape(fireL, "放量吞沒 多", shape.triangleup,   location.belowbar, color.new(color.aqua, 0),    size = size.tiny)
+plotshape(fireS, "放量吞沒 空", shape.triangledown, location.abovebar, color.new(color.fuchsia, 0), size = size.tiny)
+plotshape(strategy.position_size > 0 and nz(strategy.position_size[1]) == 0, "做多", shape.labelup,   location.belowbar, color.new(color.green, 0),  text = "多", textcolor = color.white, size = size.small)
+plotshape(strategy.position_size < 0 and nz(strategy.position_size[1]) == 0, "做空", shape.labeldown, location.abovebar, color.new(color.maroon, 0), text = "空", textcolor = color.white, size = size.small)

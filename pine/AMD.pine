@@ -1,0 +1,273 @@
+//@version=6
+// ════════════════════════════════════════════════════════════════════
+// AMD — Value Area Low 掃單反轉
+//
+// 邏輯:
+//   1. 放量跌破 VAL (Value Area Low)                 ← Manipulation (誘空/掃單)
+//   2. maxBars 根 K 棒內,放量收回 VAL 上方             ← Distribution (反轉確認)
+//   3. 觸發做多
+//
+// 測量單位 D = VAL − 掃低點:
+//   掃低點 = 0  (停損)
+//   VAL    = 1  (進場)
+//   TP1    = VAL + 1D  → 出場 tp1Pct%   (約 1R)
+//   TP2    = VAL + 2D  → 出場 tp2Pct%   (約 2R)
+//   剩餘倉位由移動停損接管
+//
+// 倉位大小由「進場價 − 掃低點」反推,每筆風險固定為權益的 riskPct%
+// ════════════════════════════════════════════════════════════════════
+strategy("AMD — VAL 掃單反轉", overlay = true,
+     initial_capital    = 10000,
+     max_bars_back      = 500,
+     default_qty_type   = strategy.fixed,
+     commission_type    = strategy.commission.percent,
+     commission_value   = 0.055,
+     slippage           = 2,
+     margin_long        = 20,
+     pyramiding         = 0,
+     calc_on_every_tick = false)
+
+// ═══════════════ ① Volume Profile ═══════════════
+g1 = "① Volume Profile"
+lookback = input.int(200, "回溯 K 棒數", minval = 50, maxval = 500, group = g1)
+rowsN    = input.int(24,  "價格分層數", minval = 10, maxval = 50, group = g1)
+vaPct    = input.float(70, "價值區間 %", minval = 40, maxval = 90, step = 5, group = g1)
+vpEvery  = input.int(5,   "重算間隔 (調大可解決逾時)", minval = 1, maxval = 50, group = g1)
+
+// ═══════════════ ② AMD 觸發 ═══════════════
+g2 = "② AMD 觸發"
+volMAlen    = input.int(20,   "均量週期", group = g2)
+volMultBrk  = input.float(1.5, "跌破棒放量倍數", minval = 1.0, step = 0.1, group = g2)
+volMultRcl  = input.float(1.3, "收回棒放量倍數", minval = 1.0, step = 0.1, group = g2)
+maxBars     = input.int(10, "幾根 K 棒內須收回", minval = 1, maxval = 50, group = g2)
+useWickBrk  = input.bool(false, "用影線判定跌破 (預設用收盤)", group = g2)
+maxEntryExt = input.float(0.5, "進場價最多高於 VAL 幾個 D (超過就放棄此訊號)", minval = 0.1, maxval = 3.0, step = 0.1, group = g2)
+
+// ═══════════════ ③ 出場 ═══════════════
+g3 = "③ 出場"
+tpMode  = input.string("以 VAL 為基準", "TP 基準", options = ["以 VAL 為基準", "以實際進場 R 倍數"], group = g3)
+tp1Mult = input.float(1.0, "TP1 = VAL + n×D　(或 n×R)", minval = 0.2, step = 0.1, group = g3)
+tp1Pct  = input.float(30,  "TP1 出場 % (以原始倉位計)", minval = 5, maxval = 90, step = 5, group = g3)
+tp2Mult = input.float(2.0, "TP2 = VAL + n×D　(或 n×R)", minval = 0.2, step = 0.1, group = g3)
+tp2Pct  = input.float(40,  "TP2 出場 % (以原始倉位計)", minval = 5, maxval = 90, step = 5, group = g3)
+beAfterTP1    = input.bool(true, "TP1 後停損移到保本", group = g3)
+trailAfterTP2 = input.bool(true, "TP2 後剩餘倉位改移動停損", group = g3)
+atrLen  = input.int(14,   "ATR 長度", minval = 2, group = g3)
+trMult  = input.float(3.0, "移動停損 ATR 倍數", minval = 0.5, step = 0.1, group = g3)
+
+// ═══════════════ ④ 風控 ═══════════════
+g4 = "④ 風控"
+riskPct = input.float(1.0, "每筆風險 % 權益 (1R)", minval = 0.1, maxval = 5, step = 0.1, group = g4)
+maxLev  = input.float(3.0, "槓桿上限", minval = 0.1, maxval = 5, step = 0.1, group = g4)
+
+// ═══════════════ 基礎計算 (ta.* 一律全域) ═══════════════
+volMA = ta.sma(volume, volMAlen)
+atr   = ta.atr(atrLen)
+hiRange = ta.highest(high, lookback)
+loRange = ta.lowest(low,  lookback)
+
+// ═══════════════ 建立成交量直方圖 → POC / VAH / VAL ═══════════════
+var vols = array.new_float(rowsN, 0.0)
+var float poc = na
+var float vah = na
+var float val = na
+
+if bar_index % vpEvery == 0 or na(val)
+    st = (hiRange - loRange) / rowsN
+    if not na(st) and st > 0
+        array.fill(vols, 0.0)
+        totalVol = 0.0
+        for i = 0 to lookback - 1
+            bv = volume[i]
+            if not na(bv) and bv > 0
+                i0 = math.max(0, math.min(rowsN - 1, int(math.floor((low[i]  - loRange) / st))))
+                i1 = math.max(0, math.min(rowsN - 1, int(math.floor((high[i] - loRange) / st))))
+                share = bv / (i1 - i0 + 1)
+                for j = i0 to i1
+                    array.set(vols, j, array.get(vols, j) + share)
+                totalVol := totalVol + bv
+
+        // POC = 成交量最大的價格層
+        pocIdx = 0
+        maxV = array.get(vols, 0)
+        for k = 1 to rowsN - 1
+            if array.get(vols, k) > maxV
+                maxV := array.get(vols, k)
+                pocIdx := k
+
+        // 價值區間:自 POC 向外擴張,每次併入成交量較大的一側,直到累積達 vaPct%
+        target = totalVol * vaPct / 100.0
+        acc = array.get(vols, pocIdx)
+        lo  = pocIdx
+        hi  = pocIdx
+        for _r = 1 to rowsN
+            if acc < target
+                canLo = lo > 0
+                canHi = hi < rowsN - 1
+                if canLo or canHi
+                    vB = canLo ? array.get(vols, lo - 1) : -1.0
+                    vA = canHi ? array.get(vols, hi + 1) : -1.0
+                    if canHi and vA >= vB
+                        hi  := hi + 1
+                        acc := acc + vA
+                    else if canLo
+                        lo  := lo - 1
+                        acc := acc + vB
+
+        poc := loRange + (pocIdx + 0.5) * st
+        val := loRange + lo * st                // 價值區間下緣
+        vah := loRange + (hi + 1) * st          // 價值區間上緣
+
+// ═══════════════ AMD 狀態機 ═══════════════
+heavyBrk = volume > volMA * volMultBrk
+heavyRcl = volume > volMA * volMultRcl
+brokeVAL = not na(val) and (useWickBrk ? low < val : close < val)
+
+var int   phase    = 0    // 0 = 等待跌破,1 = 已跌破,等收回
+var float lockVAL  = na   // 跌破當下鎖定的 VAL
+var float sweepLow = na   // 跌破後的最低點 = 停損
+var int   brkBar   = na
+
+bool trigger = false
+
+if phase == 0
+    if heavyBrk and brokeVAL
+        phase    := 1
+        lockVAL  := val
+        sweepLow := low
+        brkBar   := bar_index
+else
+    sweepLow := math.min(sweepLow, low)
+    if bar_index - brkBar > maxBars
+        phase := 0                                  // 逾時作廢
+    else if heavyRcl and close > lockVAL
+        trigger := true
+        phase   := 0
+
+// ═══════════════ 進場 ═══════════════
+var float tStop = na   // 本筆停損 (掃低點)
+var float tTP1  = na
+var float tTP2  = na
+var float tD    = na
+
+if trigger and strategy.position_size == 0 and not na(lockVAL) and not na(sweepLow)
+    d    = lockVAL - sweepLow
+    risk = close - sweepLow                         // 以收盤價估算真實風險
+    // 進場價高於 VAL 幾個 D。過大代表收回棒衝太遠,風報比已被壓垮 → 放棄
+    ext  = d > 0 ? (close - lockVAL) / d : 999.0
+    if d > 0 and risk > 0 and ext <= maxEntryExt
+        q = (strategy.equity * riskPct / 100) / risk
+        q := math.min(q, strategy.equity * maxLev / close)
+        if q > 0
+            tStop := sweepLow
+            tD    := d
+            if tpMode == "以實際進場 R 倍數"
+                tTP1 := close + risk * tp1Mult      // 保證 TP1 = tp1Mult 個 R
+                tTP2 := close + risk * tp2Mult
+            else
+                tTP1 := lockVAL + d * tp1Mult       // 原始設計:以 VAL 為基準
+                tTP2 := lockVAL + d * tp2Mult
+            strategy.entry("L", strategy.long, qty = q, comment = "AMD 多")
+
+// ═══════════════ 出場 ═══════════════
+var float entryQty = na
+var bool  tp1Done  = false
+var bool  tp2Done  = false
+var float peakH    = na
+var float stopLvl  = na
+
+justOpen = strategy.position_size > 0 and nz(strategy.position_size[1]) == 0
+
+if strategy.position_size == 0
+    entryQty := na
+    tp1Done  := false
+    tp2Done  := false
+    peakH    := na
+    stopLvl  := na
+else
+    avg = strategy.position_avg_price
+    if justOpen
+        entryQty := strategy.position_size
+        stopLvl  := tStop
+    peakH := na(peakH) ? high : math.max(peakH, high)
+
+    tp1Done := tp1Done or (not na(tTP1) and high >= tTP1)
+    tp2Done := tp2Done or (not na(tTP2) and high >= tTP2)
+
+    // 停損:初始 → (TP1 後) 保本 → (TP2 後) ATR 移動,只上不下
+    base = tp1Done and beAfterTP1 ? math.max(nz(tStop, avg), avg) : tStop
+    cand = base
+    if tp2Done and trailAfterTP2 and not na(atr)
+        cand := math.max(base, peakH - atr * trMult)
+    stopLvl := math.max(nz(stopLvl, cand), cand)
+
+    strategy.exit("SL", from_entry = "L", stop = stopLvl, comment = tp2Done and trailAfterTP2 ? "移動停損" : tp1Done and beAfterTP1 ? "保本" : "停損")
+
+    // TP1 / TP2 為純限價單,數量以「原始倉位」計算,不受先前部分出場影響
+    if not tp1Done and not na(entryQty) and not na(tTP1)
+        strategy.exit("TP1", from_entry = "L", qty = entryQty * tp1Pct / 100, limit = tTP1, comment = "TP1")
+    else
+        strategy.cancel("TP1")
+
+    if not tp2Done and not na(entryQty) and not na(tTP2)
+        strategy.exit("TP2", from_entry = "L", qty = entryQty * tp2Pct / 100, limit = tTP2, comment = "TP2")
+    else
+        strategy.cancel("TP2")
+
+// ═══════════════ 績效表 ═══════════════
+ct = strategy.closedtrades
+wt = strategy.wintrades
+lt = strategy.losstrades
+winRate = ct > 0 ? wt / ct * 100.0 : na
+avgW    = wt > 0 ? strategy.grossprofit / wt : na
+avgL    = lt > 0 ? strategy.grossloss  / lt : na
+payoff  = (not na(avgL) and avgL > 0 and not na(avgW)) ? avgW / avgL : na
+needed  = (not na(winRate) and winRate > 0) ? (100.0 - winRate) / winRate : na
+pf      = strategy.grossloss > 0 ? strategy.grossprofit / strategy.grossloss : na
+edgeOK  = not na(payoff) and not na(needed) and payoff > needed
+
+f2(x) => na(x) ? "—" : str.tostring(x, "#.##")
+
+var table tb = table.new(position.bottom_right, 2, 7, border_width = 1, border_color = color.new(color.gray, 60))
+headBg = color.new(#1e222d, 0)
+goodBg = color.new(color.green, 20)
+badBg  = color.new(color.red, 20)
+neutBg = color.new(color.gray, 45)
+
+if barstate.islast
+    table.cell(tb, 0, 0, "AMD — VAL 掃單", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 0, ct < 100 ? "樣本不足 " + str.tostring(ct) : "n=" + str.tostring(ct), text_color = color.white, bgcolor = ct < 100 ? badBg : neutBg, text_size = size.small)
+
+    stTxt = phase == 1 ? "已跌破 第" + str.tostring(bar_index - brkBar) + "/" + str.tostring(maxBars) + "根" : strategy.position_size > 0 ? "持倉中" : "等待跌破"
+    table.cell(tb, 0, 1, "狀態", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 1, stTxt, text_color = color.white, bgcolor = phase == 1 ? color.new(color.orange, 20) : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 2, "VAL / VAH", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 2, f2(val) + " / " + f2(vah), text_color = color.white, bgcolor = neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 3, "本筆 TP1 / TP2", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 3, strategy.position_size > 0 ? f2(tTP1) + " / " + f2(tTP2) : "—", text_color = color.white, bgcolor = neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 4, "勝率", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 4, na(winRate) ? "—" : f2(winRate) + "%", text_color = color.white, bgcolor = neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 5, "賠率 / 需要", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 5, f2(payoff) + " / " + f2(needed), text_color = color.white, bgcolor = edgeOK ? goodBg : badBg, text_size = size.small)
+
+    table.cell(tb, 0, 6, "PF / 淨利", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 6, f2(pf) + " / " + f2(strategy.netprofit / strategy.initial_capital * 100) + "%", text_color = color.white, bgcolor = not na(pf) and pf > 1 ? goodBg : badBg, text_size = size.small)
+
+// ═══════════════ 繪圖 ═══════════════
+pVAH = plot(vah, "VAH", color = color.new(color.teal, 20), linewidth = 1, style = plot.style_linebr)
+pVAL = plot(val, "VAL", color = color.new(color.orange, 0), linewidth = 2, style = plot.style_linebr)
+fill(pVAH, pVAL, color = color.new(color.blue, 92))
+plot(poc, "POC", color = color.new(color.red, 20), linewidth = 1, style = plot.style_linebr)
+
+inPos = strategy.position_size > 0
+plot(inPos ? stopLvl : na, "停損", color = color.new(color.red, 0),    linewidth = 2, style = plot.style_linebr)
+plot(inPos ? tTP1 : na,    "TP1",  color = color.new(color.lime, 20),  linewidth = 1, style = plot.style_linebr)
+plot(inPos ? tTP2 : na,    "TP2",  color = color.new(color.green, 20), linewidth = 1, style = plot.style_linebr)
+
+plotshape(phase == 1 and nz(phase[1]) == 0, "跌破 VAL", shape.triangledown, location.abovebar, color.new(color.fuchsia, 0), size = size.tiny)
+plotshape(trigger, "收回 VAL", shape.triangleup, location.belowbar, color.new(color.aqua, 0), size = size.small)
+plotshape(justOpen, "進場", shape.labelup, location.belowbar, color.new(color.green, 0), text = "多", textcolor = color.white, size = size.small)

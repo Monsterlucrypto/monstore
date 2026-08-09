@@ -1,0 +1,355 @@
+//@version=6
+// 純多單策略:EMA50 + POC + 放量吞沒 (三燈計分)  v4 (long only, 無濾網)
+strategy("三燈計分 純多單 v4", overlay=true,
+     initial_capital=10000, max_bars_back=500,
+     margin_long=15,
+     commission_type=strategy.commission.percent, commission_value=0.055,
+     slippage=2,
+     calc_on_every_tick=false)
+
+// ═══════════════ 參數 ═══════════════
+grpEntry = "進場模式"
+requireSignal = input.bool(true, "必須有放量吞沒訊號 (條件③列為必要條件)", group=grpEntry)
+minScore      = input.int(2, "最低燈數", minval=1, maxval=3, group=grpEntry)
+freshOnly     = input.bool(true, "同一個訊號只能用一次 (出場後需等新訊號)", group=grpEntry)
+
+grpMA = "均線"
+ema50Len = input.int(50, "趨勢 EMA", group=grpMA)
+ema20Len = input.int(20, "出場 EMA", group=grpMA)
+
+grpVP = "Volume Profile"
+lookback = input.int(200, "回溯 K 棒數", minval=50, maxval=500, group=grpVP)
+rowsN    = input.int(24, "價格分層數", minval=10, maxval=50, group=grpVP)
+vpEvery  = input.int(5, "重算間隔 (K棒) — 調大可解決逾時", minval=1, maxval=50, group=grpVP)
+
+grpHold = "站穩定義"
+holdBars = input.int(3, "需連續幾根", minval=1, group=grpHold)
+wickMult = input.float(2.0, "長下影線 = 實體的幾倍", minval=1.0, step=0.5, group=grpHold)
+
+grpVol = "條件③ 放量吞沒"
+volMAlen    = input.int(20, "均量週期", group=grpVol)
+volMult     = input.float(1.3, "誘空棒放量倍數 (× 均量)", minval=1.0, step=0.1, group=grpVol)
+volMultCfm  = input.float(1.1, "吞沒棒放量倍數 (× 均量)", minval=1.0, step=0.1, group=grpVol)
+solidPct    = input.float(0.7, "實心K實體佔比", minval=0.5, maxval=1.0, step=0.05, group=grpVol)
+engulfWin   = input.int(3, "吞沒視窗 (誘空棒後幾根內完成)", minval=1, maxval=5, group=grpVol)
+signalValid = input.int(5, "訊號有效 K 棒數 (綠燈維持)", minval=1, group=grpVol)
+
+grpRisk = "風控"
+stopPct   = input.float(2.0, "初始停損 % (開倉價下方)", minval=0.5, step=0.5, group=grpRisk)
+armPct    = input.float(4.0, "止盈觸發 % (開倉價上方)", minval=0.5, step=0.5, group=grpRisk)
+tpQtyPct  = input.float(30, "觸發時止盈倉位 %", minval=5, maxval=95, step=5, group=grpRisk)
+useHvnTP  = input.bool(true, "HVN 高量密集區止盈", group=grpRisk)
+hvnQtyPct = input.float(30, "HVN 止盈倉位 % (以當下持倉計)", minval=5, maxval=95, step=5, group=grpRisk)
+useEmaExit = input.bool(false, "啟用 EMA20 均線出場 (有移動停損時建議關)", group=grpRisk)
+exitCount  = input.int(5, "連續幾根收在 EMA20 下方離場", minval=1, group=grpRisk)
+useBEStop = input.bool(true, "止盈後剩餘倉位改掛保本停損 (關閉則沿用初始停損)", group=grpRisk)
+coolBars  = input.int(3, "停損後冷卻 K 棒數", minval=0, group=grpRisk)
+
+grpTrail = "移動停損"
+useTrail     = input.bool(true, "啟用 ATR 移動停損", group=grpTrail)
+atrLen       = input.int(14, "ATR 長度", minval=2, group=grpTrail)
+trailMult    = input.float(2.5, "ATR 倍數 (越大抱越久)", minval=0.5, step=0.1, group=grpTrail)
+trailAfterTP = input.bool(true, "只在第一段止盈後啟用", group=grpTrail)
+
+grpWarn = "警訊出場 (反向吞沒 / 跌破POC / 跌破EMA50)"
+useWarnExit   = input.bool(true, "啟用警訊出場", group=grpWarn)
+useWarnEngulf = input.bool(true,  "警訊① 反向吞沒", group=grpWarn)
+useWarnPoc    = input.bool(true,  "警訊② 跌破 POC", group=grpWarn)
+useWarnEma    = input.bool(false, "警訊③ 跌破 EMA50 (1H 太吵,建議關)", group=grpWarn)
+warnQtyPct  = input.float(30, "第 1 個警訊出場 %", minval=5, maxval=95, step=5, group=grpWarn)
+warnFullAt  = input.int(2, "累積幾個警訊全出場", minval=2, maxval=3, group=grpWarn)
+warnConfirm = input.int(2, "跌破 POC / EMA50 需連續幾根確認", minval=1, maxval=5, group=grpWarn)
+lev2      = input.float(2.0, "兩燈槓桿", minval=1, maxval=6, group=grpRisk)
+lev3      = input.float(3.0, "三燈槓桿", minval=1, maxval=6, group=grpRisk)
+
+// ═══════════════ 基礎計算 ═══════════════
+ema50 = ta.ema(close, ema50Len)
+ema20 = ta.ema(close, ema20Len)
+volMA = ta.sma(volume, volMAlen)
+atr   = ta.atr(atrLen)
+
+body  = math.abs(close - open)
+rng   = high - low
+uWick = high - math.max(open, close)
+lWick = math.min(open, close) - low
+
+// 長下影線 K 棒:戳破也算守住
+hammerBar = rng > 0 and lWick >= body * wickMult and lWick >= rng * 0.4
+
+// ═══════════════ Volume Profile → POC / HVN ═══════════════
+var vols = array.new_float(rowsN, 0.0)
+var float poc    = na
+var float loR    = na
+var float stepSz = na
+
+// ⚠ ta.* 必須每根都呼叫,不能放進 if 裡(否則 runtime error / 值錯誤)
+hiRange = ta.highest(high, lookback)
+loRange = ta.lowest(low, lookback)
+
+if bar_index % vpEvery == 0 or na(poc)
+    st = (hiRange - loRange) / rowsN
+    if not na(st) and st > 0
+        loR := loRange
+        stepSz := st
+        array.fill(vols, 0.0)
+        for i = 0 to lookback - 1
+            bv = volume[i]
+            if not na(bv) and bv > 0
+                i0 = math.max(0, math.min(rowsN - 1, int(math.floor((low[i]  - loRange) / st))))
+                i1 = math.max(0, math.min(rowsN - 1, int(math.floor((high[i] - loRange) / st))))
+                share = bv / (i1 - i0 + 1)
+                for j = i0 to i1
+                    array.set(vols, j, array.get(vols, j) + share)
+        pocIdx = 0
+        maxVol = array.get(vols, 0)
+        for k = 1 to rowsN - 1
+            if array.get(vols, k) > maxVol
+                maxVol := array.get(vols, k)
+                pocIdx := k
+        poc := loRange + (pocIdx + 0.5) * stepSz
+
+// HVN:當前價上方成交量最大的價格層 = 動態止盈目標
+float hvnAbove = na
+if not na(stepSz) and stepSz > 0
+    hVolA = 0.0
+    for k2 = 0 to rowsN - 1
+        rp = loR + (k2 + 0.5) * stepSz
+        v  = array.get(vols, k2)
+        if rp > close and v > hVolA
+            hVolA := v
+            hvnAbove := rp
+
+// ═══════════════ 三個條件 ═══════════════
+// ① EMA50 站穩
+holds50 = close > ema50 or hammerBar
+var int cnt50 = 0
+cnt50 := holds50 ? cnt50 + 1 : 0
+cond1 = cnt50 >= holdBars
+
+// ② POC 站穩
+holdsPoc = not na(poc) and (close > poc or hammerBar)
+var int cntPoc = 0
+cntPoc := holdsPoc ? cntPoc + 1 : 0
+cond2 = cntPoc >= holdBars
+
+// ③ 放量下跌陰棒(長上影/實心)後 1~2 根放量吞沒其開盤價
+heavy   = volume > volMA * volMult      // 誘空棒 / 誘多棒
+heavyC  = volume > volMA * volMultCfm   // 吞沒棒(確認棒)
+bearBar = close < open
+bullBar = close > open
+setupA  = heavy and bearBar and uWick >= body * wickMult
+setupB  = heavy and bearBar and rng > 0 and body >= rng * solidPct
+setup   = setupA or setupB
+bullHeavy = bullBar and heavyC
+
+// 誘空棒後 engulfWin 根內,出現放量陽棒吞沒其開盤價
+bool comboFire = false
+if bullHeavy
+    for n = 1 to engulfWin
+        if setup[n] and close > open[n]
+            comboFire := true
+
+cond3 = nz(ta.barssince(comboFire), 99999) <= signalValid - 1
+
+// ═══════════════ 警訊 (出場用,條件③的鏡像 + 兩條跌破) ═══════════════
+// 反向吞沒:放量上漲陽棒(長下影/實心)後 1~2 根放量跌破其開盤價
+setupAS = heavy and bullBar and lWick >= body * wickMult
+setupBS = heavy and bullBar and rng > 0 and body >= rng * solidPct
+setupS  = setupAS or setupBS
+bearHeavy = bearBar and heavyC
+
+bool comboFireS = false
+if bearHeavy
+    for n = 1 to engulfWin
+        if setupS[n] and close < open[n]
+            comboFireS := true
+
+// 跌破需連續 warnConfirm 根確認;用 == 讓每次跌破只觸發一次
+var int pocBelowStreak = 0
+pocBelowStreak := (not na(poc) and close < poc) ? pocBelowStreak + 1 : 0
+var int emaBelowStreak = 0
+emaBelowStreak := close < ema50 ? emaBelowStreak + 1 : 0
+
+warnEngulf = useWarnEngulf and comboFireS
+warnPoc    = useWarnPoc    and pocBelowStreak == warnConfirm
+warnEma    = useWarnEma    and emaBelowStreak == warnConfirm
+
+// ═══════════════ 計分 ═══════════════
+score = (cond1 ? 1 : 0) + (cond2 ? 1 : 0) + (cond3 ? 1 : 0)
+lev   = score >= 3 ? lev3 : lev2
+
+// 停損後冷卻
+var int lastLossBar = na
+if strategy.closedtrades > nz(strategy.closedtrades[1])
+    if strategy.closedtrades.profit(strategy.closedtrades - 1) < 0
+        lastLossBar := bar_index
+coolOK = coolBars == 0 or na(lastLossBar) or (bar_index - lastLossBar) >= coolBars
+
+// ═══════════════ 進場 ═══════════════
+// 訊號新鮮度:訊號必須發生在「上次出場之後」,避免同一個訊號在有效期內被重複用來進場
+var int lastExitBar = na
+if strategy.position_size == 0 and nz(strategy.position_size[1]) != 0
+    lastExitBar := bar_index
+sigAge   = nz(ta.barssince(comboFire), 99999)
+sigFresh = not freshOnly or na(lastExitBar) or sigAge < (bar_index - lastExitBar)
+
+// requireSignal = true 時,條件③(放量吞沒)是必要條件,不再只是計分項
+entryOK = (requireSignal ? (cond3 and score >= minScore) : score >= minScore) and sigFresh
+
+if coolOK and strategy.position_size == 0 and entryOK
+    strategy.entry("Long", strategy.long, qty=strategy.equity * lev / close, comment="多 x" + str.tostring(lev, "#.#"))
+
+// ═══════════════ 出場管理 ═══════════════
+var bool  armed     = false   // 已吃到止盈 → 進入鎖利模式
+var bool  tp1Done   = false
+var bool  hvnDone   = false
+var float lockedHvn = na      // 進場當下鎖定的 HVN 目標,不再逐根漂移
+var bool  wEngulfHit = false  // 三個警訊各自只計一次
+var bool  wPocHit    = false
+var bool  wEmaHit    = false
+var int   warnCount  = 0
+var bool  warnExitPending = false
+var float peakHigh  = na      // 進場後的最高價,供 ATR 移動停損用
+var float trailStop = na      // 移動停損只會往上,不會往下
+bool warnCut  = false         // 本根因警訊部分出場
+bool warnFull = false         // 本根因警訊全部出場
+
+var int belowStreak = 0
+belowStreak := close < ema20 ? belowStreak + 1 : 0
+
+justOpened = strategy.position_size > 0 and nz(strategy.position_size[1]) == 0
+
+if strategy.position_size == 0
+    armed     := false
+    tp1Done   := false
+    hvnDone   := false
+    lockedHvn := na
+    wEngulfHit := false
+    wPocHit    := false
+    wEmaHit    := false
+    warnCount  := 0
+    peakHigh   := na
+    trailStop  := na
+else
+    avg = strategy.position_avg_price
+    if justOpened
+        lockedHvn := hvnAbove
+
+    tp1Px  = avg * (1 + armPct / 100)
+    initSL = avg * (1 - stopPct / 100)
+
+    tp1Done := tp1Done or high >= tp1Px
+    hvnValid = useHvnTP and not na(lockedHvn) and lockedHvn > avg * 1.005
+    hvnDone := hvnDone or (hvnValid and high >= lockedHvn)
+    armed   := tp1Done or hvnDone
+
+    // ATR 移動停損:追蹤進場後最高價,停損只往上不往下
+    peakHigh := na(peakHigh) ? high : math.max(peakHigh, high)
+    trailOn = useTrail and (not trailAfterTP or armed)
+    if trailOn and not na(atr)
+        cand = peakHigh - atr * trailMult
+        trailStop := na(trailStop) ? cand : math.max(trailStop, cand)
+
+    // 全倉停損:三個來源取最高者(初始/保本/移動),永遠不留無保護裸倉
+    baseStop = armed and useBEStop ? avg : initSL
+    useTrailNow = trailOn and not na(trailStop) and trailStop > baseStop
+    stopPx = useTrailNow ? trailStop : baseStop
+    strategy.exit("STOP", from_entry="Long", stop=stopPx, comment=useTrailNow ? "移動停損" : armed and useBEStop ? "保本出場" : "停損")
+
+    // 第一段固定止盈
+    if not tp1Done
+        strategy.exit("TP1", from_entry="Long", qty_percent=tpQtyPct, limit=tp1Px, comment="固定止盈")
+    else
+        strategy.cancel("TP1")
+
+    // 第二段 HVN 止盈
+    if hvnValid and not hvnDone
+        strategy.exit("TP2", from_entry="Long", qty_percent=hvnQtyPct, limit=lockedHvn, comment="HVN 止盈")
+    else
+        strategy.cancel("TP2")
+
+    // 警訊出場:每個警訊每次持倉只計一次;第 1 個減碼,累積達 warnFullAt 全出
+    if useWarnExit
+        newWarn = 0
+        if warnEngulf and not wEngulfHit
+            wEngulfHit := true
+            newWarn += 1
+        if warnPoc and not wPocHit
+            wPocHit := true
+            newWarn += 1
+        if warnEma and not wEmaHit
+            wEmaHit := true
+            newWarn += 1
+        if newWarn > 0
+            warnCount += newWarn
+            if warnCount >= warnFullAt
+                strategy.close("Long", comment="警訊 x" + str.tostring(warnCount) + " 全出場")
+                warnExitPending := true
+                warnFull := true
+            else
+                strategy.close("Long", qty_percent=warnQtyPct, comment="警訊減碼 " + str.tostring(warnQtyPct, "#") + "%")
+                warnCut := true
+
+    // 鎖利後才啟用 EMA20 均線出場
+    if useEmaExit and armed and belowStreak >= exitCount
+        strategy.close("Long", comment="EMA20 連" + str.tostring(exitCount) + "根收下方")
+
+// ═══════════════ 右下角燈號表 ═══════════════
+var table tb = table.new(position.bottom_right, 2, 7, border_width=1, border_color=color.new(color.gray, 60))
+greenBg = color.new(color.green, 15)
+redBg   = color.new(color.red, 15)
+grayBg  = color.new(color.gray, 40)
+headBg  = color.new(#1e222d, 0)
+
+if barstate.islast
+    tfWarn = timeframe.in_seconds() < 300
+    table.cell(tb, 0, 0, tfWarn ? "條件 (週期<5min!)" : "條件偵測", text_color=tfWarn ? color.yellow : color.white, bgcolor=headBg, text_size=size.small)
+    table.cell(tb, 1, 0, "多方", text_color=color.white, bgcolor=headBg, text_size=size.small)
+
+    table.cell(tb, 0, 1, "① EMA50 站穩", text_color=color.white, bgcolor=headBg, text_size=size.small)
+    table.cell(tb, 1, 1, cond1 ? "符合" : "未符合", text_color=color.white, bgcolor=cond1 ? greenBg : redBg, text_size=size.small)
+
+    table.cell(tb, 0, 2, "② POC 站穩", text_color=color.white, bgcolor=headBg, text_size=size.small)
+    table.cell(tb, 1, 2, cond2 ? "符合" : "未符合", text_color=color.white, bgcolor=cond2 ? greenBg : redBg, text_size=size.small)
+
+    table.cell(tb, 0, 3, "③ 放量吞沒組合", text_color=color.white, bgcolor=headBg, text_size=size.small)
+    table.cell(tb, 1, 3, cond3 ? "符合" : "未符合", text_color=color.white, bgcolor=cond3 ? greenBg : redBg, text_size=size.small)
+
+    act = not entryOK ? (requireSignal and not cond3 ? "觀望 缺訊號 (" + str.tostring(score) + "/3)" : "觀望 (" + str.tostring(score) + "/3)") : "做多 " + str.tostring(score >= 3 ? lev3 : lev2, "#.#") + "x"
+    table.cell(tb, 0, 4, "行動", text_color=color.white, bgcolor=headBg, text_size=size.small)
+    table.cell(tb, 1, 4, act, text_color=color.white, bgcolor=entryOK ? greenBg : grayBg, text_size=size.small)
+
+    posTxt = strategy.position_size == 0 ? "空手" : armed ? "持倉·已鎖利" : "持倉·停損" + str.tostring(stopPct, "#.#") + "%"
+    posBg  = strategy.position_size == 0 ? grayBg : armed ? color.new(color.teal, 20) : color.new(color.orange, 20)
+    table.cell(tb, 0, 5, "倉位狀態", text_color=color.white, bgcolor=headBg, text_size=size.small)
+    table.cell(tb, 1, 5, posTxt, text_color=color.white, bgcolor=posBg, text_size=size.small)
+
+    warnTxt = not useWarnExit ? "已停用" : strategy.position_size == 0 ? "—" : str.tostring(warnCount) + "/" + str.tostring(warnFullAt) + (wEngulfHit ? " 吞" : "") + (wPocHit ? " POC" : "") + (wEmaHit ? " EMA50" : "")
+    warnBg  = not useWarnExit or strategy.position_size == 0 ? grayBg : warnCount == 0 ? greenBg : redBg
+    table.cell(tb, 0, 6, "警訊累積", text_color=color.white, bgcolor=headBg, text_size=size.small)
+    table.cell(tb, 1, 6, warnTxt, text_color=color.white, bgcolor=warnBg, text_size=size.small)
+
+// ═══════════════ 繪圖 ═══════════════
+plot(ema50, "EMA50", color=color.new(color.blue, 0), linewidth=2)
+plot(ema20, "EMA20", color=color.new(color.orange, 0), linewidth=1)
+plot(poc, "POC", color=color.new(color.red, 0), linewidth=2, style=plot.style_linebr)
+plot(useHvnTP ? hvnAbove : na, "上方 HVN", color=color.new(color.yellow, 30), linewidth=1, style=plot.style_linebr)
+plotshape(comboFire,  "放量吞沒",   shape.triangleup,   location.belowbar, color.new(color.aqua, 0),    size=size.small)
+plotshape(comboFireS, "反向吞沒",   shape.triangledown, location.abovebar, color.new(color.fuchsia, 0), size=size.small)
+
+// ═══════════════ 進出場標示 ═══════════════
+newLong  = strategy.position_size > 0 and nz(strategy.position_size[1]) == 0
+tpFill   = armed and not armed[1] and strategy.position_size != 0
+fullExit = strategy.position_size == 0 and nz(strategy.position_size[1]) != 0
+weExit   = fullExit and warnExitPending
+slExit   = fullExit and not armed[1] and not weExit
+maExit   = fullExit and armed[1] and not weExit
+if fullExit
+    warnExitPending := false
+
+plotshape(newLong,  "買入",     shape.labelup,   location.belowbar, color.new(color.green, 0),  text="買入",   textcolor=color.white, size=size.small)
+plotshape(tpFill,   "部分止盈", shape.labeldown, location.abovebar, color.new(color.teal, 0),   text="止盈",   textcolor=color.white, size=size.small)
+plotshape(warnCut,  "警訊減碼", shape.labeldown, location.abovebar, color.new(color.yellow, 0), text="減碼",   textcolor=color.black, size=size.small)
+plotshape(weExit,   "警訊全出", shape.labeldown, location.abovebar, color.new(color.fuchsia, 0), text="警訊出場", textcolor=color.white, size=size.small)
+plotshape(slExit,   "停損出場", shape.labeldown, location.abovebar, color.new(color.red, 0),    text="停損",   textcolor=color.white, size=size.small)
+plotshape(maExit,   "均線出場", shape.labeldown, location.abovebar, color.new(color.orange, 0), text="均線出場", textcolor=color.white, size=size.small)

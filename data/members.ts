@@ -22,14 +22,61 @@ export type Member = {
 };
 
 // ════════════════════════════════════════════════════════════
-// Founder Pass 對應 Units & 價格
+// Founder Pass 全域參數
 // ════════════════════════════════════════════════════════════
-export const FOUNDER_CONFIG: Record<string, { units: number; price: number }> = {
-  Lu: { units: 1290, price: 5000 },
-  M:  { units: 240,  price: 1000 },
-  O:  { units: 70,   price: 300  },
-  N:  { units: 20,   price: 100  },
+export const REWARD_POOL_RATE = 0.2;        // 營收進入回饋池的比例
+export const CAP_MULTIPLE_FOUNDING = 5;     // 創始批 · 終身回饋上限倍數
+export const CAP_MULTIPLE_STANDARD = 3;     // 後續批次 · 終身回饋上限倍數
+export const FOUNDER_RELEASE_RATE = 0.1;    // 目前釋出比例（第一階段 10%）
+export const FOUNDER_TOTAL_UNITS = 100_000; // 長期生態總上限
+
+export type FounderBatch = "founding" | "standard";
+
+export type FounderTierConfig = {
+  tier: string;
+  rewardUnits: number;
+  price: number;
+  totalQuota: number;
+  onSale: number;
+  locked: number;
+  batch: FounderBatch;
+  capMultiple: number;
 };
+
+// ════════════════════════════════════════════════════════════
+// Founder Pass 各級距（onSale / locked / capMultiple 皆自動計算）
+// ════════════════════════════════════════════════════════════
+const FOUNDER_TIER_BASE: { tier: string; rewardUnits: number; price: number; totalQuota: number; batch: FounderBatch }[] = [
+  { tier: "Lu", rewardUnits: 1290, price: 5000, totalQuota: 20,  batch: "founding" },
+  { tier: "M",  rewardUnits: 240,  price: 1000, totalQuota: 180, batch: "founding" },
+  { tier: "O",  rewardUnits: 70,   price: 300,  totalQuota: 300, batch: "founding" },
+  { tier: "N",  rewardUnits: 20,   price: 100,  totalQuota: 500, batch: "founding" },
+];
+
+export const FOUNDER_TIERS: FounderTierConfig[] = FOUNDER_TIER_BASE.map((t) => {
+  const onSale = Math.round(t.totalQuota * FOUNDER_RELEASE_RATE);
+  return {
+    ...t,
+    onSale,
+    locked: t.totalQuota - onSale,
+    capMultiple: t.batch === "founding" ? CAP_MULTIPLE_FOUNDING : CAP_MULTIPLE_STANDARD,
+  };
+});
+
+export const FOUNDER_CONFIG: Record<string, FounderTierConfig> = Object.fromEntries(
+  FOUNDER_TIERS.map((t) => [t.tier, t])
+);
+
+// 單張 Pass 的終身現金回饋上限 = 購買價 × 批次倍數
+export function capAmount(cfg: FounderTierConfig): number {
+  return cfg.price * cfg.capMultiple;
+}
+
+// 每張每月回饋 = 平台月營收 × 回饋池比例 × (該級距 units ÷ 流通中總 units)
+export function monthlyReward(revenue: number, units: number, circulatingUnits: number): number {
+  if (circulatingUnits <= 0) return 0;
+  return revenue * REWARD_POOL_RATE * (units / circulatingUnits);
+}
 
 // ════════════════════════════════════════════════════════════
 // VIP 自動計算：取本月與上月較大值來決定等級

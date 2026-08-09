@@ -1,8 +1,27 @@
 "use client";
 import Layout from "@/components/Layout";
 import { useState, useEffect } from "react";
-import { members, FOUNDER_CONFIG } from "@/data/members";
-import type { Member } from "@/data/members";
+import {
+  members,
+  FOUNDER_CONFIG,
+  FOUNDER_TIERS,
+  REWARD_POOL_RATE,
+  FOUNDER_RELEASE_RATE,
+  capAmount,
+  monthlyReward,
+} from "@/data/members";
+import type { Member, FounderTierConfig } from "@/data/members";
+import {
+  CAP_NOTE,
+  SCENARIO_TIER,
+  SCENARIO_REVENUES,
+  SCENARIO_CIRCULATING_UNITS,
+  SCENARIO_NOTE,
+  GIFT_INTRO,
+  GIFT_ITEMS,
+  GIFT_NOTE,
+  FOUNDER_TERMS,
+} from "@/data/founderContent";
 
 const UID_KEY = "monstore_uid";
 
@@ -34,64 +53,17 @@ function totalFounderUnits(fp: string | null | undefined): number {
   const counts = parseFounderPasses(fp);
   return Object.entries(counts).reduce((sum, [tier, qty]) => {
     const cfg = FOUNDER_CONFIG[tier];
-    return sum + (cfg ? cfg.units * qty : 0);
+    return sum + (cfg ? cfg.rewardUnits * qty : 0);
   }, 0);
 }
 
-const membershipTiers = [
-  {
-    name: "Lu",
-    label: "Lu Access",
-    units: 1290,
-    price: 5000,
-    slots: 20,
-    remaining: 20,
-    onSale: 2,   // 10% of 20
-    locked: 18,
-    color: "#E8C96A",
-    colorDim: "rgba(232,201,106,0.12)",
-    colorBorder: "rgba(232,201,106,0.35)",
-  },
-  {
-    name: "M",
-    label: "M Access",
-    units: 240,
-    price: 1000,
-    slots: 180,
-    remaining: 180,
-    onSale: 18,  // 10% of 180
-    locked: 162,
-    color: "#C9A84C",
-    colorDim: "rgba(201,168,76,0.12)",
-    colorBorder: "rgba(201,168,76,0.3)",
-  },
-  {
-    name: "O",
-    label: "O Access",
-    units: 70,
-    price: 300,
-    slots: 300,
-    remaining: 300,
-    onSale: 30,  // 10% of 300
-    locked: 270,
-    color: "#a8a9ad",
-    colorDim: "rgba(168,169,173,0.1)",
-    colorBorder: "rgba(168,169,173,0.25)",
-  },
-  {
-    name: "N",
-    label: "N Access",
-    units: 20,
-    price: 100,
-    slots: 500,
-    remaining: 500,
-    onSale: 50,  // 10% of 500
-    locked: 450,
-    color: "#cd7f32",
-    colorDim: "rgba(205,127,50,0.1)",
-    colorBorder: "rgba(205,127,50,0.25)",
-  },
-];
+// 各級距僅在此定義視覺樣式，數值一律取自 FOUNDER_CONFIG
+const TIER_STYLE: Record<string, { label: string; color: string; colorDim: string; colorBorder: string }> = {
+  Lu: { label: "Lu Access", color: "#E8C96A", colorDim: "rgba(232,201,106,0.12)", colorBorder: "rgba(232,201,106,0.35)" },
+  M:  { label: "M Access",  color: "#C9A84C", colorDim: "rgba(201,168,76,0.12)",  colorBorder: "rgba(201,168,76,0.3)"  },
+  O:  { label: "O Access",  color: "#a8a9ad", colorDim: "rgba(168,169,173,0.1)",  colorBorder: "rgba(168,169,173,0.25)" },
+  N:  { label: "N Access",  color: "#cd7f32", colorDim: "rgba(205,127,50,0.1)",   colorBorder: "rgba(205,127,50,0.25)" },
+};
 
 const benefits = [
   {
@@ -452,7 +424,7 @@ function MyFounderStatus({ member }: { member: Member }) {
             <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, fontWeight: 700, color: "#E8C96A" }}>{tier}</span>
             <span style={{ fontSize: 14, color: "#8a8578", fontFamily: "'DM Sans', system-ui, sans-serif" }}>×{qty}</span>
             <span style={{ fontSize: 13, color: "#4a4740", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-              ({((FOUNDER_CONFIG[tier]?.units ?? 0) * qty).toLocaleString()} Units)
+              ({((FOUNDER_CONFIG[tier]?.rewardUnits ?? 0) * qty).toLocaleString()} Units)
             </span>
           </div>
         ))}
@@ -475,60 +447,185 @@ function MyFounderStatus({ member }: { member: Member }) {
   );
 }
 
+function CapBadge({ cfg, color }: { cfg: FounderTierConfig; color: string }) {
+  const batchLabel = cfg.batch === "founding" ? "創始批" : "後續批次";
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${color}14`, border: `0.5px solid ${color}55`, borderRadius: 6, padding: "3px 9px", fontSize: 11, fontFamily: F.body, letterSpacing: 0.5, color, whiteSpace: "nowrap", flexShrink: 0 }}>
+      {batchLabel} · {cfg.capMultiple}x 上限
+    </span>
+  );
+}
+
 function MembershipUnits() {
   const [hov, setHov] = useState<number | null>(null);
+  const releasePct = `${Math.round(FOUNDER_RELEASE_RATE * 100)}%`;
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-      {membershipTiers.map((t, i) => {
-        return (
-          <div
-            key={t.name}
-            onMouseEnter={() => setHov(i)}
-            onMouseLeave={() => setHov(null)}
-            style={{ background: hov === i ? t.colorDim : "rgba(255,255,255,0.015)", border: `0.5px solid ${hov === i ? t.colorBorder : C.borderSubtle}`, borderRadius: 14, padding: 24, display: "flex", flexDirection: "column", gap: 16, transition: "all 0.25s ease" }}
-          >
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }} className="grid-4">
+        {FOUNDER_TIERS.map((t, i) => {
+          const s = TIER_STYLE[t.tier];
+          const cap = capAmount(t);
+          return (
+            <div
+              key={t.tier}
+              onMouseEnter={() => setHov(i)}
+              onMouseLeave={() => setHov(null)}
+              style={{ background: hov === i ? s.colorDim : "rgba(255,255,255,0.015)", border: `0.5px solid ${hov === i ? s.colorBorder : C.borderSubtle}`, borderRadius: 14, padding: 24, display: "flex", flexDirection: "column", gap: 16, transition: "all 0.25s ease" }}
+            >
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
+                  <div style={{ fontFamily: F.display, fontSize: 32, fontWeight: 300, color: s.color, letterSpacing: 2, lineHeight: 1 }}>{t.tier}</div>
+                  <CapBadge cfg={t} color={s.color} />
+                </div>
+                <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, letterSpacing: 1, textTransform: "uppercase" }}>{s.label}</div>
+              </div>
+              <div style={{ height: "0.5px", background: s.colorBorder }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>Reward Units</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: s.color }}>{t.rewardUnits.toLocaleString()}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>參考價格</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textSecondary }}>${t.price.toLocaleString()} USDT</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>總名額</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textPrimary }}>{t.totalQuota}</span>
+                </div>
+                <div style={{ height: "0.5px", background: C.borderSubtle }} />
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 13, color: "#5ea96e", fontFamily: F.body }}>販售中</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: "#5ea96e" }}>{t.onSale}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>鎖定中</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textMuted }}>{t.locked}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "8px 12px", background: `${s.color}0d`, border: `0.5px solid ${s.color}33`, borderRadius: 8 }}>
+                  <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>回饋上限</span>
+                  <span style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: s.color }}>
+                    {t.capMultiple}x · ${cap.toLocaleString()} USDT
+                  </span>
+                </div>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
+                    <span>販售中比例</span><span style={{ color: s.color }}>{releasePct}</span>
+                  </div>
+                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 3, height: 4, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: releasePct, background: `linear-gradient(90deg, ${s.color}80, ${s.color})`, borderRadius: 3 }} />
+                  </div>
+                </div>
+              </div>
+              <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, background: `linear-gradient(135deg, ${s.color}25, ${s.color}10)`, border: `0.5px solid ${s.colorBorder}`, color: s.color, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
+                申請加入
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ padding: "12px 18px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+        ✦ 每張 Founder Pass 之累計現金回饋以購買價的對應倍數為上限；達上限後現金回饋停止，會員權益終身保留（創始畢業成員）。{CAP_NOTE}
+      </div>
+    </div>
+  );
+}
+
+function ScenarioTable() {
+  const cfg = FOUNDER_CONFIG[SCENARIO_TIER];
+  const fmt = (n: number) => `$${n.toFixed(2)}`;
+  return (
+    <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 32 }} className="content-pad">
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 6 }}>回饋試算</div>
+        <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+          以 {cfg.tier} 級距（{cfg.rewardUnits} units · ${cfg.price.toLocaleString()} USDT）為例，
+          每張每月回饋 = 平台月營收 × {REWARD_POOL_RATE * 100}% ×（{cfg.rewardUnits} ÷ 流通中總 units）。
+        </div>
+      </div>
+
+      <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <table style={{ width: "100%", minWidth: 560, borderCollapse: "collapse", fontFamily: F.body }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: "left", padding: "10px 14px", fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${C.borderMid}`, whiteSpace: "nowrap" }}>
+                平台月營收
+              </th>
+              {SCENARIO_CIRCULATING_UNITS.map((u) => (
+                <th key={u} style={{ textAlign: "right", padding: "10px 14px", fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${C.borderMid}`, whiteSpace: "nowrap" }}>
+                  流通 {u.toLocaleString()} units
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {SCENARIO_REVENUES.map((r) => (
+              <tr key={r.revenue}>
+                <td style={{ padding: "12px 14px", borderBottom: `0.5px solid ${C.borderSubtle}`, whiteSpace: "nowrap" }}>
+                  <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textPrimary }}>${r.revenue.toLocaleString()}</span>
+                  {r.label && (
+                    <span style={{ fontSize: 12, color: C.gold, marginLeft: 8, fontFamily: F.body }}>（{r.label}）</span>
+                  )}
+                </td>
+                {SCENARIO_CIRCULATING_UNITS.map((u) => (
+                  <td key={u} style={{ padding: "12px 14px", textAlign: "right", borderBottom: `0.5px solid ${C.borderSubtle}`, fontFamily: F.mono, fontSize: 14, color: C.goldLight, whiteSpace: "nowrap" }}>
+                    {fmt(monthlyReward(r.revenue, cfg.rewardUnits, u))}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: 20, padding: "12px 18px", background: "rgba(201,168,76,0.03)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.8 }}>
+        ✦ {SCENARIO_NOTE}
+      </div>
+    </div>
+  );
+}
+
+function FounderGiftSection() {
+  return (
+    <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 32 }} className="content-pad">
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 6 }}>創始成員禮</div>
+        <div style={{ fontSize: 14, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>{GIFT_INTRO}</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="grid-3">
+        {GIFT_ITEMS.map((g) => (
+          <div key={g.name} style={{ background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 12, padding: 22, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ height: 96, borderRadius: 10, background: "linear-gradient(135deg, rgba(201,168,76,0.10) 0%, rgba(10,10,11,0.6) 100%)", border: `0.5px solid ${C.borderSubtle}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, color: C.gold }}>
+              {g.icon}
+            </div>
             <div>
-              <div style={{ fontFamily: F.display, fontSize: 32, fontWeight: 300, color: t.color, letterSpacing: 2, lineHeight: 1, marginBottom: 6 }}>{t.name}</div>
-              <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, letterSpacing: 1, textTransform: "uppercase" }}>{t.label}</div>
+              <div style={{ fontSize: 15, fontWeight: 500, color: C.textPrimary, fontFamily: F.body, marginBottom: 4 }}>{g.name}</div>
+              <div style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.6 }}>{g.desc}</div>
             </div>
-            <div style={{ height: "0.5px", background: t.colorBorder }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>Reward Units</span>
-                <span style={{ fontFamily: F.mono, fontSize: 20, fontWeight: 700, color: t.color }}>{t.units.toLocaleString()}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>參考價格</span>
-                <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textSecondary }}>${t.price.toLocaleString()} USDT</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>總名額</span>
-                <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textPrimary }}>{t.slots}</span>
-              </div>
-              <div style={{ height: "0.5px", background: C.borderSubtle }} />
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 13, color: "#5ea96e", fontFamily: F.body }}>販售中</span>
-                <span style={{ fontFamily: F.mono, fontSize: 14, fontWeight: 700, color: "#5ea96e" }}>{t.onSale}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 13, color: C.textMuted, fontFamily: F.body }}>鎖定中</span>
-                <span style={{ fontFamily: F.mono, fontSize: 14, color: C.textMuted }}>{t.locked}</span>
-              </div>
-            </div>
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: C.textMuted, fontFamily: F.mono, marginBottom: 6 }}>
-                <span>販售中比例</span><span style={{ color: t.color }}>10%</span>
-              </div>
-              <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 3, height: 4, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: "10%", background: `linear-gradient(90deg, ${t.color}80, ${t.color})`, borderRadius: 3 }} />
-              </div>
-            </div>
-            <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, background: `linear-gradient(135deg, ${t.color}25, ${t.color}10)`, border: `0.5px solid ${t.colorBorder}`, color: t.color, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.body, letterSpacing: 0.5 }}>
-              申請加入
-            </button>
           </div>
-        );
-      })}
+        ))}
+      </div>
+      <div style={{ marginTop: 20, padding: "12px 18px", background: "rgba(201,168,76,0.04)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 8, fontSize: 13, color: C.textMuted, fontFamily: F.body, lineHeight: 1.7 }}>
+        ✦ {GIFT_NOTE}
+      </div>
+    </div>
+  );
+}
+
+function TermsSection() {
+  return (
+    <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 32 }} className="content-pad">
+      <div style={{ fontFamily: F.display, fontSize: 22, fontWeight: 300, color: C.textPrimary, letterSpacing: 0.5, marginBottom: 20 }}>Founder Pass 條款</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {FOUNDER_TERMS.map((t) => (
+          <div key={t.title} style={{ padding: "16px 18px", background: "rgba(255,255,255,0.02)", border: `0.5px solid ${C.borderSubtle}`, borderRadius: 10 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.goldLight, fontFamily: F.body, letterSpacing: 0.5, marginBottom: 8 }}>{t.title}</div>
+            <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: F.body, lineHeight: 1.8 }}>{t.body}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -925,6 +1022,14 @@ export default function FounderPassPage() {
           <MembershipUnits />
         </div>
         <div>
+          <SectionLabel>回饋試算 · Reward Scenarios</SectionLabel>
+          <ScenarioTable />
+        </div>
+        <div>
+          <SectionLabel>創始成員禮 · Founder Gift</SectionLabel>
+          <FounderGiftSection />
+        </div>
+        <div>
           <SectionLabel>Phase One · 第一階段開放</SectionLabel>
           <GenesisRelease />
         </div>
@@ -959,6 +1064,10 @@ export default function FounderPassPage() {
         <div>
           <SectionLabel>常見問題</SectionLabel>
           <FAQ />
+        </div>
+        <div>
+          <SectionLabel>Founder Pass 條款</SectionLabel>
+          <TermsSection />
         </div>
         <div style={{ height: 8 }} />
       </div>

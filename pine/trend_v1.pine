@@ -1,0 +1,194 @@
+//@version=6
+// ════════════════════════════════════════════════════════════════════
+// 趨勢跟隨 v1 — 均線定方向 + 突破定時機 + ATR 定風險
+//
+// 數學核心:靠「正偏態」賺錢,不是靠勝率。
+//   1. 永不設止盈 → 不切斷右尾,少數大贏單負責全部獲利
+//   2. 每筆風險固定為權益的 riskPct% → 所有交易的損益單位一致 (1R)
+//   3. 倉位由 ATR 反推 → 波動大自動減碼、波動小自動加碼
+//      副作用:實際槓桿通常 < 1x,手續費幾乎不構成拖累
+//   4. 慢訊號、每筆只有 2 次成交 (進 + 出),無分批
+//
+// 預期樣貌:勝率 35~45%、賠率 2~3、常態性連續小虧、獲利集中在少數交易
+// 建議週期:4H 或 1D
+// ════════════════════════════════════════════════════════════════════
+strategy("趨勢跟隨 v1", overlay=true,
+     initial_capital   = 10000,
+     default_qty_type  = strategy.fixed,
+     commission_type   = strategy.commission.percent,
+     commission_value  = 0.055,
+     slippage          = 2,
+     margin_long       = 20,
+     margin_short      = 20,
+     pyramiding        = 10,
+     calc_on_every_tick = false)
+
+// ═══════════════ 參數 ═══════════════
+grpT = "① 趨勢判定 (均線)"
+maType   = input.string("EMA", "均線類型", options = ["EMA", "SMA"], group = grpT)
+fastLen  = input.int(50,  "快線週期", minval = 5,  group = grpT)
+slowLen  = input.int(200, "慢線週期", minval = 20, group = grpT)
+useSlope = input.bool(true, "慢線必須同向傾斜", group = grpT)
+slopeLen = input.int(20, "斜率回看根數", minval = 1, group = grpT)
+
+grpE = "② 進場時機 (突破)"
+brkLen     = input.int(20, "突破 N 根新高/新低", minval = 3, group = grpE)
+allowLong  = input.bool(true, "做多", group = grpE)
+allowShort = input.bool(true, "做空 (TSMOM 是對稱的,關掉會在熊市穩定虧損)", group = grpE)
+
+grpR = "③ 風控 (ATR)"
+atrLen  = input.int(14,   "ATR 長度", minval = 2, group = grpR)
+slMult  = input.float(2.5, "初始停損 ATR 倍數", minval = 0.5, step = 0.1, group = grpR)
+trMult  = input.float(3.5, "移動停損 ATR 倍數", minval = 0.5, step = 0.1, group = grpR)
+riskPct = input.float(1.0, "每筆風險 % 權益 (1R)", minval = 0.1, maxval = 5, step = 0.1, group = grpR)
+maxLev  = input.float(3.0, "槓桿上限", minval = 0.1, maxval = 5, step = 0.1, group = grpR)
+exitRegime = input.bool(false, "快線穿越慢線即出場 (與移動停損重複,建議關)", group = grpR)
+
+grpP = "④ 金字塔加碼"
+maxUnits = input.int(1,   "最多幾個單位 (1 = 不加碼)", minval = 1, maxval = 5, group = grpP)
+addStep  = input.float(1.0, "每順向走幾個 ATR 加一次", minval = 0.2, step = 0.1, group = grpP)
+
+// ═══════════════ 基礎計算 ═══════════════
+fastE = ta.ema(close, fastLen)
+fastS = ta.sma(close, fastLen)
+slowE = ta.ema(close, slowLen)
+slowS = ta.sma(close, slowLen)
+fast  = maType == "EMA" ? fastE : fastS
+slow  = maType == "EMA" ? slowE : slowS
+atr   = ta.atr(atrLen)
+
+slopeUp = slow > slow[slopeLen]
+slopeDn = slow < slow[slopeLen]
+
+bullRegime = fast > slow and close > slow and (not useSlope or slopeUp)
+bearRegime = fast < slow and close < slow and (not useSlope or slopeDn)
+
+// 突破用「前一根為止」的極值,避免當根自己比自己高
+hh = ta.highest(high, brkLen)[1]
+ll = ta.lowest(low,  brkLen)[1]
+
+longTrig  = allowLong  and bullRegime and close > hh
+shortTrig = allowShort and bearRegime and close < ll
+
+// ═══════════════ 倉位大小:由停損距離反推,固定風險 ═══════════════
+// qty = (權益 × 風險%) ÷ 停損距離  →  無論波動大小,打到停損都恰好虧 1R
+stopDist = atr * slMult
+qtyRisk  = stopDist > 0 ? (strategy.equity * riskPct / 100) / stopDist : 0.0
+qtyCap   = close > 0 ? strategy.equity * maxLev / close : 0.0
+qty      = math.min(qtyRisk, qtyCap)
+levNow   = close > 0 and strategy.equity > 0 ? qty * close / strategy.equity : 0.0
+
+// ═══════════════ 進場 ═══════════════
+if strategy.position_size == 0 and qty > 0 and not na(atr)
+    if longTrig
+        strategy.entry("L", strategy.long,  qty = qty, comment = "多")
+    else if shortTrig
+        strategy.entry("S", strategy.short, qty = qty, comment = "空")
+
+// ═══════════════ 出場:只有停損,沒有止盈 ═══════════════
+var float peakH   = na   // 進場後最高價
+var float troughL = na   // 進場後最低價
+var float stopLvl = na   // 停損位,單向棘輪
+var int   units   = 0    // 目前持有幾個單位
+var float lastAdd = na   // 上次進場/加碼的價格
+
+justOpen = strategy.position_size != 0 and nz(strategy.position_size[1]) == 0
+
+if strategy.position_size == 0
+    peakH   := na
+    troughL := na
+    stopLvl := na
+    units   := 0
+    lastAdd := na
+else
+    avg    = strategy.position_avg_price
+    isLong = strategy.position_size > 0
+    if justOpen
+        units   := 1
+        lastAdd := avg
+
+    if isLong
+        peakH := na(peakH) ? high : math.max(peakH, high)
+        if justOpen
+            stopLvl := avg - atr * slMult          // 進場當下鎖定初始停損
+        trail = peakH - atr * trMult               // 吊燈式移動停損
+        stopLvl := math.max(nz(stopLvl, trail), trail)   // 只上不下
+        // 金字塔加碼:順向每走 addStep 個 ATR 加一個單位
+        if units < maxUnits and not na(lastAdd) and close >= lastAdd + atr * addStep and qty > 0
+            strategy.entry("L", strategy.long, qty = qty, comment = "加碼" + str.tostring(units + 1))
+            units   := units + 1
+            lastAdd := close
+        strategy.exit("Lx", from_entry = "L", stop = stopLvl, comment = "停損")
+        if exitRegime and fast < slow
+            strategy.close("L", comment = "趨勢反轉")
+    else
+        troughL := na(troughL) ? low : math.min(troughL, low)
+        if justOpen
+            stopLvl := avg + atr * slMult
+        trail = troughL + atr * trMult
+        stopLvl := math.min(nz(stopLvl, trail), trail)   // 只下不上
+        if units < maxUnits and not na(lastAdd) and close <= lastAdd - atr * addStep and qty > 0
+            strategy.entry("S", strategy.short, qty = qty, comment = "加碼" + str.tostring(units + 1))
+            units   := units + 1
+            lastAdd := close
+        strategy.exit("Sx", from_entry = "S", stop = stopLvl, comment = "停損")
+        if exitRegime and fast > slow
+            strategy.close("S", comment = "趨勢反轉")
+
+// ═══════════════ 即時績效表:直接顯示「有沒有優勢」 ═══════════════
+ct = strategy.closedtrades
+wt = strategy.wintrades
+lt = strategy.losstrades
+winRate = ct > 0 ? wt / ct * 100.0 : na
+avgW    = wt > 0 ? strategy.grossprofit / wt : na
+avgL    = lt > 0 ? strategy.grossloss  / lt : na
+payoff  = (not na(avgL) and avgL > 0 and not na(avgW)) ? avgW / avgL : na          // 實際賠率
+needed  = (not na(winRate) and winRate > 0) ? (100.0 - winRate) / winRate : na     // 打平所需賠率
+pf      = strategy.grossloss > 0 ? strategy.grossprofit / strategy.grossloss : na
+edgeOK  = not na(payoff) and not na(needed) and payoff > needed
+
+var table tb = table.new(position.bottom_right, 2, 8, border_width = 1, border_color = color.new(color.gray, 60))
+headBg  = color.new(#1e222d, 0)
+goodBg  = color.new(color.green, 20)
+badBg   = color.new(color.red, 20)
+neutBg  = color.new(color.gray, 45)
+
+f2(x) => na(x) ? "—" : str.tostring(x, "#.##")
+
+if barstate.islast
+    table.cell(tb, 0, 0, "趨勢跟隨 v1", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 0, ct < 30 ? "樣本不足 (" + str.tostring(ct) + ")" : "n=" + str.tostring(ct), text_color = color.white, bgcolor = ct < 30 ? badBg : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 1, "勝率", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 1, na(winRate) ? "—" : f2(winRate) + "%", text_color = color.white, bgcolor = neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 2, "實際賠率", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 2, f2(payoff), text_color = color.white, bgcolor = edgeOK ? goodBg : badBg, text_size = size.small)
+
+    table.cell(tb, 0, 3, "打平需要", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 3, f2(needed), text_color = color.white, bgcolor = neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 4, "獲利因子", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 4, f2(pf), text_color = color.white, bgcolor = not na(pf) and pf > 1 ? goodBg : badBg, text_size = size.small)
+
+    table.cell(tb, 0, 5, "淨利 %", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 5, f2(strategy.netprofit / strategy.initial_capital * 100) + "%", text_color = color.white, bgcolor = strategy.netprofit > 0 ? goodBg : badBg, text_size = size.small)
+
+    table.cell(tb, 0, 6, "目前趨勢", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 6, bullRegime ? "多頭" : bearRegime ? "空頭" : "無趨勢", text_color = color.white, bgcolor = bullRegime ? goodBg : bearRegime ? badBg : neutBg, text_size = size.small)
+
+    table.cell(tb, 0, 7, "本次槓桿", text_color = color.white, bgcolor = headBg, text_size = size.small)
+    table.cell(tb, 1, 7, f2(levNow) + "x", text_color = color.white, bgcolor = neutBg, text_size = size.small)
+
+// ═══════════════ 繪圖 ═══════════════
+pFast = plot(fast, "快線", color = color.new(color.orange, 0), linewidth = 2)
+pSlow = plot(slow, "慢線", color = color.new(color.blue, 0),   linewidth = 2)
+fill(pFast, pSlow, color = bullRegime ? color.new(color.green, 88) : bearRegime ? color.new(color.red, 88) : color.new(color.gray, 94))
+
+plot(hh, "突破上緣", color = color.new(color.teal, 45), style = plot.style_stepline)
+plot(allowShort ? ll : na, "突破下緣", color = color.new(color.maroon, 45), style = plot.style_stepline)
+plot(strategy.position_size != 0 ? stopLvl : na, "停損位", color = color.new(color.red, 0), linewidth = 2, style = plot.style_linebr)
+
+plotshape(strategy.position_size > 0 and nz(strategy.position_size[1]) == 0, "做多", shape.labelup,   location.belowbar, color.new(color.green, 0),  text = "多", textcolor = color.white, size = size.small)
+plotshape(strategy.position_size < 0 and nz(strategy.position_size[1]) == 0, "做空", shape.labeldown, location.abovebar, color.new(color.maroon, 0), text = "空", textcolor = color.white, size = size.small)
+plotshape(strategy.position_size == 0 and nz(strategy.position_size[1]) != 0, "出場", shape.xcross,   location.absolute, color.new(color.yellow, 0), size = size.tiny)
