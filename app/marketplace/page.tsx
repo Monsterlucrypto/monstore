@@ -36,15 +36,30 @@ const F = {
 
 type FilterType = "全部" | "折價券" | "配件" | "Founder Pass" | "蝦皮";
 
-const products = [
+type Product = {
+  id: number;
+  name: string;
+  desc: string;
+  price: number;
+  tag: FilterType;
+  icon: string;
+  locked: boolean;
+  href?: string;
+  comingSoon?: boolean;
+  founderTier?: string;
+  art?: "zippo" | "charger";   // 有 art 就改用自繪圖示，不用 emoji
+};
+
+const products: Product[] = [
   // ── 蝦皮 ──
   { id: 8, name: "配合的蝦皮商城",     desc: "會員私訊都可以用更優惠的價格購買哦~",          price: 0,     tag: "蝦皮",        icon: "🛒", locked: false, href: "https://s.shopee.tw/9zvWcmlEOB" },
   // ── 折價券 ──
-  { id: 1, name: "NT$250 折價券",      desc: "低消 NT$1,000 適用，每筆訂單限用一張",        price: 40,    tag: "折價券",      icon: "🎟️", locked: false },
-  { id: 2, name: "NT$500 折價券",      desc: "低消 NT$2,000 適用，每筆訂單限用一張",        price: 70,    tag: "折價券",      icon: "🎫", locked: false },
+  { id: 1, name: "NT$250 折價券",      desc: "低消 NT$1,000 適用，每筆訂單限用一張",        price: 100,   tag: "折價券",      icon: "🎟️", locked: false },
+  { id: 2, name: "NT$500 折價券",      desc: "低消 NT$2,000 適用，每筆訂單限用一張",        price: 180,   tag: "折價券",      icon: "🎫", locked: false },
   // ── 配件 ──
-  { id: 3, name: "30cm Type-C 充電線", desc: "Type-C to Type-C，30cm 短線，編織材質",       price: 40,    tag: "配件",        icon: "🔌", locked: false },
-  { id: 4, name: "20W 充電頭",         desc: "GaN 20W 快充充電頭，支援 PD 快充協議",         price: 100,   tag: "配件",        icon: "🔋", locked: false },
+  { id: 10, name: "客製化 ZIPPO 禮盒", desc: "Monstore 標誌客製打火機，附原廠打火機油與打火石", price: 1000, tag: "配件",       icon: "🔥", locked: false, art: "zippo" },
+  { id: 3, name: "30cm Type-C 充電線", desc: "Type-C to Type-C，30cm 短線，編織材質",       price: 20,    tag: "配件",        icon: "🔌", locked: false },
+  { id: 4, name: "20W 充電頭",         desc: "GaN 20W 快充充電頭，支援 PD 快充協議",         price: 150,   tag: "配件",        icon: "🔋", locked: false, art: "charger" },
   { id: 9, name: "神秘小禮物",         desc: "敬請期待即將推出",                              price: 0,     tag: "配件",        icon: "🥃", locked: false, comingSoon: true },
   // ── Founder Pass ──
   { id: 5, name: "M Founder Pass",     desc: "Monstore 創始會員 M 等級，240 Reward Units，永久 Founder 權益", price: 12000, tag: "Founder Pass", icon: "◆", locked: false, founderTier: "M" },
@@ -57,6 +72,69 @@ const orders: { id: string; date: string; item: string; points: number; status: 
 // ════════════════════════════════════════════════════════════
 // 共用元件
 // ════════════════════════════════════════════════════════════
+
+// Monstore 大象標誌（單線條，比照 logo.png）
+function MonstoreMark({ color = "#E8C96A", width = 24, strokeWidth = 34 }: { color?: string; width?: number; strokeWidth?: number }) {
+  return (
+    <svg width={width} height={width * (400 / 720)} viewBox="0 0 720 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none">
+        <path d="M15,20 H515 V390 H380 V305 H245 V390 H102 V305 H15 Z" />
+        <circle cx="138" cy="173" r="72" />
+        <path d="M515,200 a20,20 0 1,1 28,0 a20,20 0 1,1 28,0 a20,20 0 1,1 28,0 a22,22 0 1,1 30,0 c12,0 22,-8 22,-24" />
+      </g>
+    </svg>
+  );
+}
+
+// 客製化 ZIPPO 打火機（卡通版）
+function ZippoArt() {
+  return (
+    <svg width="76" height="106" viewBox="0 0 80 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="zp_body" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3c3c43" />
+          <stop offset="45%" stopColor="#232329" />
+          <stop offset="100%" stopColor="#141418" />
+        </linearGradient>
+      </defs>
+
+      {/* 機身 */}
+      <rect x="10" y="4" width="60" height="104" rx="8" fill="url(#zp_body)" stroke="rgba(232,201,106,0.4)" strokeWidth="1.2" />
+      {/* 上蓋接縫 + 鉸鏈 */}
+      <path d="M10,35 H70" stroke="rgba(232,201,106,0.3)" strokeWidth="1.2" />
+      <rect x="12" y="31" width="9" height="8" rx="2" fill="#2c2c33" stroke="rgba(232,201,106,0.3)" strokeWidth="0.8" />
+      {/* Monstore 標誌 */}
+      <g transform="translate(20,60)">
+        <MonstoreMark width={40} strokeWidth={30} />
+      </g>
+    </svg>
+  );
+}
+
+// 20W 充電頭（豆腐頭）
+function ChargerArt() {
+  return (
+    <svg width="84" height="92" viewBox="0 0 100 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="chg_body" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#fbfbfc" />
+          <stop offset="60%" stopColor="#e6e6ea" />
+          <stop offset="100%" stopColor="#c9c9cf" />
+        </linearGradient>
+        <linearGradient id="chg_pin" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#d9d9de" />
+          <stop offset="100%" stopColor="#a8a8b0" />
+        </linearGradient>
+      </defs>
+      {/* 插腳 */}
+      <rect x="35" y="6" width="8" height="20" rx="2" fill="url(#chg_pin)" />
+      <rect x="57" y="6" width="8" height="20" rx="2" fill="url(#chg_pin)" />
+      {/* 機身 */}
+      <rect x="16" y="24" width="68" height="72" rx="10" fill="url(#chg_body)" stroke="rgba(0,0,0,0.18)" strokeWidth="1" />
+      <path d="M25,32 Q28,28 36,28" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -191,6 +269,10 @@ function ProductGrid({ member }: { member: Member | null }) {
                   </svg>
                   <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 16, fontWeight: 700, color: "#E8C96A", letterSpacing: 3 }}>{p.founderTier} ACCESS</span>
                 </div>
+              ) : p.art === "zippo" ? (
+                <ZippoArt />
+              ) : p.art === "charger" ? (
+                <ChargerArt />
               ) : (
                 <span style={{ opacity: p.locked ? 0.4 : 1 }}>{p.icon}</span>
               )}
