@@ -18,7 +18,11 @@ export const SCENARIO_REVENUES: { revenue: number; label?: string }[] = [
   { revenue: 1500 },
   { revenue: 5000 },
 ];
-export const SCENARIO_CIRCULATING_UNITS = [200, 1000, 10000];
+export const SCENARIO_CIRCULATING_UNITS: { units: number; label?: string }[] = [
+  { units: 20, label: "你獨得" },
+  { units: 200 },
+  { units: 1000 },
+];
 
 export const SCENARIO_NOTE =
   "上表為試算，非承諾。實際回饋金額依當期平台實際營收與流通中總 units 計算。流通 units 增加時，單張回饋比例下降；平台會員規模擴大時，營收亦隨之成長，兩者互為連動。";
@@ -36,11 +40,19 @@ export const GIFT_ITEMS: { icon: string; name: string; desc: string }[] = [
 export const GIFT_NOTE =
   "創始批限定。實體禮品項與寄送方式將另行通知，數量有限、贈完為止。";
 
+// ─── 回饋發放 ───────────────────────────────────────────────
+export const PAYOUT_DAY = 1;          // 每月發放日
+export const PAYOUT_CUTOFF_DAY = 10;  // 當月生效的購買截止日
+
 // ─── Founder Pass 條款 ──────────────────────────────────────
 export const FOUNDER_TERMS: { title: string; body: string }[] = [
   {
     title: "回饋機制",
     body: `平台營收之 ${REWARD_POOL_RATE * 100}% 進入回饋池，由 Founder Pass 持有者依其 Reward Units 佔流通中總 units 之比例分配。`,
+  },
+  {
+    title: "回饋發放",
+    body: `Founder Pass 會員專屬回饋於每月 ${PAYOUT_DAY} 號統一發放至持有者的 UID 帳戶。當月 ${PAYOUT_CUTOFF_DAY} 號（含）以前購買者，自次月 ${PAYOUT_DAY} 號起首次發放；${PAYOUT_CUTOFF_DAY} 號以後購買者，併入下一個月起算。例：8/9 購買於 9/${PAYOUT_DAY} 發放，8/11 購買於 10/${PAYOUT_DAY} 發放。`,
   },
   {
     title: "回饋上限",

@@ -535,7 +535,7 @@ function MembershipUnits() {
 
 function ScenarioTable() {
   const cfg = FOUNDER_CONFIG[SCENARIO_TIER];
-  const fmt = (n: number) => `$${n.toFixed(2)}`;
+  const fmt = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   return (
     <div style={{ background: C.bgCard, border: `0.5px solid ${C.borderSubtle}`, borderRadius: 16, padding: 32 }} className="content-pad">
       <div style={{ marginBottom: 20 }}>
@@ -553,9 +553,12 @@ function ScenarioTable() {
               <th style={{ textAlign: "left", padding: "10px 14px", fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${C.borderMid}`, whiteSpace: "nowrap" }}>
                 平台月營收
               </th>
-              {SCENARIO_CIRCULATING_UNITS.map((u) => (
-                <th key={u} style={{ textAlign: "right", padding: "10px 14px", fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${C.borderMid}`, whiteSpace: "nowrap" }}>
-                  流通 {u.toLocaleString()} units
+              {SCENARIO_CIRCULATING_UNITS.map((c) => (
+                <th key={c.units} style={{ textAlign: "right", padding: "10px 14px", fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontWeight: 500, borderBottom: `0.5px solid ${C.borderMid}`, whiteSpace: "nowrap" }}>
+                  流通 {c.units.toLocaleString()} units
+                  {c.label && (
+                    <span style={{ color: C.gold, letterSpacing: 0.5, textTransform: "none", marginLeft: 6 }}>（{c.label}）</span>
+                  )}
                 </th>
               ))}
             </tr>
@@ -569,9 +572,9 @@ function ScenarioTable() {
                     <span style={{ fontSize: 12, color: C.gold, marginLeft: 8, fontFamily: F.body }}>（{r.label}）</span>
                   )}
                 </td>
-                {SCENARIO_CIRCULATING_UNITS.map((u) => (
-                  <td key={u} style={{ padding: "12px 14px", textAlign: "right", borderBottom: `0.5px solid ${C.borderSubtle}`, fontFamily: F.mono, fontSize: 14, color: C.goldLight, whiteSpace: "nowrap" }}>
-                    {fmt(monthlyReward(r.revenue, cfg.rewardUnits, u))}
+                {SCENARIO_CIRCULATING_UNITS.map((c) => (
+                  <td key={c.units} style={{ padding: "12px 14px", textAlign: "right", borderBottom: `0.5px solid ${C.borderSubtle}`, fontFamily: F.mono, fontSize: 14, color: C.goldLight, whiteSpace: "nowrap" }}>
+                    {fmt(monthlyReward(r.revenue, cfg.rewardUnits, c.units))}
                   </td>
                 ))}
               </tr>
