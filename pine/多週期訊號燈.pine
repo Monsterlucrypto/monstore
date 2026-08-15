@@ -1,0 +1,263 @@
+//@version=6
+// ════════════════════════════════════════════════════════════════════
+// 多週期訊號燈 v4 —— 純表格指標
+//
+//   ① 收在 EMA100 之上
+//   ② 收在 價值區間 (VAL / VAH) 之上
+//   ③ 放量吞沒訊號有效中
+//   ④ 收在 POC 之上
+//   ⑤ 回撤觸及 Fib① 後站穩
+//   ⑥ 回撤觸及 Fib② 後站穩
+//
+// 星等 = 該週期亮幾個綠燈 (最多 ★×6)
+// 高週期值一律取「上一根已收盤」,不重繪
+// 「無資料」= 該指標算不出來(非紅燈),用來區分故障與真實訊號
+//
+// ⚠ 效能:每個啟用的週期都要跑一次完整 Volume Profile。
+//    取消勾選的週期會「完全跳過運算」,不只是不顯示。
+//    卡頓時依序調:取消不需要的週期 → 重算間隔調大 → 回溯 K 棒數調小
+// ════════════════════════════════════════════════════════════════════
+indicator("多週期訊號燈 v4", overlay = true, max_bars_back = 500)
+
+// ═══════════════ 顯示週期 ═══════════════
+gTF = "顯示週期 (取消勾選 = 跳過運算)"
+show15 = input.bool(true, "15 分", group = gTF)
+show1H = input.bool(true, "1 小時", group = gTF)
+show4H = input.bool(true, "4 小時", group = gTF)
+show1D = input.bool(true, "日線",  group = gTF)
+
+// ═══════════════ ① EMA ═══════════════
+g1 = "① EMA"
+emaLen = input.int(100, "EMA 週期", minval = 2, group = g1)
+
+// ═══════════════ ②④ Volume Profile ═══════════════
+g2 = "②④ Volume Profile"
+vpLook  = input.int(200, "回溯 K 棒數", minval = 50, maxval = 500, group = g2)
+vpRows  = input.int(20,  "價格分層數", minval = 10, maxval = 40, group = g2)
+vaPct   = input.float(70, "價值區間 %", minval = 40, maxval = 90, step = 5, group = g2)
+vpEvery = input.int(10,  "重算間隔 (卡頓就調大)", minval = 1, maxval = 50, group = g2)
+vaMode  = input.string("收在 VAL 之上", "② 綠燈條件", options = ["收在 VAH 之上", "收在 VAL 之上"], group = g2)
+
+// ═══════════════ ③ 放量吞沒 ═══════════════
+g3 = "③ 放量吞沒"
+volMAlen   = input.int(20,   "均量週期", group = g3)
+volMult    = input.float(1.3, "誘空棒放量倍數", minval = 1.0, step = 0.1, group = g3)
+volMultCfm = input.float(1.1, "吞沒棒放量倍數", minval = 1.0, step = 0.1, group = g3)
+wickMult   = input.float(2.0, "長上影線 = 實體幾倍", minval = 1.0, step = 0.5, group = g3)
+solidPct   = input.float(0.7, "實心K實體佔比", minval = 0.5, maxval = 1.0, step = 0.05, group = g3)
+engulfWin  = input.int(3, "吞沒視窗 (誘空棒後幾根內)", minval = 1, maxval = 5, group = g3)
+sigValid   = input.int(5, "訊號有效根數 (綠燈維持)", minval = 1, group = g3)
+
+// ═══════════════ ⑤⑥ 斐波那契:觸及後站穩 ═══════════════
+g4 = "⑤⑥ 斐波那契 (觸及後站穩)"
+swingLen    = input.int(300, "取樣 K 棒數 (找波段高低點)", minval = 50, maxval = 500, group = g4)
+fibR1       = input.float(0.382, "⑤ 比例", minval = 0.1, maxval = 0.95, step = 0.001, group = g4)
+fibR2       = input.float(0.5,   "⑥ 比例", minval = 0.1, maxval = 0.95, step = 0.001, group = g4)
+fibTouchWin = input.int(10, "觸及後幾根內仍有效", minval = 1, maxval = 50, group = g4)
+fibHoldBars = input.int(2,  "站穩需連續幾根收在其上", minval = 1, maxval = 10, group = g4)
+
+// ═══════════════ 顯示 ═══════════════
+g5 = "顯示"
+lineTF    = input.string("4 小時", "圖上參考線取自哪個週期", options = ["15 分", "1 小時", "4 小時", "日線"], group = g5)
+showLine  = input.bool(true, "畫出 POC / VAL / VAH / Fib", group = g5)
+starGoal  = input.int(4, "幾顆星算達標 (表格標金黃)", minval = 1, maxval = 6, group = g5)
+tblSize   = input.string("normal", "表格字級", options = ["small", "normal", "large"], group = g5)
+tblPos    = input.string("右下", "表格位置", options = ["右下", "左下", "右上", "左上"], group = g5)
+
+// ════════════════════════════════════════════════════════════════════
+// 核心計算   active = false 時跳過整個 Volume Profile 迴圈
+// ════════════════════════════════════════════════════════════════════
+calc(active) =>
+    // ─── ① EMA ───
+    s1 = close > ta.ema(close, emaLen)
+
+    // ─── ②④ Volume Profile → POC / VAL / VAH ───
+    hiR = ta.highest(high, vpLook)
+    loR = ta.lowest(low,  vpLook)
+    var float poc = na
+    var float val = na
+    var float vah = na
+    var int   lastBk = -1
+    // 以「絕對時間」分桶決定重算時機。若用 bar_index,不同圖表週期載入的根數不同,
+    // 同一根 K 棒編號會不一樣 → 重算時機錯開 → 各週期顯示的 POC/VAL/VAH 不一致
+    bkSize = vpEvery * timeframe.in_seconds() * 1000
+    bk = bkSize > 0 ? int(time / bkSize) : 0
+
+    if active and (na(poc) or bk != lastBk)
+        lastBk := bk
+        st = (hiR - loR) / vpRows
+        if not na(st) and st > 0
+            vols = array.new_float(vpRows, 0.0)
+            tot  = 0.0
+            for i = 0 to vpLook - 1
+                bv = volume[i]
+                if not na(bv) and bv > 0
+                    i0 = math.max(0, math.min(vpRows - 1, int(math.floor((low[i]  - loR) / st))))
+                    i1 = math.max(0, math.min(vpRows - 1, int(math.floor((high[i] - loR) / st))))
+                    sh = bv / (i1 - i0 + 1)
+                    for j = i0 to i1
+                        array.set(vols, j, array.get(vols, j) + sh)
+                    tot := tot + bv
+
+            // POC = 成交量最大的價格層
+            pIdx = 0
+            mx   = array.get(vols, 0)
+            for k = 1 to vpRows - 1
+                if array.get(vols, k) > mx
+                    mx   := array.get(vols, k)
+                    pIdx := k
+
+            // 價值區間:自 POC 向外擴張,每次併入成交量較大的一側
+            tgt = tot * vaPct / 100.0
+            acc = array.get(vols, pIdx)
+            lo  = pIdx
+            hi  = pIdx
+            for _r = 1 to vpRows
+                if acc < tgt
+                    cL = lo > 0
+                    cH = hi < vpRows - 1
+                    if cL or cH
+                        vB = cL ? array.get(vols, lo - 1) : -1.0
+                        vA = cH ? array.get(vols, hi + 1) : -1.0
+                        if cH and vA >= vB
+                            hi  := hi + 1
+                            acc := acc + vA
+                        else if cL
+                            lo  := lo - 1
+                            acc := acc + vB
+
+            poc := loR + (pIdx + 0.5) * st
+            val := loR + lo * st
+            vah := loR + (hi + 1) * st
+
+    s2 = vaMode == "收在 VAH 之上" ? (not na(vah) and close > vah) : (not na(val) and close > val)
+    s4 = not na(poc) and close > poc
+
+    // ─── ③ 放量吞沒 ───
+    vMA = ta.sma(volume, volMAlen)
+    bdy = math.abs(close - open)
+    rg  = high - low
+    uW  = high - math.max(open, close)
+    hv  = volume > vMA * volMult
+    hvC = volume > vMA * volMultCfm
+    setupL = hv and close < open and (uW >= bdy * wickMult or (rg > 0 and bdy >= rg * solidPct))
+    bool fire = false
+    if close > open and hvC
+        for n = 1 to engulfWin
+            if setupL[n] and close > open[n]
+                fire := true
+    s3 = nz(ta.barssince(fire), 99999) <= sigValid - 1
+
+    // ─── ⑤⑥ 斐波那契:回撤觸及 → 重新站穩 ───
+    swH   = ta.highest(high, swingLen)
+    swL   = ta.lowest(low,  swingLen)
+    upLeg = ta.highestbars(high, swingLen) > ta.lowestbars(low, swingLen)
+    swRng = swH - swL
+    fib1 = swRng > 0 ? (upLeg ? swH - swRng * fibR1 : swL + swRng * fibR1) : na
+    fib2 = swRng > 0 ? (upLeg ? swH - swRng * fibR2 : swL + swRng * fibR2) : na
+
+    var int since1 = 9999
+    var int hold1  = 0
+    since1 := (not na(fib1) and low  <= fib1) ? 0 : since1 + 1
+    hold1  := (not na(fib1) and close > fib1) ? hold1 + 1 : 0
+    s5 = since1 <= fibTouchWin and hold1 >= fibHoldBars
+
+    var int since2 = 9999
+    var int hold2  = 0
+    since2 := (not na(fib2) and low  <= fib2) ? 0 : since2 + 1
+    hold2  := (not na(fib2) and close > fib2) ? hold2 + 1 : 0
+    s6 = since2 <= fibTouchWin and hold2 >= fibHoldBars
+
+    // 全部往前挪一根 → 只回傳已收盤的值,不重繪
+    [s1[1], s2[1], s3[1], s4[1], s5[1], s6[1], poc[1], val[1], vah[1], fib1[1], fib2[1]]
+
+// ════════════════════════════════════════════════════════════════════
+// 四個週期   沒勾選也不是參考線來源 → 傳入 false,跳過運算
+// ════════════════════════════════════════════════════════════════════
+need15 = show15 or lineTF == "15 分"
+need1H = show1H or lineTF == "1 小時"
+need4H = show4H or lineTF == "4 小時"
+need1D = show1D or lineTF == "日線"
+
+LA = barmerge.lookahead_on
+[a1,a2,a3,a4,a5,a6, aPoc,aVal,aVah, aF1,aF2] = request.security(syminfo.tickerid, "15",  calc(need15), lookahead = LA)
+[b1,b2,b3,b4,b5,b6, bPoc,bVal,bVah, bF1,bF2] = request.security(syminfo.tickerid, "60",  calc(need1H), lookahead = LA)
+[c1,c2,c3,c4,c5,c6, cPoc,cVal,cVah, cF1,cF2] = request.security(syminfo.tickerid, "240", calc(need4H), lookahead = LA)
+[d1,d2,d3,d4,d5,d6, dPoc,dVal,dVah, dF1,dF2] = request.security(syminfo.tickerid, "D",   calc(need1D), lookahead = LA)
+
+cnt(x1,x2,x3,x4,x5,x6) => (x1?1:0)+(x2?1:0)+(x3?1:0)+(x4?1:0)+(x5?1:0)+(x6?1:0)
+nA = cnt(a1,a2,a3,a4,a5,a6)
+nB = cnt(b1,b2,b3,b4,b5,b6)
+nC = cnt(c1,c2,c3,c4,c5,c6)
+nD = cnt(d1,d2,d3,d4,d5,d6)
+
+isLT(s) => lineTF == s
+lnPoc = isLT("15 分") ? aPoc : isLT("1 小時") ? bPoc : isLT("4 小時") ? cPoc : dPoc
+lnVal = isLT("15 分") ? aVal : isLT("1 小時") ? bVal : isLT("4 小時") ? cVal : dVal
+lnVah = isLT("15 分") ? aVah : isLT("1 小時") ? bVah : isLT("4 小時") ? cVah : dVah
+lnF1  = isLT("15 分") ? aF1  : isLT("1 小時") ? bF1  : isLT("4 小時") ? cF1  : dF1
+lnF2  = isLT("15 分") ? aF2  : isLT("1 小時") ? bF2  : isLT("4 小時") ? cF2  : dF2
+
+// ════════════════════════════════════════════════════════════════════
+// 表格
+// ════════════════════════════════════════════════════════════════════
+star(n) => n >= 6 ? "★★★★★★" : n == 5 ? "★★★★★" : n == 4 ? "★★★★" : n == 3 ? "★★★" : n == 2 ? "★★" : n == 1 ? "★" : "—"
+
+sz  = tblSize == "small" ? size.small : tblSize == "large" ? size.large : size.normal
+pos = tblPos == "左下" ? position.bottom_left : tblPos == "右上" ? position.top_right : tblPos == "左上" ? position.top_left : position.bottom_right
+
+var table tb = table.new(pos, 5, 8, border_width = 1, border_color = color.new(color.gray, 60))
+headBg  = color.new(#1e222d, 0)
+greenBg = color.new(color.green, 15)
+redBg   = color.new(color.red, 25)
+goldBg  = color.new(color.orange, 20)
+grayBg  = color.new(color.gray, 45)
+naBg    = color.new(color.purple, 40)
+
+cell(col, row, txt, bg) => table.cell(tb, col, row, txt, text_color = color.white, bgcolor = bg, text_size = sz)
+starCell(col, n) => table.cell(tb, col, 0, star(n), text_color = color.yellow, bgcolor = n >= starGoal ? goldBg : grayBg, text_size = sz)
+// ok = false → 該指標算不出來,顯示「無資料」以區分故障與真實紅燈
+lampCell(col, row, b, ok) => table.cell(tb, col, row, not ok ? "無資料" : b ? "綠" : "紅", text_color = color.white, bgcolor = not ok ? naBg : b ? greenBg : redBg, text_size = sz)
+
+drawCol(col, tfName, n, x1, x2, x3, x4, x5, x6, vpOK, fibOK, isLine) =>
+    starCell(col, n)
+    cell(col, 1, tfName + (isLine ? " ◀" : ""), headBg)
+    lampCell(col, 2, x1, true)
+    lampCell(col, 3, x2, vpOK)
+    lampCell(col, 4, x3, true)
+    lampCell(col, 5, x4, vpOK)
+    lampCell(col, 6, x5, fibOK)
+    lampCell(col, 7, x6, fibOK)
+
+if barstate.islast
+    cell(0, 0, "★ 評分", headBg)
+    cell(0, 1, "週期", headBg)
+    cell(0, 2, "① EMA" + str.tostring(emaLen), headBg)
+    cell(0, 3, "② " + (vaMode == "收在 VAH 之上" ? "VAH" : "VAL"), headBg)
+    cell(0, 4, "③ 放量吞沒", headBg)
+    cell(0, 5, "④ POC", headBg)
+    cell(0, 6, "⑤ Fib " + str.tostring(fibR1), headBg)
+    cell(0, 7, "⑥ Fib " + str.tostring(fibR2), headBg)
+
+    col = 0
+    if show15
+        col += 1
+        drawCol(col, "15分",  nA, a1,a2,a3,a4,a5,a6, not na(aPoc), not na(aF1), isLT("15 分"))
+    if show1H
+        col += 1
+        drawCol(col, "1小時", nB, b1,b2,b3,b4,b5,b6, not na(bPoc), not na(bF1), isLT("1 小時"))
+    if show4H
+        col += 1
+        drawCol(col, "4小時", nC, c1,c2,c3,c4,c5,c6, not na(cPoc), not na(cF1), isLT("4 小時"))
+    if show1D
+        col += 1
+        drawCol(col, "日線",  nD, d1,d2,d3,d4,d5,d6, not na(dPoc), not na(dF1), isLT("日線"))
+
+// ════════════════════════════════════════════════════════════════════
+// 圖上參考線
+// ════════════════════════════════════════════════════════════════════
+plot(showLine ? lnPoc : na, "POC", color = color.new(color.red, 20),    linewidth = 2, style = plot.style_linebr)
+plot(showLine ? lnVah : na, "VAH", color = color.new(color.teal, 30),   linewidth = 1, style = plot.style_linebr)
+plot(showLine ? lnVal : na, "VAL", color = color.new(color.orange, 10), linewidth = 2, style = plot.style_linebr)
+plot(showLine ? lnF1  : na, "Fib ⑤", color = color.new(color.yellow, 0),  linewidth = 1, style = plot.style_linebr)
+plot(showLine ? lnF2  : na, "Fib ⑥", color = color.new(color.fuchsia, 0), linewidth = 1, style = plot.style_linebr)
